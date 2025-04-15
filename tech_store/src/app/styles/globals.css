@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+.custom-dots .ant-carousel .slick-dots li button {
+  background: #d9d9d9;
+  opacity: 0.5;
+}
+
+.custom-dots .ant-carousel .slick-dots li.slick-active button {
+  background: #1890ff;
+  opacity: 1;
+}
+
+.rounded-button {
+  border-radius: 9999px !important;
+}
+
+.customer-reviews-swiper .swiper-pagination-bullet {
+  background: #d9d9d9;
+}
+
+.customer-reviews-swiper .swiper-pagination-bullet-active {
+  background: #1890ff;
+}
