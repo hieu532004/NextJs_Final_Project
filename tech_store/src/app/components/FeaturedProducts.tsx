@@ -1,4 +1,3 @@
-// src/app/components/FeaturedProducts.tsx
 'use client';
 
 import { Button, Card, Rate, notification } from 'antd';
@@ -52,13 +51,15 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
           Sản phẩm nổi bật
           <span className="absolute -bottom-2 left-0 w-16 h-1 bg-blue-600"></span>
         </h2>
-        <Button
-          type="primary"
-          className="bg-blue-600 hover:bg-blue-700 !rounded-full px-6"
-          icon={<RightOutlined />}
-        >
-          Xem tất cả
-        </Button>
+        <Link href="/products">
+          <Button
+            type="primary"
+            className="bg-blue-600 hover:bg-blue-700 !rounded-full px-6"
+            icon={<RightOutlined />}
+          >
+            Xem tất cả
+          </Button>
+        </Link>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {products.length === 0 ? (

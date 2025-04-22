@@ -378,6 +378,7 @@
         {
           "_id": "68b1fao155n3ln13o5n30mru",
           "id": 1,
+          "product_id": "68b1f4h599h7fh57i9h74glm", 
           "name": "Nguyễn Thành",
           "rating": 5,
           "comment": "Tôi đã mua một chiếc laptop từ TechStore và tôi rất hài lòng với chất lượng sản phẩm cũng như dịch vụ khách hàng. Giao hàng nhanh và đúng hẹn.",
@@ -388,6 +389,7 @@
         {
           "_id": "68b1fao155n3ln13o5n30mrv",
           "id": 2,
+          "product_id": "68b1f4h599h7fh57i9h74glm", 
           "name": "Trần Hương",
           "rating": 5,
           "comment": "Giá cả rất cạnh tranh và chính sách bảo hành rất tốt. Nhân viên tư vấn nhiệt tình, am hiểu sản phẩm. Chắc chắn sẽ quay lại mua sắm.",
@@ -398,6 +400,7 @@
         {
           "_id": "68b1fao155n3ln13o5n30mrw",
           "id": 3,
+          "product_id": "68b1f4h599h7fh57i9h74glo", 
           "name": "Phạm Linh",
           "rating": 4,
           "comment": "Tôi đã mua một bộ gaming gear từ TechStore. Sản phẩm chính hãng, chất lượng tốt. Chỉ tiếc là thời gian giao hàng hơi lâu một chút.",
@@ -408,16 +411,92 @@
         {
           "_id": "68b1fao155n3ln13o5n30mrx",
           "id": 4,
-          "name": "Lê Minh",
+          "product_id": "68b1f4h599h7fh57i9h74glp", 
           "rating": 5,
           "comment": "Đã mua bàn phím cơ tại đây và rất hài lòng. Sản phẩm đúng như mô tả, đóng gói cẩn thận. Sẽ tiếp tục ủng hộ shop trong tương lai.",
           "avatar": "LM",
           "created_at": "2025-04-13T08:00:00Z",
           "__v": 0
+        },
+        {
+          "_id": "68b1fao155n3ln13o5n30mry",
+          "id": 5,
+          "product_id": "68b1f4h599h7fh57i9h74glm", 
+          "name": "Hoàng Anh",
+          "rating": 4.5,
+          "comment": "MacBook Air M2 thật sự ấn tượng với thiết kế mỏng nhẹ và hiệu năng mạnh mẽ. Màn hình Retina rất đẹp, nhưng giá hơi cao.",
+          "avatar": "HA",
+          "created_at": "2025-04-14T15:00:00Z",
+          "__v": 0
+        },
+        {
+          "_id": "68b1fao155n3ln13o5n30mrz",
+          "id": 6,
+          "product_id": "68b1f4h599h7fh57i9h74glm", 
+          "name": "Đỗ Quang",
+          "rating": 4,
+          "comment": "Sản phẩm tốt, pin lâu, nhưng mình mong có thêm cổng kết nối. Dịch vụ giao hàng nhanh, đóng gói cẩn thận.",
+          "avatar": "DQ",
+          "created_at": "2025-04-15T11:00:00Z",
+          "__v": 0
+        },
+        {
+          "_id": "68b1fao155n3ln13o5n30ms0",
+          "id": 7,
+          "product_id": "68b1f4h599h7fh57i9h74gln",
+          "name": "Vũ Hoàng",
+          "rating": 4.5,
+          "comment": "Laptop chơi game rất tốt, đồ họa mượt mà, nhưng hơi nặng. Giá sale rất hợp lý, cảm ơn TechStore!",
+          "avatar": "VH",
+          "created_at": "2025-04-16T09:00:00Z",
+          "__v": 0
+        },
+        {
+          "_id": "68b1fao155n3ln13o5n30ms1",
+          "id": 8,
+          "product_id": "68b1f4h599h7fh57i9h74glq", 
+          "name": "Ngọc Mai",
+          "rating": 5,
+          "comment": "Tai nghe chất lượng tuyệt vời, chống ồn tốt, âm thanh rõ nét. Đáng giá từng đồng!",
+          "avatar": "NM",
+          "created_at": "2025-04-17T13:00:00Z",
+          "__v": 0
+        },
+        {
+          "_id": "68b1fao155n3ln13o5n30ms2",
+          "id": 9,
+          "product_id": "68b1f4h599h7fh57i9h74glr", 
+          "name": "Minh Tuấn",
+          "rating": 4,
+          "comment": "Balo đẹp, nhiều ngăn tiện lợi, nhưng chất liệu không quá dày. Dùng tạm ổn cho laptop 15 inch.",
+          "avatar": "MT",
+          "created_at": "2025-04-18T10:00:00Z",
+          "__v": 0
+        },
+        {
+          "_id": "68b1fao155n3ln13o5n30ms3",
+          "id": 10,
+          "product_id": "68b1f4h599h7fh57i9h74gls", 
+          "name": "Thanh Hằng",
+          "rating": 5,
+          "comment": "Màn hình 4K rất đẹp, màu sắc chuẩn, phù hợp cho công việc thiết kế. Giao hàng nhanh, đóng gói kỹ càng.",
+          "avatar": "TH",
+          "created_at": "2025-04-19T14:00:00Z",
+          "__v": 0
+        },
+        {
+          "_id": "68b1fao155n3ln13o5n30ms4",
+          "id": 11,
+          "product_id": "68b1f4h599h7fh57i9h74glt",
+          "rating": 4.5,
+          "comment": "Cáp sạc bền, sạc nhanh, giá hợp lý. Rất hài lòng với sản phẩm của Anker.",
+          "avatar": "BN",
+          "created_at": "2025-04-20T12:00:00Z",
+          "__v": 0
         }
       ],
       "pagination": {
-        "totalRecord": 4,
+        "totalRecord": 11,
         "limit": 10,
         "page": 1
       }
@@ -425,7 +504,9 @@
   },
   "cart": {
     "items": [
-      { "product_id": "68b1f4h599h7fh57i9h74glm", "quantity": 2 }
+      { "product_id": "68b1f4h599h7fh57i9h74glm", "quantity": 2 }, 
+      { "product_id": "68b1f4h599h7fh57i9h74glo", "quantity": 1 }, 
+      { "product_id": "68b1f4h599h7fh57i9h74glq", "quantity": 1 }  
     ]
   }
 }

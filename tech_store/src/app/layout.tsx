@@ -1,6 +1,6 @@
-// app/layout.tsx
-
+import { CartProvider } from './contexts/CartContext';
 import './styles/globals.css';
+
 export const metadata = {
   title: 'TechStore - Mua sắm công nghệ',
   description: 'Cửa hàng công nghệ với sản phẩm chất lượng cao.',
@@ -9,7 +9,11 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi">
-      <body>{children}</body>
+      <body>
+        <CartProvider>
+          {children}
+        </CartProvider>
+      </body>
     </html>
   );
 }
