@@ -249,7 +249,7 @@
           "title": "Gaming Gear Sale",
           "description": "Giảm đến 30% cho các sản phẩm gaming",
           "buttonText": "Khám phá ngay",
-          "image": "https://readdy.ai/api/search-image?query=Gaming%20peripherals%20collection%20including%20keyboard%2C%20mouse%2C%20headset%20with%20RGB%20lighting%2C%20gradient%20blue%20background%20fading%20to%20white%20on%20the%20left%20side%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%20 Lithuanian%20texture%2C%20commercial%20quality%2C%20perfect%20for%20website%20hero%20banner&width=800&height=400&seq=10&orientation=landscape",
+          "image": "https://cdn.tgdd.vn//News/1173869//23-730x408-1.jpg",
           "link": "/khuyen-mai/gaming-gear-sale",
           "is_active": true,
           "start_date": "2025-04-10T00:00:00Z",
@@ -293,7 +293,7 @@
         {
           "_id": "68b1fbp266o4mo24p6o41nsx",
           "name": "Dell",
-          "icon": "fab fa-dell",
+          "icon": "fas fa-laptop-code",
           "slug": "dell",
           "logo_url": "https://example.com/images/dell-logo.jpg",
           "__v": 0
@@ -301,7 +301,7 @@
         {
           "_id": "68b1fbp266o4mo24p6o41nsy",
           "name": "HP",
-          "icon": "fab fa-hp",
+          "icon": "fas fa-desktop",
           "slug": "hp",
           "logo_url": "https://example.com/images/hp-logo.jpg",
           "__v": 0

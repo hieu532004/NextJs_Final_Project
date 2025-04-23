@@ -48,7 +48,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
   return (
     <section className="container mx-auto px-4 py-12">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-semibold text-gray-900 relative">
+        <h2 className="text-2xl font-bold text-gray-800 relative">
           Sản phẩm nổi bật
           <span className="absolute -bottom-2 left-0 w-16 h-1 bg-blue-600"></span>
         </h2>

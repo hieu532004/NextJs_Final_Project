@@ -23,6 +23,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ banners }) => {
                       size="large"
                       className="w-max bg-blue-600 hover:bg-blue-700 !rounded-button whitespace-nowrap"
                     >
+                      
                       {banner.buttonText}
                     </Button>
                   </div>

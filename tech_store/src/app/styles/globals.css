@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+@import '@fortawesome/fontawesome-free/css/brands.min.css';
 
 .custom-dots .ant-carousel .slick-dots li button {
   background: #d9d9d9;
