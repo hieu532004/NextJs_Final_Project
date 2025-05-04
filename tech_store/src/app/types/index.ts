@@ -1,4 +1,3 @@
-// src/app/types/index.ts
 export interface Category {
   _id: string;
   id: string;
@@ -53,6 +52,7 @@ export interface Brand {
 export interface Review {
   _id: string;
   id: number;
+  product_id: string; // Thêm product_id để liên kết với sản phẩm
   name: string;
   rating: number;
   comment: string;
