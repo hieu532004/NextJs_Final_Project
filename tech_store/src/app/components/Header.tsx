@@ -1,7 +1,7 @@
 // src/app/components/Header.tsx
 'use client';
 
-import { Input, Badge, Button, Dropdown, Menu, Drawer, Collapse } from 'antd';
+import { Input, Badge, Button, Dropdown, Menu, Drawer, Collapse, List, Spin } from 'antd';
 import {
   SearchOutlined,
   ShoppingCartOutlined,
@@ -14,8 +14,10 @@ import {
   DownOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useCart } from '../contexts/CartContext';
+import axios from 'axios';
+import debounce from 'lodash/debounce';
 
 const { Panel } = Collapse;
 
@@ -24,9 +26,21 @@ interface HeaderProps {
   setSearchValue: (value: string) => void;
 }
 
+interface Product {
+  _id: string;
+  id: number;
+  name: string;
+  price: number;
+  salePrice: number;
+  image: string;
+  slug: string;
+}
+
 const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue }) => {
   const { cartCount } = useCart();
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const toggleMobileMenu = () => setMobileMenuVisible(!mobileMenuVisible);
 
@@ -58,6 +72,42 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue }) => {
     </Menu>
   );
 
+  // Debounced search function
+  const performSearch = useCallback(
+    debounce(async (query: string) => {
+      if (query.length < 2) {
+        setSearchResults([]);
+        return;
+      }
+      setLoading(true);
+      try {
+        const response = await axios.get('http://localhost:3001/products');
+        const products = response.data.data.products;
+        const filteredResults = products.filter((product: Product) =>
+          product.name.toLowerCase().includes(query.toLowerCase())
+        );
+        setSearchResults(filteredResults.slice(0, 5)); // Giới hạn 5 kết quả
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    }, 300),
+    []
+  );
+
+  // Handle search input change
+  useEffect(() => {
+    performSearch(searchValue);
+  }, [searchValue, performSearch]);
+
+  // Clear search results when mobile menu closes
+  useEffect(() => {
+    if (!mobileMenuVisible) {
+      setSearchResults([]);
+    }
+  }, [mobileMenuVisible]);
+
   return (
     <>
       <header className="bg-white shadow-md sticky top-0 z-50">
@@ -69,7 +119,7 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue }) => {
               <Link href="/" className="mr-8">
                 <h1 className="text-2xl font-bold text-blue-600 m-0">TechStore</h1>
               </Link>
-              <div className="hidden lg:block">
+              <div className="hidden lg:block relative">
                 <Input
                   size="large"
                   placeholder="Tìm kiếm sản phẩm..."
@@ -78,6 +128,20 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue }) => {
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                 />
+                {searchResults.length > 0 && (
+                  <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-md mt-1 z-50">
+                    <List
+                      dataSource={searchResults}
+                      renderItem={(item) => (
+                        <List.Item>
+                          <Link href={`/products/${item.slug}`} className="w-full block p-2 hover:bg-gray-100">
+                            {item.name} - {item.salePrice.toLocaleString('vi-VN')}₫
+                          </Link>
+                        </List.Item>
+                      )}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -109,7 +173,7 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue }) => {
           </div>
 
           {/* Search Bar (Mobile) */}
-          <div className="block lg:hidden py-3">
+          <div className="block lg:hidden py-3 relative">
             <Input
               size="large"
               placeholder="Tìm kiếm sản phẩm..."
@@ -118,6 +182,20 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue }) => {
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
             />
+            {searchResults.length > 0 && (
+              <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-md mt-1 z-50">
+                <List
+                  dataSource={searchResults}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <Link href={`/products/${item.slug}`} className="w-full block p-2 hover:bg-gray-100">
+                        {item.name} - {item.salePrice.toLocaleString('vi-VN')}₫
+                      </Link>
+                    </List.Item>
+                  )}
+                />
+              </div>
+            )}
           </div>
 
           {/* Navigation and Hotline (Desktop) */}
@@ -166,6 +244,33 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue }) => {
         width={280}
       >
         <div className="space-y-4">
+          {/* Search in Mobile Menu */}
+          <div className="relative">
+            <Input
+              size="large"
+              placeholder="Tìm kiếm sản phẩm..."
+              prefix={<SearchOutlined className="text-gray-400" />}
+              className="w-full !rounded-full"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+            {loading && <Spin className="absolute right-4 top-1/2 transform -translate-y-1/2" />}
+            {searchResults.length > 0 && (
+              <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-md mt-1 z-50">
+                <List
+                  dataSource={searchResults}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <Link href={`/products/${item.slug}`} className="w-full block p-2 hover:bg-gray-100">
+                        {item.name} - {item.salePrice.toLocaleString('vi-VN')}₫
+                      </Link>
+                    </List.Item>
+                  )}
+                />
+              </div>
+            )}
+          </div>
+
           {/* Cart */}
           <Link href="/cart" className="flex items-center justify-between py-3 border-b">
             <Badge
