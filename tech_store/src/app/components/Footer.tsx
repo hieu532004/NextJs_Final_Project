@@ -50,7 +50,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-3">
               <li className="flex items-start">
                 <EnvironmentOutlined className="mt-1 mr-3" />
-                <span>Nguyễn Văn Linh, Quận Hải châu, TP. Đà Nẵng</span>
+                <span>123 Nguyễn Văn Linh, Quận Hải Châu, TP. Đà Nẵng</span>
               </li>
               <li className="flex items-center">
                 <PhoneOutlined className="mr-3" />
