@@ -2,7 +2,7 @@ import { FC } from "react";
 import OrderItem from "./OrderItem";
 import DiscountCode from "./DiscountCode";
 import PaymentTotal from "./PaymentTotal";
-import { Input, Button } from "antd";
+
 
 interface OrderSummaryProps {
   orderItems: { name: string; quantity: number; price: number; imageUrl: string }[];

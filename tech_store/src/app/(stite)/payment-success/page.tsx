@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // Lấy hook router
-import { Button, Card, Divider, Tag, message } from "antd";
+import { Button, Card, Tag, message } from "antd";
 import { CheckCircleFilled, PhoneOutlined, MailOutlined, ClockCircleOutlined, HomeOutlined } from "@ant-design/icons";
 import Footer from "@/app/components/Footer";
 

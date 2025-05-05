@@ -5,7 +5,6 @@ import { Modal, Form, Input, Button, Alert } from "antd";
 import { useRouter } from "next/navigation";
 
 const CardPayment: React.FC<{ totalAfterDiscount: number; onCancel: () => void }> = ({
-  totalAfterDiscount,
   onCancel,
 }) => {
   const [loading, setLoading] = useState(false); // Để kiểm tra trạng thái loading

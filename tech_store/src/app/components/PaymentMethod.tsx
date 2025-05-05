@@ -1,26 +1,31 @@
 
 
-import {useState} from "react";
+
+import { useState } from "react";
 import { Radio, Select } from "antd";
+import { RadioChangeEvent } from "antd/es/radio";
 
 const { Option } = Select;
 
-const PaymentMethod = ({ paymentMethod, setPaymentMethod }: { paymentMethod: string; setPaymentMethod: React.Dispatch<React.SetStateAction<string>> }) => {
+interface PaymentMethodProps {
+  paymentMethod: string;
+  setPaymentMethod: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const PaymentMethod: React.FC<PaymentMethodProps> = ({ paymentMethod, setPaymentMethod }) => {
   const [paymentType, setPaymentType] = useState<string>("oneTime");
   const [installmentDuration, setInstallmentDuration] = useState<string>("3");
 
-  // Xử lý thay đổi paymentMethod
-  const handlePaymentMethodChange = (e: any) => {
-    setPaymentMethod(e.target.value); // Cập nhật paymentMethod khi người dùng chọn phương thức
+ 
+  const handlePaymentMethodChange = (e: RadioChangeEvent) => {
+    setPaymentMethod(e.target.value);
   };
 
-  // Xử lý thay đổi paymentType (Thanh toán 1 lần hay trả góp)
-  const handlePaymentTypeChange = (e: any) => {
+  const handlePaymentTypeChange = (e: RadioChangeEvent) => {
     setPaymentType(e.target.value);
   };
 
-  // Xử lý thay đổi kỳ hạn trả góp
-  const handleInstallmentDurationChange = (e: any) => {
+  const handleInstallmentDurationChange = (e: RadioChangeEvent) => {
     setInstallmentDuration(e.target.value);
   };
 
