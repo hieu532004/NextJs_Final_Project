@@ -52,13 +52,9 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
           <span className="absolute -bottom-2 left-0 w-16 h-1 bg-blue-600"></span>
         </h2>
         <Link href="/products">
-          <Button
-            type="primary"
-            className="bg-blue-600 hover:bg-blue-700 !rounded-full px-6"
-            icon={<RightOutlined />}
-          >
-            Xem tất cả
-          </Button>
+        <Button type="link" className="text-blue-600 font-medium !rounded-button whitespace-nowrap">
+          Xem tất cả <RightOutlined />
+        </Button>
         </Link>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">

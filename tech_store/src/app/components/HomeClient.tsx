@@ -1,7 +1,6 @@
-// src/app/components/HomeClient.tsx
 'use client';
 
-import { useState, useEffect } from 'react'; // Thêm useEffect
+import { useState, useEffect } from 'react';
 import { useCart } from '../contexts/CartContext';
 import Header from './Header';
 import MobileMenuDrawer from './MobileMenuDrawer';
@@ -42,10 +41,9 @@ export default function HomeClient({
   const [filterDrawerVisible, setFilterDrawerVisible] = useState(false);
   const [searchValue, setSearchValue] = useState('');
 
-  // Di chuyển setCartCount vào useEffect
   useEffect(() => {
     setCartCount(initialCartCount);
-  }, [initialCartCount, setCartCount]); // Dependency: initialCartCount, setCartCount
+  }, [initialCartCount, setCartCount]);
 
   const toggleMobileMenu = () => setMobileMenuVisible(!mobileMenuVisible);
 

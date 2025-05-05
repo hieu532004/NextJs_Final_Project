@@ -1,10 +1,11 @@
+// src/app/(site)/products/[slug]/page.tsx
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
 import React from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import { Button, Card, Rate, notification, Tag, Divider, Row, Col, Space, Tabs, List, Avatar, Carousel, Select, Form, Input, message, Pagination, Progress } from 'antd';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Button, Card, Rate, notification, Tag, Divider, Row, Col, Space, Tabs, List, Avatar, Carousel, Select, Form, Input, message, Pagination, Progress, Spin } from 'antd';
 import { ShoppingCartOutlined, GiftOutlined, StarOutlined, ShareAltOutlined, CarOutlined, LoginOutlined } from '@ant-design/icons';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,17 +25,21 @@ interface ProductDetailProps {
 export default function ProductDetail({ params }: ProductDetailProps) {
   const { setCartCount } = useCart();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const carouselRef = useRef<any>(null);
 
   const resolvedParams = React.use(params);
   const slug = resolvedParams.slug;
+  const selectedCategory = searchParams.get('category');
 
   const [product, setProduct] = useState<Product | null>(null);
   const [category, setCategory] = useState<Category | null>(null);
   const [allReviews, setAllReviews] = useState<Review[]>([]);
   const [displayedReviews, setDisplayedReviews] = useState<Review[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [categoryProducts, setCategoryProducts] = useState<Product[]>([]); // Danh sách sản phẩm theo danh mục
   const [loading, setLoading] = useState(true);
+  const [loadingCategory, setLoadingCategory] = useState(false); // Loading cho danh mục
   const [error, setError] = useState<string | null>(null);
   const [loadingAddToCart, setLoadingAddToCart] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string>('Silver');
@@ -52,6 +57,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
   // Form đánh giá
   const [form] = Form.useForm();
 
+  // Fetch thông tin sản phẩm chi tiết
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -137,20 +143,61 @@ export default function ProductDetail({ params }: ProductDetailProps) {
     fetchProduct();
   }, [slug]);
 
+  // Fetch sản phẩm theo danh mục từ query parameter
+  useEffect(() => {
+    const fetchCategoryProducts = async () => {
+      if (!selectedCategory) {
+        setCategoryProducts([]);
+        return;
+      }
+
+      setLoadingCategory(true);
+      try {
+        const response = await axios.get('http://localhost:3001/products');
+        const products = response.data.data.products;
+
+        const categoryMap: { [key: string]: string[] } = {
+          'laptop-gaming': ['Gaming'],
+          'laptop-office': ['Văn Phòng'],
+          'laptop-design': ['Đồ Họa'],
+          'macbook': ['MacBook'],
+          'mouse': ['Chuột'],
+          'keyboard': ['Bàn phím'],
+          'headphones': ['Tai nghe'],
+          'backpack': ['Balo'],
+          'monitor': ['Màn hình'],
+          'printer': ['Máy in'],
+          'scanner': ['Máy scan'],
+          'projector': ['Máy chiếu'],
+        };
+
+        const categoryKeywords = categoryMap[selectedCategory] || [];
+        const filteredProducts = products.filter((product: Product) =>
+          categoryKeywords.some((keyword) => product.name.includes(keyword))
+        );
+        setCategoryProducts(filteredProducts);
+      } catch (error) {
+        console.error('Error fetching category products:', error);
+      } finally {
+        setLoadingCategory(false);
+      }
+    };
+
+    fetchCategoryProducts();
+  }, [selectedCategory]);
+
   // Logic cập nhật giá và hình ảnh khi thay đổi tùy chọn
   useEffect(() => {
     if (!product) return;
 
-    // Cập nhật giá dựa trên dung lượng
     let priceAdjustment = 0;
     if (selectedStorage === '512GB') {
-      priceAdjustment = 2000000; // Tăng giá 2 triệu cho 512GB
+      priceAdjustment = 2000000;
     } else if (selectedStorage === '1TB') {
-      priceAdjustment = 5000000; // Tăng giá 5 triệu cho 1TB
+      priceAdjustment = 5000000;
     }
     setCurrentPrice(product.salePrice + priceAdjustment);
 
-    // Cập nhật hình ảnh dựa trên màu sắc
     const colorLower = selectedColor.toLowerCase();
     setCurrentImages([
       product.image.replace('silver', colorLower),
@@ -216,8 +263,8 @@ export default function ProductDetail({ params }: ProductDetailProps) {
 
     try {
       const newReview: Review = {
-        _id: Date.now().toString(), // Tạo _id tạm thời
-        id: allReviews.length + 1, // Tạo id tạm thời
+        _id: Date.now().toString(),
+        id: allReviews.length + 1,
         product_id: product?._id || '',
         name: values.name || 'Ẩn danh',
         avatar: values.name?.charAt(0) || 'A',
@@ -232,7 +279,6 @@ export default function ProductDetail({ params }: ProductDetailProps) {
       setDisplayedReviews(updatedReviews.slice(0, pageSize));
       setCurrentPage(1);
 
-      // Cập nhật thống kê đánh giá
       const totalRating = updatedReviews.reduce((sum, review) => sum + review.rating, 0);
       setAverageRating(totalRating / updatedReviews.length);
       const distribution = [0, 0, 0, 0, 0];
@@ -263,11 +309,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <Header 
-        searchValue="" 
-        setSearchValue={() => {}} 
-        toggleMobileMenu={() => {}} 
-      />
+      <Header searchValue="" setSearchValue={() => {}} toggleMobileMenu={() => {}} />
 
       {/* Nội dung chính */}
       <main className="flex-grow container mx-auto p-4">
@@ -577,6 +619,62 @@ export default function ProductDetail({ params }: ProductDetailProps) {
         </Tabs>
 
         <Divider />
+
+        {/* Section hiển thị sản phẩm theo danh mục */}
+        {selectedCategory && (
+          <>
+            <h2 className="text-xl font-bold mb-4">
+              Sản phẩm theo danh mục: {selectedCategory.replace(/-/g, ' ')}
+            </h2>
+            {loadingCategory ? (
+              <Spin />
+            ) : categoryProducts.length > 0 ? (
+              <Row gutter={[16, 16]}>
+                {categoryProducts.map((catProduct) => (
+                  <Col xs={24} sm={12} md={6} key={catProduct._id}>
+                    <Link href={`/products/${catProduct.slug}`}>
+                      <Card
+                        hoverable
+                        cover={
+                          <div className="relative h-40">
+                            <Image
+                              src={catProduct.image}
+                              alt={catProduct.name}
+                              fill
+                              style={{ objectFit: 'contain' }}
+                              className="p-2"
+                            />
+                          </div>
+                        }
+                      >
+                        <Card.Meta
+                          title={catProduct.name}
+                          description={
+                            <div>
+                              <p className="text-red-600 font-bold">
+                                {catProduct.salePrice.toLocaleString('vi-VN')}đ
+                              </p>
+                              {catProduct.salePrice < catProduct.price && (
+                                <p className="text-gray-400 line-through text-sm">
+                                  {catProduct.price.toLocaleString('vi-VN')}đ
+                                </p>
+                              )}
+                              <Rate disabled value={catProduct.rating} allowHalf className="text-sm" />
+                            </div>
+                          }
+                        />
+                      </Card>
+                    </Link>
+                  </Col>
+                ))}
+              </Row>
+            ) : (
+              <p className="text-gray-500">Không có sản phẩm nào trong danh mục này.</p>
+            )}
+            <Divider />
+          </>
+        )}
+
         <h2 className="text-xl font-bold mb-4">Sản phẩm liên quan</h2>
         <Row gutter={[16, 16]}>
           {relatedProducts.map((relatedProduct) => (
