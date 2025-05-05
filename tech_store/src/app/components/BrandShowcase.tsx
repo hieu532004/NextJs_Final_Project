@@ -1,4 +1,3 @@
-// src/app/components/BrandShowcase.tsx
 'use client';
 
 import Link from 'next/link';
@@ -18,6 +17,13 @@ const BrandShowcase: React.FC<BrandShowcaseProps> = ({ brands }) => {
     );
   }
 
+  // Hàm tạo URL với query parameter brand
+  const createQueryString = (brand: string) => {
+    const params = new URLSearchParams();
+    params.set('brand', brand);
+    return `/products?${params.toString()}`;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Thương hiệu nổi bật</h2>
@@ -26,7 +32,7 @@ const BrandShowcase: React.FC<BrandShowcaseProps> = ({ brands }) => {
           {brands.map((brand) => (
             <Link
               key={brand._id}
-              href={`/brands/${brand.slug}`}
+              href={createQueryString(brand.slug)} // Sử dụng query parameter brand
               className="flex items-center justify-center"
               aria-label={`View ${brand.name} products`}
             >

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Card, Row, Col, Menu, Slider, Checkbox, Select, Rate, Tag, Button, Space, Pagination, Modal, notification } from 'antd';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Product, Category } from '@/app/types';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
@@ -13,20 +14,77 @@ import { useCart } from '@/app/contexts/CartContext';
 
 const { Option } = Select;
 
+// Định nghĩa categoryMap dựa trên data.json
+const categoryMap: { [key: string]: string } = {
+  'laptop': 'Laptop',
+  'chuot': 'Chuột',
+  'ban-phim': 'Bàn phím',
+  'tai-nghe': 'Tai nghe',
+  'cap-sac': 'Cáp sạc',
+  'balo-laptop': 'Balo laptop',
+  'man-hinh': 'Màn hình',
+  'phu-kien-khac': 'Phụ kiện khác',
+};
+
 export default function ProductList() {
   const { setCartCount } = useCart();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const queryCategory = searchParams.get('category');
+  const queryBrand = searchParams.get('brand');
+  const querySearch = searchParams.get('search'); // Đọc query parameter search
+
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000000]); // Khoảng giá
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]); // Lọc theo thương hiệu
-  const [minRating, setMinRating] = useState<number>(0); // Lọc theo đánh giá tối thiểu
-  const [sortOrder, setSortOrder] = useState<string>('default'); // Sắp xếp
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000000]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [minRating, setMinRating] = useState<number>(0);
+  const [sortOrder, setSortOrder] = useState<string>('default');
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null); // Sản phẩm xem nhanh
-  const pageSize = 6; // Số sản phẩm mỗi trang
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>(querySearch || ''); // State cho tìm kiếm
+  const pageSize = 6;
+
+  // Thiết lập selectedCategory từ query parameter khi trang tải
+  useEffect(() => {
+    if (queryCategory) {
+      const matchedCategoryName = categoryMap[queryCategory];
+      if (matchedCategoryName) {
+        const matchedCategory = categories.find(cat => cat.name === matchedCategoryName);
+        setSelectedCategory(matchedCategory ? matchedCategory._id : 'all');
+      } else {
+        setSelectedCategory('all');
+      }
+    } else {
+      setSelectedCategory('all');
+    }
+  }, [queryCategory, categories]);
+
+  // Thiết lập selectedBrands từ query parameter brand khi trang tải
+  useEffect(() => {
+    if (queryBrand) {
+      const matchedBrand = products.find(product => product.brand.toLowerCase() === queryBrand.toLowerCase())?.brand;
+      if (matchedBrand) {
+        setSelectedBrands([matchedBrand]);
+      } else {
+        setSelectedBrands([]);
+      }
+    } else {
+      setSelectedBrands([]);
+    }
+  }, [queryBrand, products]);
+
+  // Cập nhật searchQuery từ query parameter search
+  useEffect(() => {
+    if (querySearch) {
+      setSearchQuery(querySearch);
+    } else {
+      setSearchQuery('');
+    }
+  }, [querySearch]);
 
   // Lấy dữ liệu từ API
   useEffect(() => {
@@ -51,7 +109,6 @@ export default function ProductList() {
         setCategories(categoriesData);
         setError(null);
 
-        // Tìm khoảng giá tối đa để thiết lập Slider
         const prices = productsData.map((p: Product) => p.salePrice);
         const maxPrice = Math.max(...prices, 100000000);
         setPriceRange([0, maxPrice]);
@@ -72,6 +129,23 @@ export default function ProductList() {
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setCurrentPage(1);
+
+    const selectedCat = categories.find(cat => cat._id === categoryId);
+    const categorySlug = selectedCat
+      ? Object.keys(categoryMap).find(key => categoryMap[key] === selectedCat.name) || 'all'
+      : 'all';
+
+    const params = new URLSearchParams();
+    if (categoryId !== 'all') {
+      params.set('category', categorySlug);
+    }
+    if (selectedBrands.length > 0) {
+      params.set('brand', selectedBrands[0].toLowerCase());
+    }
+    if (searchQuery) {
+      params.set('search', searchQuery);
+    }
+    router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
   const handlePriceRangeChange = (value: [number, number]) => {
@@ -82,6 +156,22 @@ export default function ProductList() {
   const handleBrandChange = (checkedValues: string[]) => {
     setSelectedBrands(checkedValues);
     setCurrentPage(1);
+
+    const params = new URLSearchParams();
+    if (selectedCategory !== 'all') {
+      const selectedCat = categories.find(cat => cat._id === selectedCategory);
+      const categorySlug = selectedCat
+        ? Object.keys(categoryMap).find(key => categoryMap[key] === selectedCat.name) || 'all'
+        : 'all';
+      params.set('category', categorySlug);
+    }
+    if (checkedValues.length > 0) {
+      params.set('brand', checkedValues[0].toLowerCase());
+    }
+    if (searchQuery) {
+      params.set('search', searchQuery);
+    }
+    router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
   const handleRatingChange = (value: number) => {
@@ -104,7 +194,10 @@ export default function ProductList() {
     const inPriceRange = product.salePrice >= priceRange[0] && product.salePrice <= priceRange[1];
     const inBrands = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
     const aboveMinRating = product.rating >= minRating;
-    return inCategory && inPriceRange && inBrands && aboveMinRating;
+    const matchesSearch = searchQuery
+      ? product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+    return inCategory && inPriceRange && inBrands && aboveMinRating && matchesSearch;
   });
 
   // Sắp xếp sản phẩm
@@ -119,10 +212,12 @@ export default function ProductList() {
   // Phân trang
   const paginatedProducts = filteredProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  // Tìm tên danh mục đang chọn
+  // Tìm tên danh mục hoặc thương hiệu đang chọn
   const selectedCategoryName = selectedCategory === 'all'
     ? 'Tất cả sản phẩm'
     : categories.find(cat => cat._id === selectedCategory)?.name || 'Không xác định';
+
+  const selectedBrandName = selectedBrands.length > 0 ? selectedBrands.join(', ') : '';
 
   // Thêm vào giỏ hàng
   const addToCart = async (product: Product) => {
@@ -159,34 +254,32 @@ export default function ProductList() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Header */}
-      <Header 
-        searchValue="" 
-        setSearchValue={() => {}} 
-        toggleMobileMenu={() => {}} 
-      />
+      <Header searchValue={searchQuery} setSearchValue={setSearchQuery} />
 
-      {/* Nội dung chính */}
       <main className="flex-grow container mx-auto p-4">
-        {/* Breadcrumb */}
         <div className="mb-4 text-sm">
           <Link href="/">Trang chủ</Link> / <span>Sản phẩm</span>
           {selectedCategory !== 'all' && <> / <span>{selectedCategoryName}</span></>}
+          {selectedBrandName && <> / <span>{selectedBrandName}</span></>}
+          {searchQuery && <> / <span>Kết quả tìm kiếm: "{searchQuery}"</span></>}
         </div>
 
-        {/* Tiêu đề và số lượng sản phẩm */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">{selectedCategoryName}</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            {searchQuery
+              ? `Kết quả tìm kiếm cho "${searchQuery}"`
+              : selectedBrandName
+              ? `Sản phẩm thương hiệu ${selectedBrandName}`
+              : selectedCategoryName}
+          </h1>
           <p className="text-sm text-gray-600">
             Tìm thấy {filteredProducts.length} sản phẩm
           </p>
         </div>
 
         <Row gutter={[16, 16]}>
-          {/* Sidebar bộ lọc */}
           <Col xs={24} md={6}>
             <Card title="Bộ lọc sản phẩm" className="shadow-sm">
-              {/* Lọc theo danh mục */}
               <h3 className="text-lg font-semibold mb-2">Danh mục</h3>
               <Menu
                 mode="vertical"
@@ -199,7 +292,6 @@ export default function ProductList() {
                 ))}
               </Menu>
 
-              {/* Lọc theo giá */}
               <h3 className="text-lg font-semibold mt-4 mb-2">Khoảng giá</h3>
               <Slider
                 range
@@ -218,7 +310,6 @@ export default function ProductList() {
                 {priceRange[0].toLocaleString('vi-VN')}đ - {priceRange[1].toLocaleString('vi-VN')}đ
               </p>
 
-              {/* Lọc theo thương hiệu */}
               <h3 className="text-lg font-semibold mt-4 mb-2">Thương hiệu</h3>
               <Checkbox.Group
                 options={brands.map(brand => ({ label: brand, value: brand }))}
@@ -227,7 +318,6 @@ export default function ProductList() {
                 className="flex flex-col space-y-2"
               />
 
-              {/* Lọc theo đánh giá */}
               <h3 className="text-lg font-semibold mt-4 mb-2">Đánh giá tối thiểu</h3>
               <Rate
                 value={minRating}
@@ -237,9 +327,7 @@ export default function ProductList() {
             </Card>
           </Col>
 
-          {/* Danh sách sản phẩm */}
           <Col xs={24} md={18}>
-            {/* Sắp xếp */}
             <div className="mb-4 flex justify-between items-center">
               <span className="text-sm text-gray-600">
                 Hiển thị {paginatedProducts.length} trong số {filteredProducts.length} sản phẩm
@@ -260,7 +348,6 @@ export default function ProductList() {
               </div>
             </div>
 
-            {/* Danh sách sản phẩm dạng lưới */}
             <Row gutter={[16, 16]}>
               {paginatedProducts.map((product) => (
                 <Col xs={24} sm={12} md={8} key={product._id}>
@@ -348,7 +435,6 @@ export default function ProductList() {
               ))}
             </Row>
 
-            {/* Phân trang */}
             <Pagination
               current={currentPage}
               pageSize={pageSize}
@@ -360,7 +446,6 @@ export default function ProductList() {
           </Col>
         </Row>
 
-        {/* Modal xem nhanh sản phẩm */}
         {quickViewProduct && (
           <Modal
             title={quickViewProduct.name}
@@ -425,7 +510,6 @@ export default function ProductList() {
         )}
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

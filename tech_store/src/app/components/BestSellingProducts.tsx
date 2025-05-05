@@ -2,6 +2,7 @@
 import { Button, Card, Rate } from 'antd';
 import { ShoppingCartOutlined, RightOutlined } from '@ant-design/icons';
 import { Product } from '@/app/types';
+import Link from 'next/link';
 
 interface BestSellingProductsProps {
   products: Product[];
@@ -12,9 +13,11 @@ const BestSellingProducts: React.FC<BestSellingProductsProps> = ({ products }) =
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Sản phẩm bán chạy</h2>
+        <Link href="/products">
         <Button type="link" className="text-blue-600 font-medium !rounded-button whitespace-nowrap">
           Xem tất cả <RightOutlined />
         </Button>
+        </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.slice(4, 8).concat(products.slice(0, 4)).map((product) => (
