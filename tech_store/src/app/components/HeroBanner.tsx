@@ -1,6 +1,7 @@
 'use client';
 import { Carousel, Button } from 'antd';
 import { Banner } from '@/app/types';
+import Link from 'next/link';
 
 interface HeroBannerProps {
   banners: Banner[];
@@ -18,6 +19,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ banners }) => {
                   <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-12 z-10">
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">{banner.title}</h2>
                     <p className="text-lg text-gray-600 mb-6">{banner.description}</p>
+                    <Link href="/products">
                     <Button
                       type="primary"
                       size="large"
@@ -26,6 +28,8 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ banners }) => {
                       
                       {banner.buttonText}
                     </Button>
+                    </Link>
+                   
                   </div>
                   <div className="hidden md:block w-1/2 relative">
                     <img

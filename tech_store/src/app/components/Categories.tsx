@@ -1,4 +1,3 @@
-// src/app/components/Categories.tsx
 'use client';
 
 import { FC } from 'react';
@@ -18,6 +17,13 @@ const Categories: FC<CategoriesProps> = ({ categories }) => {
     );
   }
 
+  // Hàm tạo URL với query parameter category
+  const createQueryString = (category: string) => {
+    const params = new URLSearchParams();
+    params.set('category', category);
+    return `/products?${params.toString()}`;
+  };
+
   return (
     <section className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Danh mục sản phẩm</h2>
@@ -25,7 +31,7 @@ const Categories: FC<CategoriesProps> = ({ categories }) => {
         {categories.map((category) => (
           <Link
             key={category._id}
-            href={`/products/${category.slug}`}
+            href={createQueryString(category.slug)} // Sử dụng slug từ data.json
             className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
             aria-label={`View ${category.name} products`}
           >
