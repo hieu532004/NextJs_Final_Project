@@ -20,11 +20,11 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
   const addToCart = async (productId: string, productName: string) => {
     setLoadingProductId(productId);
     try {
-      await axios.post('http://localhost:3001/cart', {
+      await axios.post('http://localhost:3000/cart', {
         product_id: productId,
         quantity: 1,
       });
-      const response = await axios.get('http://localhost:3001/cart');
+      const response = await axios.get('http://localhost:3000/cart');
       const cartData = response.data.data as { items: { quantity: number }[] };
       setCartCount(cartData.items.reduce((total, item) => total + item.quantity, 0));
       notification.success({
