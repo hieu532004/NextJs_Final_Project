@@ -202,7 +202,7 @@ const SupportWidget: React.FC = () => {
         width={window.innerWidth < 640 ? '100%' : 400}
         className="sm:!rounded-l-lg"
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full ">
           {/* Khu vực tin nhắn */}
           <div className="flex-1 overflow-y-auto p-4 bg-gray-100 rounded-lg mb-4 space-y-3">
             {loading ? (

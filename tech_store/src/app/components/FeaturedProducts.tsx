@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Rate, notification } from 'antd';
+import { Button, Card, Rate, notification, Skeleton } from 'antd';
 import { ShoppingCartOutlined, RightOutlined } from '@ant-design/icons';
 import { Product } from '../types';
 import axios from 'axios';
@@ -52,21 +52,32 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
           <span className="absolute -bottom-2 left-0 w-16 h-1 bg-blue-600"></span>
         </h2>
         <Link href="/products">
-        <Button type="link" className="text-blue-600 font-medium !rounded-button whitespace-nowrap">
-          Xem tất cả <RightOutlined />
-        </Button>
+          <Button type="link" className="text-blue-600 font-medium !rounded-button whitespace-nowrap">
+            Xem tất cả <RightOutlined />
+          </Button>
         </Link>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {products.length === 0 ? (
+          // Hiển thị Skeleton khi không có sản phẩm
           Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="animate-pulse">
-              <div className="bg-gray-200 aspect-square rounded-lg mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-            </div>
+            <Card
+              key={index}
+              className="border-none shadow-sm rounded-xl overflow-hidden"
+            >
+              <Skeleton.Image active className="!w-full !h-[200px]" />
+              <div className="p-4">
+                <Skeleton active paragraph={{ rows: 2 }} title={{ width: '75%' }} />
+                <Skeleton active paragraph={{ rows: 1, width: ['50%'] }} className="mt-2" />
+                <div className="flex justify-between items-center mt-4">
+                  <Skeleton active paragraph={{ rows: 1, width: ['40%'] }} />
+                  <Skeleton.Button active className="!w-8 !h-8" />
+                </div>
+              </div>
+            </Card>
           ))
         ) : (
+          // Hiển thị sản phẩm khi có dữ liệu
           products.map((product) => (
             <Card
               key={product._id}
