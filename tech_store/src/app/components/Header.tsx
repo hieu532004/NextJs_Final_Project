@@ -124,13 +124,13 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue }) => {
           <div className="hidden lg:block border-t border-gray-200">
             <div className="flex items-center justify-between py-3">
               <div className="flex items-center space-x-8">
-                <Dropdown overlay={laptopMenu}>
+                <Dropdown menu={laptopMenu}>
                   <a className="text-gray-700 hover:text-blue-600 cursor-pointer flex items-center">
                     <LaptopOutlined className="mr-1" /> Laptop{' '}
                     <DownOutlined className="text-xs ml-1" />
                   </a>
                 </Dropdown>
-                <Dropdown overlay={accessoriesMenu}>
+                <Dropdown menu={accessoriesMenu}>
                   <a className="text-gray-700 hover:text-blue-600 cursor-pointer flex items-center">
                     <TabletOutlined className="mr-1" /> Phụ kiện{' '}
                     <DownOutlined className="text-xs ml-1" />
