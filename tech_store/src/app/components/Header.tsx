@@ -211,7 +211,7 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
                     <ShoppingCartOutlined className="text-2xl text-gray-700" />
                   </Badge>
                 </Link>
-                <Link href="/account" className="flex items-center cursor-pointer">
+                <Link href="/login" className="flex items-center cursor-pointer">
                   <UserOutlined className="text-2xl text-gray-700" />
                   <span className="ml-2 text-gray-700">Đăng nhập</span>
                 </Link>
