@@ -603,6 +603,16 @@
       "password": "123123",
       "confirmPassword": "123123",
       "agreement": true
+    },
+    {
+      "id": "8dde",
+      "username": "hieu",
+      "name": "hieu",
+      "email": "hieu532004@gmail.com",
+      "phone": "0347854097",
+      "password": "123456",
+      "confirmPassword": "123456",
+      "agreement": true
     }
   ]
 }
