@@ -64,3 +64,16 @@ export interface Review {
 export interface Cart {
   items: { product_id: string; quantity: number }[];
 }
+
+export interface User {
+  id: number;
+  username: string;
+  password: string;
+  email: string;
+  name: string;
+  address?: string;
+  phone?: string;
+  birthDate?: string; // Hoặc Date nếu bạn muốn làm việc với kiểu Date
+  gender?: string;
+  // ... các thông tin khác liên quan đến người dùng
+}
