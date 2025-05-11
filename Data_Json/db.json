@@ -425,7 +425,184 @@
   },
   "cart": {
     "items": [
-      { "product_id": "68b1f4h599h7fh57i9h74glm", "quantity": 2 }
+      {
+        "product_id": "68b1f4h599h7fh57i9h74glm",
+        "quantity": 2
+      }
     ]
-  }
+  },
+  "users": [
+    {
+      "id": "1",
+      "username": "namle",
+      "password": "123456",
+      "email": "namle@gmail.com",
+      "name": "John Doe",
+      "address": "123 Main Street, Anytown, CA",
+      "phone": "123-456-7890",
+      "birthDate": "1990-05-15",
+      "gender": "male"
+    },
+    {
+      "id": "2",
+      "username": "jane.smith",
+      "password": "password",
+      "email": "jane.smith@example.com",
+      "name": "Jane Smith",
+      "address": "456 Oak Avenue, Anytown, CA",
+      "phone": "987-654-3210",
+      "birthDate": "1992-11-20",
+      "gender": "female"
+    },
+    {
+      "id": "1e96",
+      "username": "namle",
+      "name": "1212",
+      "email": "namle@gmail.com",
+      "phone": "0987651212",
+      "password": "123456",
+      "confirmPassword": "123456",
+      "agreement": true
+    },
+    {
+      "id": "5c89",
+      "username": "namle",
+      "name": "12312",
+      "email": "namle@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "1dcc",
+      "username": "namle",
+      "name": "12312",
+      "email": "namle@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "4fad",
+      "username": "namle",
+      "name": "12312",
+      "email": "namle@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "896a",
+      "username": "namle",
+      "name": "12312",
+      "email": "namle@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "a8d7",
+      "username": "namle",
+      "name": "12312",
+      "email": "namle@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "6267",
+      "username": "namle",
+      "name": "12312",
+      "email": "namlse@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "8df9",
+      "username": "namle",
+      "name": "12312",
+      "email": "namlsse@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "f587",
+      "username": "namle2",
+      "name": "12312",
+      "email": "namlsse@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "cfd0",
+      "username": "namle2",
+      "name": "12312",
+      "email": "namlsse@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "cb3a",
+      "username": "namle2",
+      "name": "12312",
+      "email": "namlsse@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "6d87",
+      "username": "namle2",
+      "name": "12312",
+      "email": "namlsse@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "54e7",
+      "username": "namle2",
+      "name": "12312",
+      "email": "namlsse@gmail.com",
+      "phone": "0876543434",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "47df",
+      "username": "namle1",
+      "name": "121321sđ",
+      "email": "namlesss@gmail.com",
+      "phone": "0976542123",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "df5c",
+      "username": "namle33",
+      "name": "namlllll",
+      "email": "namlelinh@gmail.com",
+      "phone": "0987632317",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    }
+  ]
 }

@@ -10,6 +10,7 @@ import PaymentQRCodeModal from "@/app/components/PaymentQRCodeModal";
 import Footer from "@/app/components/Footer";
 import CardPayment from "@/app/components/CardPayment"; // Modal thanh toán thẻ
 import CODPayment from "@/app/components/CODPayment";
+import Header from "@/app/components/Header";
 
 const App: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState("card"); // Phương thức thanh toán
@@ -22,6 +23,7 @@ const App: React.FC = () => {
   const [showCardPayment, setShowCardPayment] = useState(false); // Modal thanh toán thẻ tín dụng
   const [showCODPayment, setShowCODPayment] = useState(false); // Modal thanh toán thẻ tín dụng
 
+  const [searchValue, setSearchValue] = useState('');
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -60,7 +62,7 @@ const App: React.FC = () => {
         console.log("Validation Failed:", errorInfo);
       });
   };
-  
+
 
   const originalPrice = 32990000;
   const shippingFee = 30000;
@@ -73,6 +75,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header searchValue={searchValue} setSearchValue={setSearchValue} />
       <div className="container mx-auto px-4 py-8">
         <Form form={form} layout="vertical">
           <div className="flex flex-wrap -mx-4">

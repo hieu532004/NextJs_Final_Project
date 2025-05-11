@@ -96,7 +96,7 @@ const AddressSelector = () => {
         className="flex-1"
       >
         <div>
-          <label className="block text-lg font-medium">Tỉnh/Thành phố</label>
+          <label className="block text-lg font-medium ">Tỉnh/Thành phố</label>
           <Select
             placeholder="Chọn tỉnh/thành phố"
             style={{ width: '100%' }}
