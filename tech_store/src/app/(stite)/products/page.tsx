@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Card, Row, Col, Menu, Slider, Checkbox, Select, Rate, Tag, Button, Space, Pagination, Modal, notification } from 'antd';
+import { Card, Row, Col, Menu, Slider, Checkbox, Select, Rate, Tag, Button, Space, Pagination, Modal, notification, Skeleton } from 'antd';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -32,7 +32,7 @@ export default function ProductList() {
   const router = useRouter();
   const queryCategory = searchParams.get('category');
   const queryBrand = searchParams.get('brand');
-  const querySearch = searchParams.get('search'); // Đọc query parameter search
+  const querySearch = searchParams.get('search');
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -45,10 +45,10 @@ export default function ProductList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>(querySearch || ''); // State cho tìm kiếm
+  const [searchQuery, setSearchQuery] = useState<string>(querySearch || '');
   const pageSize = 6;
 
-  // Thiết lập selectedCategory từ query parameter khi trang tải
+  // Thiết lập selectedCategory từ query parameter
   useEffect(() => {
     if (queryCategory) {
       const matchedCategoryName = categoryMap[queryCategory];
@@ -63,7 +63,7 @@ export default function ProductList() {
     }
   }, [queryCategory, categories]);
 
-  // Thiết lập selectedBrands từ query parameter brand khi trang tải
+  // Thiết lập selectedBrands từ query parameter
   useEffect(() => {
     if (queryBrand) {
       const matchedBrand = products.find(product => product.brand.toLowerCase() === queryBrand.toLowerCase())?.brand;
@@ -77,7 +77,7 @@ export default function ProductList() {
     }
   }, [queryBrand, products]);
 
-  // Cập nhật searchQuery từ query parameter search
+  // Cập nhật searchQuery từ query parameter
   useEffect(() => {
     if (querySearch) {
       setSearchQuery(querySearch);
@@ -244,10 +244,6 @@ export default function ProductList() {
     }
   };
 
-  if (loading) {
-    return <div className="container mx-auto p-4">Đang tải...</div>;
-  }
-
   if (error) {
     return <div className="container mx-auto p-4 text-red-500">{error}</div>;
   }
@@ -279,170 +275,197 @@ export default function ProductList() {
 
         <Row gutter={[16, 16]}>
           <Col xs={24} md={6}>
-            <Card title="Bộ lọc sản phẩm" className="shadow-sm">
-              <h3 className="text-lg font-semibold mb-2">Danh mục</h3>
-              <Menu
-                mode="vertical"
-                selectedKeys={selectedCategory ? [selectedCategory] : ['all']}
-                onClick={({ key }) => handleCategorySelect(key)}
-              >
-                <Menu.Item key="all">Tất cả sản phẩm</Menu.Item>
-                {categories.map(category => (
-                  <Menu.Item key={category._id}>{category.name}</Menu.Item>
-                ))}
-              </Menu>
+            {loading ? (
+              <Card className="shadow-sm">
+                <Skeleton active paragraph={{ rows: 10 }} />
+              </Card>
+            ) : (
+              <Card title="Bộ lọc sản phẩm" className="shadow-sm">
+                <h3 className="text-lg font-semibold mb-2">Danh mục</h3>
+                <Menu
+                  mode="vertical"
+                  selectedKeys={selectedCategory ? [selectedCategory] : ['all']}
+                  onClick={({ key }) => handleCategorySelect(key)}
+                >
+                  <Menu.Item key="all">Tất cả sản phẩm</Menu.Item>
+                  {categories.map(category => (
+                    <Menu.Item key={category._id}>{category.name}</Menu.Item>
+                  ))}
+                </Menu>
 
-              <h3 className="text-lg font-semibold mt-4 mb-2">Khoảng giá</h3>
-              <Slider
-                range
-                min={0}
-                max={Math.max(...products.map(p => p.salePrice), 100000000)}
-                value={priceRange}
-                onChange={(value) => {
-                  if (Array.isArray(value) && value.length === 2) {
-                    handlePriceRangeChange(value as [number, number]);
-                  }
-                }}
-                step={100000}
-                tipFormatter={(value) => value?.toLocaleString('vi-VN') + 'đ'}
-              />
-              <p className="text-sm text-gray-600">
-                {priceRange[0].toLocaleString('vi-VN')}đ - {priceRange[1].toLocaleString('vi-VN')}đ
-              </p>
+                <h3 className="text-lg font-semibold mt-4 mb-2">Khoảng giá</h3>
+                <Slider
+                  range
+                  min={0}
+                  max={Math.max(...products.map(p => p.salePrice), 100000000)}
+                  value={priceRange}
+                  onChange={(value) => {
+                    if (Array.isArray(value) && value.length === 2) {
+                      handlePriceRangeChange(value as [number, number]);
+                    }
+                  }}
+                  step={100000}
+                  tipFormatter={(value) => value?.toLocaleString('vi-VN') + 'đ'}
+                />
+                <p className="text-sm text-gray-600">
+                  {priceRange[0].toLocaleString('vi-VN')}đ - {priceRange[1].toLocaleString('vi-VN')}đ
+                </p>
 
-              <h3 className="text-lg font-semibold mt-4 mb-2">Thương hiệu</h3>
-              <Checkbox.Group
-                options={brands.map(brand => ({ label: brand, value: brand }))}
-                value={selectedBrands}
-                onChange={handleBrandChange}
-                className="flex flex-col space-y-2"
-              />
+                <h3 className="text-lg font-semibold mt-4 mb-2">Thương hiệu</h3>
+                <Checkbox.Group
+                  options={brands.map(brand => ({ label: brand, value: brand }))}
+                  value={selectedBrands}
+                  onChange={handleBrandChange}
+                  className="flex flex-col space-y-2"
+                />
 
-              <h3 className="text-lg font-semibold mt-4 mb-2">Đánh giá tối thiểu</h3>
-              <Rate
-                value={minRating}
-                onChange={handleRatingChange}
-                className="text-sm"
-              />
-            </Card>
+                <h3 className="text-lg font-semibold mt-4 mb-2">Đánh giá tối thiểu</h3>
+                <Rate
+                  value={minRating}
+                  onChange={handleRatingChange}
+                  className="text-sm"
+                />
+              </Card>
+            )}
           </Col>
 
           <Col xs={24} md={18}>
-            <div className="mb-4 flex justify-between items-center">
-              <span className="text-sm text-gray-600">
-                Hiển thị {paginatedProducts.length} trong số {filteredProducts.length} sản phẩm
-              </span>
+            {loading ? (
               <div>
-                <label className="mr-2 font-semibold">Sắp xếp:</label>
-                <Select
-                  value={sortOrder}
-                  onChange={handleSortChange}
-                  style={{ width: 200 }}
-                  placeholder="Sắp xếp"
-                >
-                  <Option value="default">Mặc định</Option>
-                  <Option value="priceAsc">Giá: Thấp đến cao</Option>
-                  <Option value="priceDesc">Giá: Cao đến thấp</Option>
-                  <Option value="ratingDesc">Đánh giá: Cao đến thấp</Option>
-                </Select>
+                <div className="mb-4 flex justify-between items-center">
+                  <Skeleton.Input active style={{ width: 200 }} />
+                  <Skeleton.Input active style={{ width: 200 }} />
+                </div>
+                <Row gutter={[16, 16]}>
+                  {[...Array(6)].map((_, index) => (
+                    <Col xs={24} sm={12} md={8} key={index}>
+                      <Card className="shadow-md">
+                        <Skeleton.Image active style={{ width: '100%', height: 192 }} />
+                        <Skeleton active paragraph={{ rows: 3 }} />
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="mb-4 flex justify-between items-center">
+                  <span className="text-sm text-gray-600">
+                    Hiển thị {paginatedProducts.length} trong số {filteredProducts.length} sản phẩm
+                  </span>
+                  <div>
+                    <label className="mr-2 font-semibold">Sắp xếp:</label>
+                    <Select
+                      value={sortOrder}
+                      onChange={handleSortChange}
+                      style={{ width: 200 }}
+                      placeholder="Sắp xếp"
+                    >
+                      <Option value="default">Mặc định</Option>
+                      <Option value="priceAsc">Giá: Thấp đến cao</Option>
+                      <Option value="priceDesc">Giá: Cao đến thấp</Option>
+                      <Option value="ratingDesc">Đánh giá: Cao đến thấp</Option>
+                    </Select>
+                  </div>
+                </div>
 
-            <Row gutter={[16, 16]}>
-              {paginatedProducts.map((product) => (
-                <Col xs={24} sm={12} md={8} key={product._id}>
-                  <Card
-                    cover={
-                      <Link href={`/products/${product.slug}`}>
-                        <div className="relative h-48">
-                          <Image
-                            src={product.image}
-                            alt={product.name}
-                            fill
-                            style={{ objectFit: 'contain' }}
-                            className="p-2 transition-transform duration-300 hover:scale-105"
-                          />
-                          {product.isNew && (
-                            <Tag color="green" className="absolute top-2 left-2">
-                              Mới
-                            </Tag>
-                          )}
-                          {product.discount > 0 && (
-                            <Tag color="red" className="absolute top-2 right-2">
-                              -{product.discount}%
-                            </Tag>
-                          )}
-                        </div>
-                      </Link>
-                    }
-                    actions={[
-                      <Button
-                        key="add-to-cart"
-                        type="primary"
-                        icon={<ShoppingCartOutlined />}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          addToCart(product);
-                        }}
-                        disabled={product.stock === 0}
+                <Row gutter={[16, 16]}>
+                  {paginatedProducts.map((product) => (
+                    <Col xs={24} sm={12} md={8} key={product._id}>
+                      <Card
+                        cover={
+                          <Link href={`/products/${product.slug}`}>
+                            <div className="relative h-48">
+                              <Image
+                                src={product.image}
+                                alt={product.name}
+                                fill
+                                style={{ objectFit: 'contain' }}
+                                className="p-2 transition-transform duration-300 hover:scale-105"
+                              />
+                              {product.isNew && (
+                                <Tag color="green" className="absolute top-2 left-2">
+                                  Mới
+                                </Tag>
+                              )}
+                              {product.discount > 0 && (
+                                <Tag color="red" className="absolute top-2 right-2">
+                                  -{product.discount}%
+                                </Tag>
+                              )}
+                            </div>
+                          </Link>
+                        }
+                        actions={[
+                          <Button
+                            key="add-to-cart"
+                            type="primary"
+                            icon={<ShoppingCartOutlined />}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              addToCart(product);
+                            }}
+                            disabled={product.stock === 0}
+                          >
+                            Thêm vào giỏ
+                          </Button>,
+                          <Button
+                            key="quick-view"
+                            icon={<EyeOutlined />}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setQuickViewProduct(product);
+                            }}
+                          >
+                            Xem nhanh
+                          </Button>,
+                        ]}
+                        className="shadow-md hover:shadow-lg transition-shadow duration-300"
                       >
-                        Thêm vào giỏ
-                      </Button>,
-                      <Button
-                        key="quick-view"
-                        icon={<EyeOutlined />}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setQuickViewProduct(product);
-                        }}
-                      >
-                        Xem nhanh
-                      </Button>,
-                    ]}
-                    className="shadow-md hover:shadow-lg transition-shadow duration-300"
-                  >
-                    <Card.Meta
-                      title={
-                        <Link href={`/products/${product.slug}`}>
-                          <span className="text-lg font-semibold">{product.name}</span>
-                        </Link>
-                      }
-                      description={
-                        <div>
-                          <div className="flex items-center mb-1">
-                            <span className="text-red-500 font-bold mr-2">
-                              {product.salePrice.toLocaleString('vi-VN')}đ
-                            </span>
-                            {product.discount > 0 && (
-                              <span className="text-gray-500 line-through text-sm">
-                                {product.price.toLocaleString('vi-VN')}đ
-                              </span>
-                            )}
-                          </div>
-                          <Rate disabled value={product.rating} allowHalf className="text-sm mb-1" />
-                          <p className="text-gray-600 text-sm">Thương hiệu: {product.brand}</p>
-                          {product.installment_available && (
-                            <p className="text-green-600 text-sm">Hỗ trợ trả góp</p>
-                          )}
-                          <p className="text-gray-500 text-sm">
-                            Còn {product.stock} sản phẩm
-                          </p>
-                        </div>
-                      }
-                    />
-                  </Card>
-                </Col>
-              ))}
-            </Row>
+                        <Card.Meta
+                          title={
+                            <Link href={`/products/${product.slug}`}>
+                              <span className="text-lg font-semibold">{product.name}</span>
+                            </Link>
+                          }
+                          description={
+                            <div>
+                              <div className="flex items-center mb-1">
+                                <span className="text-red-500 font-bold mr-2">
+                                  {product.salePrice.toLocaleString('vi-VN')}đ
+                                </span>
+                                {product.discount > 0 && (
+                                  <span className="text-gray-500 line-through text-sm">
+                                    {product.price.toLocaleString('vi-VN')}đ
+                                  </span>
+                                )}
+                              </div>
+                              <Rate disabled value={product.rating} allowHalf className="text-sm mb-1" />
+                              <p className="text-gray-600 text-sm">Thương hiệu: {product.brand}</p>
+                              {product.installment_available && (
+                                <p className="text-green-600 text-sm">Hỗ trợ trả góp</p>
+                              )}
+                              <p className="text-gray-500 text-sm">
+                                Còn {product.stock} sản phẩm
+                              </p>
+                            </div>
+                          }
+                        />
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
 
-            <Pagination
-              current={currentPage}
-              pageSize={pageSize}
-              total={filteredProducts.length}
-              onChange={handlePageChange}
-              className="mt-6 text-center"
-              showSizeChanger={false}
-            />
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={filteredProducts.length}
+                  onChange={handlePageChange}
+                  className="mt-6 text-center"
+                  showSizeChanger={false}
+                />
+              </>
+            )}
           </Col>
         </Row>
 

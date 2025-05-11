@@ -5,8 +5,37 @@ import { useEffect, useState, useRef } from 'react';
 import React from 'react';
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Button, Card, Rate, notification, Tag, Divider, Row, Col, Space, Tabs, List, Avatar, Carousel, Select, Form, Input, message, Pagination, Progress, Spin } from 'antd';
-import { ShoppingCartOutlined, GiftOutlined, StarOutlined, ShareAltOutlined, CarOutlined, LoginOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Card,
+  Rate,
+  notification,
+  Tag,
+  Divider,
+  Row,
+  Col,
+  Space,
+  Tabs,
+  List,
+  Avatar,
+  Carousel,
+  Select,
+  Form,
+  Input,
+  message,
+  Pagination,
+  Progress,
+  Spin,
+  Skeleton,
+} from 'antd';
+import {
+  ShoppingCartOutlined,
+  GiftOutlined,
+  StarOutlined,
+  ShareAltOutlined,
+  CarOutlined,
+  LoginOutlined,
+} from '@ant-design/icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product, Category, Review } from '@/app/types';
@@ -20,6 +49,108 @@ const { TextArea } = Input;
 
 interface ProductDetailProps {
   params: Promise<{ slug: string }>;
+}
+
+// Component Skeleton
+function ProductDetailSkeleton() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Header Skeleton */}
+      <div className="border-b">
+        <div className="container mx-auto p-4">
+          <Skeleton active paragraph={{ rows: 1 }} title={false} />
+        </div>
+      </div>
+
+      {/* Main Content Skeleton */}
+      <main className="flex-grow container mx-auto p-4">
+        {/* Breadcrumb Skeleton */}
+        <div className="mb-4">
+          <Skeleton active paragraph={{ rows: 1 }} title={false} />
+        </div>
+
+        <Row gutter={[16, 16]}>
+          {/* Image Carousel Skeleton */}
+          <Col xs={24} md={10}>
+            <Card className="border-none shadow-sm">
+              <Skeleton.Image style={{ width: '100%', height: 384 }} />
+              <div className="flex justify-center mt-4 space-x-2">
+                {Array(3).fill(0).map((_, index) => (
+                  <Skeleton.Image key={index} style={{ width: 64, height: 64 }} />
+                ))}
+              </div>
+            </Card>
+          </Col>
+
+          {/* Product Info Skeleton */}
+          <Col xs={24} md={14}>
+            <Skeleton active title={{ width: '60%' }} paragraph={{ rows: 2 }} />
+            <Skeleton active title={false} paragraph={{ rows: 1, width: ['40%'] }} />
+            <Skeleton active title={false} paragraph={{ rows: 3, width: ['30%', '20%', '25%'] }} />
+
+            {/* Options Skeleton */}
+            <div className="mb-4">
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <Skeleton.Input active style={{ width: 120 }} size="default" />
+                <Skeleton.Input active style={{ width: 120 }} size="default" />
+              </Space>
+            </div>
+
+            {/* Buttons Skeleton */}
+            <Space size="middle" className="mb-4">
+              <Skeleton.Button active size="large" style={{ width: 160 }} />
+              <Skeleton.Button active size="large" style={{ width: 120 }} />
+              <Skeleton.Button active size="large" style={{ width: 100 }} />
+            </Space>
+
+            {/* Shipping & Warranty Skeleton */}
+            <Card className="border shadow-sm mb-4">
+              <Skeleton active paragraph={{ rows: 1 }} title={false} />
+            </Card>
+            <Card className="border shadow-sm mb-4">
+              <Skeleton active paragraph={{ rows: 1 }} title={false} />
+            </Card>
+            <Card className="border shadow-sm">
+              <Skeleton active title={{ width: '30%' }} paragraph={{ rows: 3, width: ['80%', '60%', '70%'] }} />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Tabs Skeleton */}
+        <div className="my-4">
+          <Skeleton active title={{ width: '20%' }} paragraph={{ rows: 0 }} />
+          <Skeleton active paragraph={{ rows: 5 }} title={false} />
+        </div>
+
+        {/* Related Products Skeleton */}
+        <div className="my-4">
+          <Skeleton active title={{ width: '30%' }} paragraph={{ rows: 0 }} />
+          <Row gutter={[16, 16]} className="mt-4">
+            {Array(4).fill(0).map((_, index) => (
+              <Col xs={24} sm={12} md={6} key={index}>
+                <Card className="border shadow-sm">
+                  <Skeleton.Image style={{ width: '100%', height: 160 }} />
+                  <Skeleton active title={{ width: '80%' }} paragraph={{ rows: 2, width: ['60%', '40%'] }} />
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </div>
+
+        {/* Payment Offer Skeleton */}
+        <Card className="border shadow-sm">
+          <Skeleton active title={{ width: '30%' }} paragraph={{ rows: 1 }} />
+        </Card>
+      </main>
+
+      {/* Footer Skeleton */}
+      <div className="border-t">
+        <div className="container mx-auto p-4">
+          <Skeleton active paragraph={{ rows: 3 }} title={false} />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function ProductDetail({ params }: ProductDetailProps) {
@@ -37,9 +168,9 @@ export default function ProductDetail({ params }: ProductDetailProps) {
   const [allReviews, setAllReviews] = useState<Review[]>([]);
   const [displayedReviews, setDisplayedReviews] = useState<Review[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [categoryProducts, setCategoryProducts] = useState<Product[]>([]); // Danh sách sản phẩm theo danh mục
+  const [categoryProducts, setCategoryProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadingCategory, setLoadingCategory] = useState(false); // Loading cho danh mục
+  const [loadingCategory, setLoadingCategory] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadingAddToCart, setLoadingAddToCart] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string>('Silver');
@@ -48,13 +179,11 @@ export default function ProductDetail({ params }: ProductDetailProps) {
   const [currentImages, setCurrentImages] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [averageRating, setAverageRating] = useState<number>(0);
-  const [ratingDistribution, setRatingDistribution] = useState<number[]>([0, 0, 0, 0, 0]); // [1 sao, 2 sao, 3 sao, 4 sao, 5 sao]
+  const [ratingDistribution, setRatingDistribution] = useState<number[]>([0, 0, 0, 0, 0]);
   const pageSize = 5;
 
-  // Giả lập trạng thái đăng nhập
-  const [isLoggedIn] = useState<boolean>(false); // Thay đổi thành true để kiểm tra trạng thái đăng nhập
+  const [isLoggedIn] = useState<boolean>(false);
 
-  // Form đánh giá
   const [form] = Form.useForm();
 
   // Fetch thông tin sản phẩm chi tiết
@@ -96,11 +225,9 @@ export default function ProductDetail({ params }: ProductDetailProps) {
         const foundCategory = categories.find((cat) => cat._id === foundProduct.category_id);
         setCategory(foundCategory || null);
 
-        // Lọc đánh giá theo product_id
         const productReviews = reviews.filter((review) => review.product_id === foundProduct._id);
         setAllReviews(productReviews);
 
-        // Tính toán thống kê đánh giá
         if (productReviews.length > 0) {
           const totalRating = productReviews.reduce((sum, review) => sum + review.rating, 0);
           setAverageRating(totalRating / productReviews.length);
@@ -115,7 +242,6 @@ export default function ProductDetail({ params }: ProductDetailProps) {
           setRatingDistribution(distribution.map((count) => (count / productReviews.length) * 100));
         }
 
-        // Phân trang đánh giá
         setDisplayedReviews(productReviews.slice(0, pageSize));
 
         const related = products.filter(
@@ -125,7 +251,6 @@ export default function ProductDetail({ params }: ProductDetailProps) {
 
         setError(null);
 
-        // Khởi tạo giá và hình ảnh ban đầu
         setCurrentPrice(foundProduct.salePrice);
         setCurrentImages([
           foundProduct.image,
@@ -143,7 +268,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
     fetchProduct();
   }, [slug]);
 
-  // Fetch sản phẩm theo danh mục từ query parameter
+  // Fetch sản phẩm theo danh mục
   useEffect(() => {
     const fetchCategoryProducts = async () => {
       if (!selectedCategory) {
@@ -186,7 +311,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
     fetchCategoryProducts();
   }, [selectedCategory]);
 
-  // Logic cập nhật giá và hình ảnh khi thay đổi tùy chọn
+  // Cập nhật giá và hình ảnh
   useEffect(() => {
     if (!product) return;
 
@@ -206,7 +331,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
     ]);
   }, [selectedColor, selectedStorage, product]);
 
-  // Cập nhật danh sách đánh giá hiển thị khi thay đổi trang
+  // Cập nhật danh sách đánh giá
   useEffect(() => {
     const start = (currentPage - 1) * pageSize;
     const end = start + pageSize;
@@ -298,8 +423,9 @@ export default function ProductDetail({ params }: ProductDetailProps) {
     }
   };
 
+  // Hiển thị skeleton khi đang tải
   if (loading) {
-    return <div className="container mx-auto p-4">Đang tải...</div>;
+    return <ProductDetailSkeleton />;
   }
 
   if (error || !product) {
@@ -333,7 +459,6 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                   </div>
                 ))}
               </Carousel>
-              {/* Hình thu nhỏ */}
               <div className="flex justify-center mt-4 space-x-2">
                 {currentImages.map((img, index) => (
                   <div
@@ -367,9 +492,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
             <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
             <div className="flex items-center mb-2">
               <Rate disabled value={product.rating} allowHalf className="text-sm mr-2" />
-              <span className="text-sm text-gray-500">
-                ({allReviews.length} đánh giá)
-              </span>
+              <span className="text-sm text-gray-500">({allReviews.length} đánh giá)</span>
             </div>
             <div className="text-lg font-bold text-red-600 mb-2">
               {currentPrice.toLocaleString('vi-VN')}đ
@@ -386,17 +509,14 @@ export default function ProductDetail({ params }: ProductDetailProps) {
               Danh mục: <span className="font-semibold">{category?.name || 'Không xác định'}</span>
             </div>
             <div className="text-sm text-gray-600 mb-4">
-              Tình trạng: <span className="font-semibold">{product.stock > 0 ? `Còn ${product.stock} sản phẩm` : 'Hết hàng'}</span>
+              Tình trạng:{' '}
+              <span className="font-semibold">{product.stock > 0 ? `Còn ${product.stock} sản phẩm` : 'Hết hàng'}</span>
             </div>
 
             <div className="mb-4">
               <div className="text-sm text-gray-600 mb-2">
                 Màu sắc:
-                <Select
-                  value={selectedColor}
-                  onChange={(value) => setSelectedColor(value)}
-                  style={{ width: 120, marginLeft: 8 }}
-                >
+                <Select value={selectedColor} onChange={(value) => setSelectedColor(value)} style={{ width: 120, marginLeft: 8 }}>
                   <Option value="Silver">Silver</Option>
                   <Option value="Space Gray">Space Gray</Option>
                   <Option value="Starlight">Starlight</Option>
@@ -404,11 +524,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
               </div>
               <div className="text-sm text-gray-600 mb-4">
                 Dung lượng:
-                <Select
-                  value={selectedStorage}
-                  onChange={(value) => setSelectedStorage(value)}
-                  style={{ width: 120, marginLeft: 8 }}
-                >
+                <Select value={selectedStorage} onChange={(value) => setSelectedStorage(value)} style={{ width: 120, marginLeft: 8 }}>
                   <Option value="256GB">256GB</Option>
                   <Option value="512GB">512GB</Option>
                   <Option value="1TB">1TB</Option>
@@ -437,16 +553,11 @@ export default function ProductDetail({ params }: ProductDetailProps) {
               >
                 Mua ngay
               </Button>
-              <Button
-                icon={<ShareAltOutlined />}
-                size="large"
-                onClick={handleShare}
-              >
+              <Button icon={<ShareAltOutlined />} size="large" onClick={handleShare}>
                 Chia sẻ
               </Button>
             </Space>
 
-            {/* Thông tin giao hàng */}
             <Card className="border shadow-sm mb-4">
               <div className="flex items-center text-sm text-gray-600">
                 <CarOutlined className="mr-2" />
@@ -479,7 +590,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
 
         <Tabs defaultActiveKey="1" className="mb-4">
           <TabPane tab="Mô tả sản phẩm" key="1">
-            <div className="text-gray-700">
+          <div className="text-gray-700">
               <p className="mb-2">
                 MacBook Air M2 2022 là dòng laptop cao cấp mới nhất của Apple, mang đến hiệu năng vượt trội với chip M2 mạnh mẽ. Thiết kế mỏng nhẹ, sang trọng cùng màn hình Retina 13.6 inch sắc nét, đây là lựa chọn hoàn hảo cho công việc và giải trí.
               </p>
@@ -620,7 +731,6 @@ export default function ProductDetail({ params }: ProductDetailProps) {
 
         <Divider />
 
-        {/* Section hiển thị sản phẩm theo danh mục */}
         {selectedCategory && (
           <>
             <h2 className="text-xl font-bold mb-4">
