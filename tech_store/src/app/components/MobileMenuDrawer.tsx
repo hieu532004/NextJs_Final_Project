@@ -32,9 +32,11 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [submenuPosition, setSubmenuPosition] = useState({ top: 0 });
+  const [brandSubmenuPosition, setBrandSubmenuPosition] = useState({ top: 0, left: 0 });
   const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const submenuRef = useRef<HTMLDivElement | null>(null);
   const brandSubmenuRef = useRef<HTMLDivElement | null>(null);
+  const brandRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const brandHoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -61,6 +63,20 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
       }
     }
   }, [hoveredCategory]);
+
+  // Cập nhật vị trí của droplist khi hover vào thương hiệu
+  useEffect(() => {
+    if (hoveredBrand && brandRefs.current[hoveredBrand] && submenuRef.current) {
+      const brandRect = brandRefs.current[hoveredBrand]?.getBoundingClientRect();
+      const submenuRect = submenuRef.current.getBoundingClientRect();
+      if (brandRect && submenuRect) {
+        setBrandSubmenuPosition({
+          top: brandRect.bottom + window.scrollY, // Cộng scrollY để tính đúng vị trí tuyệt đối
+          left: submenuRect.left - 200 // Đặt bên trái của category-submenu, trừ chiều rộng của droplist (200px)
+        });
+      }
+    }
+  }, [hoveredBrand]);
 
   // Lấy sản phẩm và thương hiệu theo danh mục
   useEffect(() => {
@@ -113,22 +129,19 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
   // Xử lý hover vào danh mục
   const handleCategoryMouseEnter = (categoryId: string) => {
     if (!isMobile) {
-      // Xóa timeout trước đó nếu có
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
         hoverTimeoutRef.current = null;
       }
       setHoveredCategory(categoryId);
-      setHoveredBrand(null); // Reset hovered brand
+      setHoveredBrand(null);
     }
   };
 
   // Xử lý rời khỏi danh mục
   const handleCategoryMouseLeave = () => {
     if (!isMobile) {
-      // Đặt timeout để tránh menu biến mất ngay lập tức
       hoverTimeoutRef.current = setTimeout(() => {
-        // Chỉ đóng menu nếu chuột không nằm trên submenu
         if (submenuRef.current && !isMouseOverElement(submenuRef.current) && 
             brandSubmenuRef.current && !isMouseOverElement(brandSubmenuRef.current)) {
           setHoveredCategory(null);
@@ -176,11 +189,11 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
         if (brandSubmenuRef.current && !isMouseOverElement(brandSubmenuRef.current)) {
           setHoveredBrand(null);
         }
-      }, 100);
+      }, 300); // Tăng thời gian timeout để chuột kịp di chuyển sang droplist
     }
   };
 
-  // Xử lý hover vào submenu thương hiệu
+  // Xử lý hover vào droplist
   const handleBrandSubmenuMouseEnter = () => {
     if (!isMobile && brandHoverTimeoutRef.current) {
       clearTimeout(brandHoverTimeoutRef.current);
@@ -188,12 +201,12 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
     }
   };
 
-  // Xử lý rời khỏi submenu thương hiệu
+  // Xử lý rời khỏi droplist
   const handleBrandSubmenuMouseLeave = () => {
     if (!isMobile) {
       brandHoverTimeoutRef.current = setTimeout(() => {
         setHoveredBrand(null);
-      }, 100);
+      }, 300);
     }
   };
 
@@ -269,9 +282,7 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                   {/* Desktop: Chỉ hover, không click */}
                   {!isMobile ? (
                     <div 
-                      className={`flex items-center justify-between py-2 cursor-pointer text-gray-800 hover:text-blue-600 ${
-                        hoveredCategory === category._id ? 'text-blue-600' : ''
-                      }`}
+                      className={`flex items-center justify-between py-2 cursor-pointer text-gray-800 hover:text-blue-600 ${hoveredCategory === category._id ? 'text-blue-600' : ''}`}
                       onMouseEnter={() => handleCategoryMouseEnter(category._id)}
                       onMouseLeave={handleCategoryMouseLeave}
                     >
@@ -283,9 +294,7 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                   ) : (
                     /* Mobile: Click để mở rộng */
                     <div 
-                      className={`flex items-center justify-between py-2 cursor-pointer text-gray-800 hover:text-blue-600 ${
-                        expandedCategory === category._id ? 'text-blue-600' : ''
-                      }`}
+                      className={`flex items-center justify-between py-2 cursor-pointer text-gray-800 hover:text-blue-600 ${expandedCategory === category._id ? 'text-blue-600' : ''}`}
                       onClick={() => handleCategoryClick(category._id)}
                     >
                       <div className="flex items-center space-x-2">
@@ -380,9 +389,8 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                                 {brandsByCategory.map(({ brand, products }) => (
                                   <div 
                                     key={brand}
-                                    className={`brand-item p-2 rounded-md cursor-pointer ${
-                                      hoveredBrand === brand ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
-                                    }`}
+                                    ref={el => { brandRefs.current[brand] = el; }}
+                                    className={`brand-item p-2 rounded-md cursor-pointer ${hoveredBrand === brand ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'}`}
                                     onMouseEnter={() => handleBrandMouseEnter(brand)}
                                     onMouseLeave={handleBrandMouseLeave}
                                   >
@@ -402,77 +410,35 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                     </div>
                   )}
                   
-                  {/* Submenu thương hiệu */}
+                  {/* Droplist thương hiệu (hiển thị ra ngoài menu phụ) */}
                   {!isMobile && hoveredBrand && hoveredCategory && (
                     <div 
                       ref={brandSubmenuRef}
-                      className="brand-submenu"
+                      className="brand-droplist"
+                      style={{ top: brandSubmenuPosition.top + 'px', left: brandSubmenuPosition.left + 'px' }}
                       onMouseEnter={handleBrandSubmenuMouseEnter}
                       onMouseLeave={handleBrandSubmenuMouseLeave}
                     >
-                      <div className="submenu-header">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-semibold">{hoveredBrand}</h4>
-                          <Link 
-                            href={`/products?brand=${hoveredBrand}&category=${getCategoryName(hoveredCategory)}`}
-                            onClick={onClose}
-                            className="text-xs text-blue-600 hover:underline"
-                          >
-                            Xem tất cả
-                          </Link>
+                      {brandProducts.length > 0 ? (
+                        <div className="droplist-content">
+                          {brandProducts.map((product) => (
+                            <Link 
+                              href={`/products/${product.slug}`} 
+                              key={product._id}
+                              onClick={onClose}
+                              className="droplist-item block"
+                            >
+                              <span className="text-sm text-gray-800 hover:text-blue-600">
+                                {product.name}
+                              </span>
+                            </Link>
+                          ))}
                         </div>
-                      </div>
-                      <div className="submenu-content">
-                        {brandProducts.length > 0 ? (
-                          <div className="space-y-3">
-                            {brandProducts.slice(0, 5).map((product) => (
-                              <Link 
-                                href={`/products/${product.slug}`} 
-                                key={product._id}
-                                onClick={onClose}
-                                className="product-item block"
-                              >
-                                <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded-md transition-colors">
-                                  <div className="relative w-12 h-12 flex-shrink-0">
-                                    <Image
-                                      src={product.image || "/placeholder.svg"}
-                                      alt={product.name}
-                                      fill
-                                      style={{ objectFit: 'contain' }}
-                                      className="rounded-md"
-                                    />
-                                    {product.discount > 0 && (
-                                      <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] px-1 rounded">
-                                        -{product.discount}%
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-medium text-gray-900 truncate">
-                                      {product.name}
-                                    </p>
-                                    <div className="flex items-center">
-                                      <p className="text-xs text-red-600 font-semibold">
-                                        {product.salePrice.toLocaleString('vi-VN')}đ
-                                      </p>
-                                      {product.discount > 0 && (
-                                        <p className="text-[10px] text-gray-500 line-through ml-1">
-                                          {product.price.toLocaleString('vi-VN')}đ
-                                        </p>
-                                      )}
-                                    </div>
-                                    {product.isNew && (
-                                      <span className="text-[10px] text-green-600">Mới</span>
-                                    )}
-                                  </div>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-xs text-gray-500 py-2">Không có sản phẩm</p>
-                        )}
-                      </div>
+                      ) : (
+                        <div className="droplist-content">
+                          <span className="text-sm text-gray-500">Không có sản phẩm</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -482,10 +448,10 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
         </div>
       </Drawer>
 
-      {/* CSS cho menu phụ */}
+      {/* CSS cho menu phụ và droplist */}
       <style jsx global>{`
         /* Thiết lập chung cho menu phụ */
-        .category-submenu, .brand-submenu {
+        .category-submenu {
           background-color: white;
           border-radius: 8px;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -510,17 +476,36 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
           background-color: #f5f5f5;
         }
         
+        /* Thiết lập cho droplist (hiển thị ra ngoài) */
+        .brand-droplist {
+          position: fixed;
+          background-color: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+          z-index: 1001; /* Đảm bảo hiển thị trên category-submenu */
+          width: 200px;
+          animation: fadeIn 0.2s ease-in-out;
+        }
+        
+        .droplist-content {
+          padding: 8px 0;
+        }
+        
+        .droplist-item {
+          padding: 8px 12px;
+          display: block;
+          transition: background-color 0.2s ease;
+        }
+        
+        .droplist-item:hover {
+          background-color: #f5f5f5;
+        }
+        
         /* Desktop: hiển thị bên trái drawer */
         @media (min-width: 768px) {
           .desktop-submenu {
             position: fixed;
             left: calc(100% - 300px - 290px);
-            animation: fadeIn 0.2s ease-in-out;
-          }
-          
-          .brand-submenu {
-            position: fixed;
-            left: calc(100% - 300px - 290px - 290px);
             top: var(--submenu-top, 0);
             animation: fadeIn 0.2s ease-in-out;
           }
@@ -540,24 +525,27 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
             background: transparent;
           }
           
-          /* Thêm vùng kết nối giữa brand và submenu */
+          /* Đặt tham chiếu cho brand-item */
           .brand-item {
             position: relative;
+            transition: all 0.2s ease;
           }
           
+          /* Thêm vùng kết nối giữa brand-item và droplist */
           .brand-item::after {
             content: '';
             position: absolute;
             top: 0;
-            right: -20px;
-            width: 20px;
-            height: 100%;
+            left: -220px; /* Mở rộng sang trái để bao phủ khoảng cách đến droplist (200px + 20px khoảng cách) */
+            width: calc(100% + 240px); /* Bao gồm cả chiều rộng của brand-item và droplist */
+            height: calc(100% + 10px); /* Kéo dài xuống dưới để kết nối với droplist */
             background: transparent;
+            pointer-events: none; /* Đảm bảo không chặn tương tác */
           }
           
           @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(10px); }
-            to { opacity: 1; transform: translateX(0); }
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
           }
         }
         
@@ -580,11 +568,6 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
         
         .featured-product:hover {
           transform: translateY(-2px);
-        }
-        
-        /* Styling cho brand items */
-        .brand-item {
-          transition: all 0.2s ease;
         }
       `}</style>
     </>
