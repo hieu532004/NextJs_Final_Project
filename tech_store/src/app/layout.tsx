@@ -1,7 +1,7 @@
 import { Inter } from 'next/font/google';
-import SupportWidget from './components/SupportWidget';
-import { CartProvider } from './contexts/CartContext';
+import SupportWidget from './components/SupportWidget'; 
 import './styles/globals.css';
+import { CartProvider } from './components/cart';
 
 // Tích hợp font Inter (hoặc font khác nếu bạn muốn)
 const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '600', '700'] });

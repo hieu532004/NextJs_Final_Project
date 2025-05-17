@@ -16,15 +16,33 @@ interface FeaturedProductsProps {
 const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
   const { addToCart } = useCart(); // Lấy hàm addToCart từ CartContext
 
-  const handleAddToCart = (product: Product) => {
-    addToCart({
-      id: product._id,
-      name: product.name,
-      price: product.salePrice,
-      quantity: 1,
-      image: product.image,
-    });
-  };
+
+  const addToCart = async (productId: string, productName: string) => {
+    setLoadingProductId(productId);
+    try {
+      await axios.post('http://localhost:3000/cart', {
+        product_id: productId,
+        quantity: 1,
+      });
+      const response = await axios.get('http://localhost:3000/cart');
+      const cartData = response.data.data as { items: { quantity: number }[] };
+      setCartCount(cartData.items.reduce((total, item) => total + item.quantity, 0));
+      notification.success({
+        message: 'Thêm vào giỏ hàng thành công!',
+        description: `${productName} đã được thêm vào giỏ hàng.`,
+        duration: 2,
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      notification.error({
+        message: 'Lỗi',
+        description: 'Không thể thêm sản phẩm vào giỏ hàng.',
+        duration: 2,
+      });
+    } finally {
+      setLoadingProductId(null);
+    }
+
 
   return (
     <section className="container mx-auto px-4 py-12">
