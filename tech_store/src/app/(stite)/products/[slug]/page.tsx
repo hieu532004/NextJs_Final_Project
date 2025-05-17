@@ -360,7 +360,8 @@ export default function ProductDetail({ params }: ProductDetailProps) {
       message.success('Đã sao chép liên kết sản phẩm!');
     });
   };
-
+// Thêm vào giỏ hàng
+  
   const onFinishReview = async (values: any) => {
     if (!isLoggedIn) {
       message.error('Vui lòng đăng nhập để gửi đánh giá!');

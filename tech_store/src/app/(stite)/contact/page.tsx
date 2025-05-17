@@ -10,7 +10,7 @@ export default function ContactPage() {
         <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-100 to-gray-300">
             <Header searchValue="" setSearchValue={() => {}} />
             <main className="flex-grow container mx-auto px-4 py-12">
-                <h1 className="text-5xl font-extrabold text-center text-gray-900 mb-8 bg-gradient-to-r from-gray-800 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-5xl font-extrabold text-center mb-8 bg-gradient-to-r from-gray-800 to-purple-600 bg-clip-text text-transparent">
                     Liên Hệ Với Chúng Tôi
                 </h1>
                 <div className="max-w-3xl mx-auto">

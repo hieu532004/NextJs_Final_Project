@@ -8,7 +8,7 @@ export default function PrivacyPage() {
         <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
             <Header searchValue="" setSearchValue={() => {}} />
             <main className="flex-grow container mx-auto px-4 py-12">
-                <h1 className="text-5xl font-extrabold mb-8 text-center bg-gradient-to-r text-gray-900 from-gray-800 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-5xl font-extrabold mb-8 text-center bg-gradient-to-r from-gray-800 to-purple-600 bg-clip-text text-transparent">
                     Chính Sách Bảo Mật
                 </h1>
                 <div className="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300">

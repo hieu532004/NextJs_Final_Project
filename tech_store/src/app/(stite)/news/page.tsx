@@ -30,7 +30,7 @@ export default function NewsPage() {
         <div className="flex flex-col min-h-screen bg-gray-50">
             <Header searchValue="" setSearchValue={() => {}} />
             <main className="flex-grow container mx-auto px-4 py-12">
-                <h1 className="text-4xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-gray-800 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-purple-600 bg-clip-text text-transparent">
                     Tin Tức Công Nghệ
                 </h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

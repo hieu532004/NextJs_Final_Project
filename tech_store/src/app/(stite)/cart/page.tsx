@@ -88,7 +88,7 @@ export default function CartPage() {
       </div>
       <div className="container mx-auto max-w-6xl">
 
-        <h1 className="flex justify-center text-2xl font-bold mb-8 mt-4 justify-center items-center">Giỏ hàng</h1>
+        <h1 className="flex justify-center text-2xl font-bold mb-8 mt-4 items-center">Giỏ hàng</h1>
         <div className="lg:col-span-2">
           <div className="rounded-lg shadow-sm overflow-hidden border border-gray-500 bg-white">
             <div className="hidden md:grid grid-cols-12 gap-4 p-4 border-b text-base font-medium text-gray-500">
