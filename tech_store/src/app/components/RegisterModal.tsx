@@ -42,7 +42,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
 
     try {
       // 1. Lấy danh sách người dùng hiện có (GET /users)
-      const usersResponse = await fetch('http://localhost:3001/users', {
+      const usersResponse = await fetch(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/users`, {
         method: 'GET',
       });
 
@@ -78,7 +78,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
       }
 
       // 3. Tạo người dùng mới (POST /users)
-      const response = await fetch('http://localhost:3001/users', {
+      const response = await fetch('${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

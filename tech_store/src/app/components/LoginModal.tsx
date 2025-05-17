@@ -30,7 +30,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isVisible, onCancel, onShowRegi
         setNotificationData(null);
 
         try {
-            const response = await fetch('http://localhost:3001/users');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/users`);
             if (!response.ok) {
                 let errorMessage = `Lỗi HTTP! Trạng thái: ${response.status}`;
                 try {

@@ -1,11 +1,13 @@
+
+
 import { FC } from "react";
 import OrderItem from "./OrderItem";
 import DiscountCode from "./DiscountCode";
 import PaymentTotal from "./PaymentTotal";
 
-
+// Interface cho OrderSummaryProps (đã cập nhật để sử dụng 'image')
 interface OrderSummaryProps {
-  orderItems: { name: string; quantity: number; price: number; imageUrl: string }[];
+  orderItems: { name: string; quantity: number; price: number; image?: string }[]; // Sử dụng 'image'
   originalPrice: number;
   shippingFee: number;
   discountCode: string;
@@ -37,7 +39,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
         name={item.name}
         quantity={item.quantity}
         price={item.price}
-        imageUrl={item.imageUrl}
+        image={item.image} // Sử dụng 'image'
       />
     ))}
 

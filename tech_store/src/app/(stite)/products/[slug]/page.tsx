@@ -192,9 +192,9 @@ export default function ProductDetail({ params }: ProductDetailProps) {
       try {
         setLoading(true);
         const [productsResponse, categoriesResponse, reviewsResponse] = await Promise.all([
-          axios.get('http://localhost:3001/products'),
-          axios.get('http://localhost:3001/categories'),
-          axios.get('http://localhost:3001/reviews'),
+          axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products`),
+          axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/categories`),
+          axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/reviews`),
         ]);
 
         const productsData = productsResponse.data?.data?.products;
@@ -278,7 +278,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
 
       setLoadingCategory(true);
       try {
-        const response = await axios.get('http://localhost:3001/products');
+        const response = await axios.get('${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products');
         const products = response.data.data.products;
 
         const categoryMap: { [key: string]: string[] } = {
@@ -338,38 +338,19 @@ export default function ProductDetail({ params }: ProductDetailProps) {
     setDisplayedReviews(allReviews.slice(start, end));
   }, [currentPage, allReviews]);
 
-  const addToCart = async () => {
-    if (!product) return;
-    setLoadingAddToCart(true);
-    try {
-      await axios.post('http://localhost:3001/cart', {
-        product_id: product._id,
-        quantity: 1,
-        color: selectedColor,
-        storage: selectedStorage,
-      });
-      const response = await axios.get('http://localhost:3001/cart');
-      const cartData = response.data as { items: { quantity: number }[] };
-      setCartCount(cartData.items.reduce((total, item) => total + item.quantity, 0));
-      notification.success({
-        message: 'Thêm vào giỏ hàng thành công!',
-        description: `${product.name} (${selectedColor}, ${selectedStorage}) đã được thêm vào giỏ hàng.`,
-        duration: 2,
-      });
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      notification.error({
-        message: 'Lỗi',
-        description: 'Không thể thêm sản phẩm vào giỏ hàng.',
-        duration: 2,
-      });
-    } finally {
-      setLoadingAddToCart(false);
-    }
+  const { addToCart } = useCart(); // Lấy hàm addToCart từ CartContext
+
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product._id,
+      name: product.name,
+      price: product.salePrice,
+      quantity: 1,
+      image: product.image,
+    });
   };
 
   const handleBuyNow = () => {
-    addToCart();
     router.push('/cart');
   };
 
@@ -398,7 +379,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
         created_at: new Date().toISOString(),
         __v: 0,
       };
-      await axios.post('http://localhost:3001/reviews', newReview);
+      await axios.post('${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/reviews', newReview);
       const updatedReviews = [newReview, ...allReviews];
       setAllReviews(updatedReviews);
       setDisplayedReviews(updatedReviews.slice(0, pageSize));
@@ -537,7 +518,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                 type="primary"
                 icon={<ShoppingCartOutlined />}
                 size="large"
-                onClick={addToCart}
+                onClick={() => handleAddToCart(product)}
                 loading={loadingAddToCart}
                 disabled={product.stock === 0}
                 className="bg-blue-600 hover:bg-blue-700"

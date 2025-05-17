@@ -14,34 +14,16 @@ interface FeaturedProductsProps {
 }
 
 const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
-  const { setCartCount } = useCart();
-  const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
+  const { addToCart } = useCart();
 
-  const addToCart = async (productId: string, productName: string) => {
-    setLoadingProductId(productId);
-    try {
-      await axios.post('http://localhost:3001/cart', {
-        product_id: productId,
-        quantity: 1,
-      });
-      const response = await axios.get('http://localhost:3001/cart');
-      const cartData = response.data.data as { items: { quantity: number }[] };
-      setCartCount(cartData.items.reduce((total, item) => total + item.quantity, 0));
-      notification.success({
-        message: 'Thêm vào giỏ hàng thành công!',
-        description: `${productName} đã được thêm vào giỏ hàng.`,
-        duration: 2,
-      });
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      notification.error({
-        message: 'Lỗi',
-        description: 'Không thể thêm sản phẩm vào giỏ hàng.',
-        duration: 2,
-      });
-    } finally {
-      setLoadingProductId(null);
-    }
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product._id,
+      name: product.name,
+      price: product.salePrice,
+      quantity: 1,
+      image: product.image,
+    });
   };
 
   return (
@@ -57,23 +39,14 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
           </Button>
         </Link>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.length === 0 ? (
           // Hiển thị Skeleton khi không có sản phẩm
-          Array.from({ length: 5 }).map((_, index) => (
-            <Card
-              key={index}
-              className="border-none shadow-sm rounded-xl overflow-hidden"
-            >
-              <Skeleton.Image active className="!w-full !h-[200px]" />
-              <div className="p-4">
-                <Skeleton active paragraph={{ rows: 2 }} title={{ width: '75%' }} />
-                <Skeleton active paragraph={{ rows: 1, width: ['50%'] }} className="mt-2" />
-                <div className="flex justify-between items-center mt-4">
-                  <Skeleton active paragraph={{ rows: 1, width: ['40%'] }} />
-                  <Skeleton.Button active className="!w-8 !h-8" />
-                </div>
-              </div>
+          Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index} className="h-full flex flex-col border-none shadow-sm rounded-xl overflow-hidden">
+              <Skeleton.Image active className="!w-full !h-48" />
+              <Skeleton active paragraph={{ rows: 2 }} className="mt-4" />
+              <Skeleton.Button active block className="!h-10 mt-4" />
             </Card>
           ))
         ) : (
@@ -82,15 +55,16 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
             <Card
               key={product._id}
               hoverable
-              className="border-none shadow-sm hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden"
+              className="h-full flex flex-col border-none shadow-sm hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden"
               cover={
                 <Link href={`/products/${product.slug}`}>
-                  <div className="relative aspect-square bg-white">
+                  <div className="relative pt-4 px-4 h-48 overflow-hidden">
                     <Image
                       src={product.image}
                       alt={product.name}
                       fill
-                      className="object-contain p-4"
+                      style={{ objectFit: 'contain', objectPosition: 'top' }}
+                      className="transition-transform duration-300 hover:scale-105"
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
                     />
                     {product.discount > 0 && (
@@ -107,36 +81,31 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
                 </Link>
               }
             >
-              <div className="p-4">
-                <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 min-h-[2.5rem]">
-                  {product.name}
-                </h3>
-                <div className="flex items-center my-2">
-                  <Rate disabled defaultValue={product.rating} className="!text-xs" />
-                  <span className="text-xs text-gray-500 ml-2">
-                    ({Math.round(product.rating * 20)})
-                  </span>
+              <div className="flex-1 p-4">
+                <h3 className="text-base font-medium text-gray-800 mb-2 line-clamp-2 h-12">{product.name}</h3>
+                <div className="mb-2">
+                  <Rate disabled defaultValue={product.rating} className="text-sm" />
                 </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-lg font-bold text-red-600">
-                      {product.salePrice.toLocaleString('vi-VN')}₫
-                    </div>
-                    {product.salePrice < product.price && (
-                      <div className="text-xs text-gray-400 line-through">
-                        {product.price.toLocaleString('vi-VN')}₫
-                      </div>
-                    )}
+                <div className="mb-4">
+                  <div className="text-lg font-bold text-red-600">
+                    {product.salePrice.toLocaleString('vi-VN')}₫
                   </div>
-                  <Button
-                    type="text"
-                    icon={<ShoppingCartOutlined />}
-                    className="text-blue-600 hover:text-blue-800"
-                    onClick={() => addToCart(product._id, product.name)}
-                    loading={loadingProductId === product._id}
-                  />
+                  {product.salePrice < product.price && (
+                    <div className="text-sm text-gray-500 line-through">
+                      {product.price.toLocaleString('vi-VN')}₫
+                    </div>
+                  )}
                 </div>
               </div>
+              <Button
+                type="primary"
+                block
+                icon={<ShoppingCartOutlined />}
+                onClick={() => handleAddToCart(product)}
+                className="bg-blue-600 hover:bg-blue-700 !rounded-button whitespace-nowrap"
+              >
+                Thêm vào giỏ
+              </Button>
             </Card>
           ))
         )}

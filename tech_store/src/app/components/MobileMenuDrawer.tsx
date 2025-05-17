@@ -69,7 +69,7 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
       
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:3001/products');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products`);
         const allProducts = response.data.data.products;
         
         // Lọc sản phẩm theo category_id

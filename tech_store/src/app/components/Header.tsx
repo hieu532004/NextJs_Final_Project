@@ -113,7 +113,7 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
       }
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:3001/products');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products`);
         // Truy cập đúng vào data.products từ response
         const products = response.data.data.products || [];
         const filteredResults = products.filter((product: Product) =>

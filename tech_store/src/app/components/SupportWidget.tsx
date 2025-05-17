@@ -31,7 +31,7 @@ const SupportWidget: React.FC = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:3001/products');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products`);
         setProducts(response.data.data.products || []);
       } catch (error) {
         console.error('Error fetching products:', error);
