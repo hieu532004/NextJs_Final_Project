@@ -1,11 +1,18 @@
 
+
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Select, message, Form, Spin } from 'antd';
 
 const { Option } = Select;
 
-const AddressSelector = () => {
+interface AddressSelectorProps {
+  setCities?: React.Dispatch<React.SetStateAction<any[]>>;
+  setDistricts?: React.Dispatch<React.SetStateAction<any[]>>;
+  setCommunes?: React.Dispatch<React.SetStateAction<any[]>>;
+}
+
+const AddressSelector: React.FC<AddressSelectorProps> = ({ setCities: setCitiesProp, setDistricts: setDistrictsProp, setCommunes: setCommunesProp }) => {
   const form = Form.useFormInstance();
 
   const [cities, setCities] = useState<any[]>([]); // Lưu danh sách tỉnh thành
@@ -17,6 +24,24 @@ const AddressSelector = () => {
   const [loadingCities, setLoadingCities] = useState<boolean>(false); // Trạng thái loading cho các tỉnh thành
   const [loadingDistricts, setLoadingDistricts] = useState<boolean>(false); // Trạng thái loading cho quận huyện
   const [loadingCommunes, setLoadingCommunes] = useState<boolean>(false); // Trạng thái loading cho phường xã
+
+  useEffect(() => {
+    if (setCitiesProp) {
+      setCitiesProp(cities);
+    }
+  }, [cities, setCitiesProp]);
+
+  useEffect(() => {
+    if (setDistrictsProp) {
+      setDistrictsProp(districts);
+    }
+  }, [districts, setDistrictsProp]);
+
+  useEffect(() => {
+    if (setCommunesProp) {
+      setCommunesProp(communes);
+    }
+  }, [communes, setCommunesProp]);
 
   // Hàm xử lý khi tải dữ liệu tỉnh thành
   const fetchCities = async () => {
@@ -101,8 +126,8 @@ const AddressSelector = () => {
             placeholder="Chọn tỉnh/thành phố"
             style={{ width: '100%' }}
             onChange={handleCityChange}
-            onFocus={fetchCities} 
-            loading={loadingCities} 
+            onFocus={fetchCities}
+            loading={loadingCities}
           >
             {cities.map((city) => (
               <Option key={city.id} value={city.id}>
@@ -124,8 +149,8 @@ const AddressSelector = () => {
             placeholder="Chọn quận/huyện"
             style={{ width: '100%' }}
             onChange={handleDistrictChange}
-            disabled={!selectedCity} 
-            loading={loadingDistricts} 
+            disabled={!selectedCity}
+            loading={loadingDistricts}
           >
             {districts.map((district) => (
               <Option key={district.id} value={district.id}>

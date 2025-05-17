@@ -219,30 +219,20 @@ export default function ProductList() {
 
   const selectedBrandName = selectedBrands.length > 0 ? selectedBrands.join(', ') : '';
 
-  // Thêm vào giỏ hàng
-  const addToCart = async (product: Product) => {
-    try {
-      await axios.post('http://localhost:3001/cart', {
-        product_id: product._id,
-        quantity: 1,
-      });
-      const response = await axios.get('http://localhost:3001/cart');
-      const cartData = response.data as { items: { quantity: number }[] };
-      setCartCount(cartData.items.reduce((total, item) => total + item.quantity, 0));
-      notification.success({
-        message: 'Thêm vào giỏ hàng thành công!',
-        description: `${product.name} đã được thêm vào giỏ hàng.`,
-        duration: 2,
-      });
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      notification.error({
-        message: 'Lỗi',
-        description: 'Không thể thêm sản phẩm vào giỏ hàng.',
-        duration: 2,
-      });
-    }
+  const { addToCart } = useCart(); // Lấy hàm addToCart từ CartContext
+
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product._id,
+      name: product.name,
+      price: product.salePrice,
+      quantity: 1,
+      image: product.image,
+    });
   };
+
+  // Thêm vào giỏ hàng
+
 
   if (loading) {
     return <div className="container mx-auto p-4">Đang tải...</div>;
@@ -269,8 +259,8 @@ export default function ProductList() {
             {searchQuery
               ? `Kết quả tìm kiếm cho "${searchQuery}"`
               : selectedBrandName
-              ? `Sản phẩm thương hiệu ${selectedBrandName}`
-              : selectedCategoryName}
+                ? `Sản phẩm thương hiệu ${selectedBrandName}`
+                : selectedCategoryName}
           </h1>
           <p className="text-sm text-gray-600">
             Tìm thấy {filteredProducts.length} sản phẩm
@@ -380,11 +370,7 @@ export default function ProductList() {
                         key="add-to-cart"
                         type="primary"
                         icon={<ShoppingCartOutlined />}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          addToCart(product);
-                        }}
-                        disabled={product.stock === 0}
+                        onClick={() => handleAddToCart(product)}
                       >
                         Thêm vào giỏ
                       </Button>,
@@ -490,11 +476,7 @@ export default function ProductList() {
                   <Button
                     type="primary"
                     icon={<ShoppingCartOutlined />}
-                    onClick={() => {
-                      addToCart(quickViewProduct);
-                      setQuickViewProduct(null);
-                    }}
-                    disabled={quickViewProduct.stock === 0}
+                    onClick={() => handleAddToCart(quickViewProduct)}
                   >
                     Thêm vào giỏ hàng
                   </Button>

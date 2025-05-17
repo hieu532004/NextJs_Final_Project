@@ -1,120 +1,298 @@
-"use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Lấy hook router
-import { Button, Card, Tag, message } from "antd";
-import { CheckCircleFilled, PhoneOutlined, MailOutlined, ClockCircleOutlined, HomeOutlined } from "@ant-design/icons";
-import Footer from "@/app/components/Footer";
 
-// Component cho trang thanh toán thành công
+"use client"
+import React, { useState, useEffect } from 'react';
+import { Button, Input, Divider, Modal, Steps, message } from 'antd';
+import { CheckCircleFilled, HomeOutlined, ShoppingOutlined, UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@/app/contexts/authContext';
+const { Step } = Steps;
+
 const PaymentSuccess: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false); // Kiểm tra nếu người dùng hợp lệ
+  const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [orderData, setOrderData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user } = useAuth();
 
-  // Hàm để kiểm tra cookie hoặc session
   useEffect(() => {
-    const paymentStatus = document.cookie.split("; ").find(row => row.startsWith("paymentStatus="));
-    
-    if (paymentStatus && paymentStatus.split("=")[1] === "success") {
-      setIsAuthenticated(true); // Nếu thanh toán thành công, cho phép truy cập trang
+    const orderIdFromQuery = searchParams.get('orderId');
+    if (orderIdFromQuery) {
+      setOrderId(orderIdFromQuery);
     } else {
-      router.push("/"); // Nếu không có trạng thái thanh toán thành công, chuyển hướng về trang chủ
+      console.error("Không tìm thấy orderId trên URL.");
+      setError("Không tìm thấy mã đơn hàng.");
+      setLoading(false);
     }
-  }, [router]);
+  }, [searchParams]);
 
-  // Tiến trình tải hóa đơn PDF
-  const handleDownloadInvoice = () => {
-    message.success("Đang tải hóa đơn PDF...");
+  useEffect(() => {
+    if (orderId) {
+      setLoading(true);
+      setError(null);
+      fetch(`http://localhost:3001/orders/${orderId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          setOrderData(data);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error("Failed to fetch order details:", error);
+          setError("Không thể tải thông tin đơn hàng.");
+          setLoading(false);
+        });
+    }
+  }, [orderId]);
+
+  const showTrackingModal = () => {
+    setIsTrackingModalOpen(true);
   };
 
-  const handleContinueShopping = () => {
-    message.success("Chuyển hướng đến trang mua sắm...");
-    // Chuyển hướng đến trang mua sắm
-    router.push("/");
+  const handleTrackingModalClose = () => {
+    setIsTrackingModalOpen(false);
   };
 
-  if (!isAuthenticated) {
-    return null; // Trả về null nếu không được phép truy cập trang
+  if (loading) {
+    return <div className="flex justify-center items-center h-full">Đang tải thông tin đơn hàng...</div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center h-full text-red-500">{error}</div>;
+  }
+
+  if (!orderData) {
+    return <div className="flex justify-center items-center h-full">Không tìm thấy thông tin đơn hàng.</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Thành công header */}
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-6 text-center">
-          <CheckCircleFilled className="text-6xl text-green-500 mb-4" />
-          <h1 className="text-2xl font-bold text-green-800 mb-2">Thanh toán thành công</h1>
-          <p className="text-gray-600 mb-2">Cảm ơn bạn đã mua hàng tại cửa hàng của chúng tôi</p>
-          <div className="flex justify-center items-center gap-2 mb-2">
-            <span className="text-gray-600">Mã đơn hàng:</span>
-            <span className="font-bold text-gray-800">#ORD123456789</span>
-          </div>
-          <div className="flex justify-center items-center gap-2">
-            <ClockCircleOutlined className="text-gray-500" />
-            <span className="text-gray-600">Ngày đặt hàng: 02/05/2025 - 14:30</span>
-          </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <header className="bg-white shadow-sm py-4 px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-start">
+          <Button
+            icon={<ArrowLeftOutlined />}
+            type="link"
+            className="text-blue-600 hover:text-blue-800"
+            onClick={() => router.push('/')}
+          >
+            Quay lại trang chủ
+          </Button>
+          <h1 className="ml-4 text-2xl font-bold text-blue-600 cursor-pointer">
+            TechStore
+          </h1>
         </div>
+      </header>
 
-        {/* Chi tiết đơn hàng, thông tin khách hàng, giao hàng, thanh toán */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-1">
-            <Card className="h-full shadow-sm" title="Thông tin khách hàng">
-              <div className="space-y-4">
-                <div><p className="text-gray-500 text-sm mb-1">Họ tên</p><p className="font-medium">Nguyễn Văn A</p></div>
-                <div><p className="text-gray-500 text-sm mb-1">Số điện thoại</p><p className="font-medium">0912345678</p></div>
-                <div><p className="text-gray-500 text-sm mb-1">Email</p><p className="font-medium">example@gmail.com</p></div>
-              </div>
-            </Card>
+      {/* Main Content */}
+      <main className="flex-grow py-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8">
+          {/* Success Message */}
+          <div className="text-center mb-8">
+            <CheckCircleFilled className="text-6xl text-green-500 mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800">Thanh toán thành công</h2>
+            <p className="text-gray-600 mt-2">Cảm ơn bạn đã mua hàng tại TechStore</p>
+            <p className="text-gray-600 mt-1">Mã đơn hàng: <span className="font-semibold">#{orderData.id}</span></p>
           </div>
 
-          {/* Thông tin giao hàng */}
-          <div className="md:col-span-1">
-            <Card className="h-full shadow-sm" title="Thông tin giao hàng">
-              <div className="space-y-4">
-                <div><p className="text-gray-500 text-sm mb-1">Địa chỉ giao hàng</p><p className="font-medium">123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh</p></div>
-                <div><p className="text-gray-500 text-sm mb-1">Phương thức vận chuyển</p><p className="font-medium">Giao hàng tiêu chuẩn</p></div>
-                <div><p className="text-gray-500 text-sm mb-1">Thời gian dự kiến</p><p className="font-medium">05/05/2025 - 07/05/2025</p></div>
-              </div>
-            </Card>
-          </div>
+          <Divider className="my-6" />
 
-          {/* Thông tin thanh toán */}
-          <div className="md:col-span-1">
-            <Card className="h-full shadow-sm" title="Thông tin thanh toán">
-              <div className="space-y-4">
-                <div><p className="text-gray-500 text-sm mb-1">Phương thức thanh toán</p><div className="flex items-center gap-2"><i className="fas fa-credit-card text-blue-500"></i><p className="font-medium">Thẻ tín dụng/ghi nợ</p></div></div>
-                <div><p className="text-gray-500 text-sm mb-1">Tình trạng thanh toán</p><Tag color="green" className="!rounded-button">Đã thanh toán</Tag></div>
-                <div><p className="text-gray-500 text-sm mb-1">Mã giảm giá</p><p className="font-medium">SUMMER2023</p></div>
-              </div>
-            </Card>
-          </div>
-        </div>
-
-        {/* Các nút */}
-        <div className="flex flex-col md:flex-row gap-4 mt-8">
-          <Button type="primary" size="large" icon={<i className="fas fa-file-invoice mr-2"></i>} className="!rounded-button whitespace-nowrap cursor-pointer" onClick={handleDownloadInvoice}>Tải hóa đơn PDF</Button>
-          <Button size="large" icon={<i className="fas fa-shopping-cart mr-2"></i>} className="!rounded-button whitespace-nowrap cursor-pointer" onClick={handleContinueShopping}>Tiếp tục mua sắm</Button>
-        </div>
-
-        {/* Hỗ trợ khách hàng */}
-        <div className="mt-10 bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-medium mb-4">Hỗ trợ khách hàng</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-start">
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3"><PhoneOutlined className="text-blue-500" /></div>
-              <div><p className="font-medium">Hotline</p><p className="text-blue-500">1900 1234</p><p className="text-sm text-gray-500">8:00 - 21:00, Thứ 2 - Chủ Nhật</p></div>
+          {/* Order Details */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-4">Thông tin đơn hàng</h3>
+            <div className="space-y-4">
+              {orderData.orderItems && orderData.orderItems.map((item: any) => (
+                <div key={item.productId} className="flex items-center p-4 border border-gray-100 rounded-lg">
+                  <div className="w-16 h-16 overflow-hidden rounded-md flex-shrink-0">
+                    <img
+                      src={item.imageUrl || `https://via.placeholder.com/100x100?text=Product+${item.productId}`} // Sử dụng item.imageUrl, fallback nếu không có
+                      alt={`Sản phẩm ${item.productId}`}
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                  <div className="ml-4 flex-grow">
+                    <h4 className="font-medium"> {item.name}</h4> {/* Bạn có thể cần tên sản phẩm từ API */}
+                    <p className="text-sm text-gray-500">SL: {item.quantity}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold">{parseFloat(item.pricePerUnit).toLocaleString('vi-VN')} VND</p>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex items-start">
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3"><MailOutlined className="text-blue-500" /></div>
-              <div><p className="font-medium">Email hỗ trợ</p><p className="text-blue-500">support@example.com</p><p className="text-sm text-gray-500">Phản hồi trong vòng 24h</p></div>
-            </div>
-            <div className="flex items-start">
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3"><HomeOutlined className="text-blue-500" /></div>
-              <div><p className="font-medium">Cửa hàng</p><p className="text-gray-700">123 Đường ABC, Quận 1</p><p className="text-sm text-gray-500">8:00 - 21:00, Thứ 2 - Chủ Nhật</p></div>
+
+            <div className="mt-6 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Tổng tiền hàng:</span>
+                <span>{parseFloat(orderData.totalAmount + orderData.discountAmount).toLocaleString('vi-VN')} VND</span> {/* Điều chỉnh nếu có phí ship */}
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Giảm giá:</span>
+                <span>{parseFloat(orderData.discountAmount).toLocaleString('vi-VN')} VND</span>
+              </div>
+              <Divider className="my-3" />
+              <div className="flex justify-between font-bold">
+                <span>Tổng thanh toán:</span>
+                <span className="text-red-600 text-xl">{parseFloat(orderData.totalAmount).toLocaleString('vi-VN')} VND</span>
+              </div>
+              <div className="text-right text-xs text-gray-500">(Đã bao gồm VAT)</div>
             </div>
           </div>
+
+          <Divider className="my-6" />
+
+          {/* Shipping Information */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-4">Thông tin giao hàng</h3>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <p className="text-gray-600 mb-1">Họ tên:</p>
+                <p className="font-medium">{orderData.fullName}</p>
+              </div>
+              <div>
+                <p className="text-gray-600 mb-1">Số điện thoại:</p>
+                <p className="font-medium">{orderData.phone}</p>
+              </div>
+              <div>
+                <p className="text-gray-600 mb-1">Email:</p>
+                <p className="font-medium">{orderData.email}</p>
+              </div>
+
+              {orderData.userfullname && ( // Kiểm tra nếu userId tồn tại
+                <div>
+                  <p className="text-gray-600 mb-1">Tên khách hàng:</p>
+                  <p className="font-medium">{orderData.userfullname}</p>
+                </div>
+              )}
+              <div className="col-span-2">
+                <p className="text-gray-600 mb-1">Địa chỉ giao hàng:</p>
+                <p className="font-medium">
+                  {orderData.detailAddress}, {orderData.commune}, {orderData.district}, {orderData.city}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Divider className="my-6" />
+
+          {/* Payment Method */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-4">Phương thức thanh toán</h3>
+            <div className="flex items-center p-3 border border-gray-200 rounded-lg w-fit">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                {orderData.paymentMethod === 'ewallet' ? <i className="fas fa-wallet text-blue-600"></i> : <i className="fas fa-credit-card text-blue-600"></i>} {/* Thêm icon phù hợp */}
+              </div>
+              <span className="ml-3 font-medium">
+                {orderData.paymentMethod === 'card' ? 'Thẻ tín dụng/ghi nợ' :
+                  orderData.paymentMethod === 'ewallet' ? 'Ví điện tử' :
+                    orderData.paymentMethod === 'bank' ? 'Chuyển khoản ngân hàng' :
+                      orderData.paymentMethod === 'cod' ? 'Thanh toán khi nhận hàng' :
+                        'Phương thức khác'}
+              </span>
+              {/* <span className="ml-3 font-medium">{orderData.paymentMethod === 'ewallet' ? 'Ví điện tử' : 'Phương thức khác'}</span> Hiển thị tên phương thức */}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap justify-center gap-4 mt-8">
+            <Button
+              type="primary"
+              size="large"
+              className="!rounded-button whitespace-nowrap bg-blue-600 hover:bg-blue-700 min-w-[180px] cursor-pointer"
+              icon={<i className="fas fa-truck-fast mr-2"></i>}
+              onClick={showTrackingModal}
+            >
+              Theo dõi đơn hàng
+            </Button>
+            <Button
+              size="large"
+              className="!rounded-button whitespace-nowrap min-w-[180px] cursor-pointer"
+              icon={<ShoppingOutlined className="mr-2" />}
+              onClick={() => router.push('/')}
+            >
+              Tiếp tục mua sắm
+            </Button>
+            <Button
+              size="large"
+              className="!rounded-button whitespace-nowrap min-w-[180px] cursor-pointer"
+              icon={<HomeOutlined className="mr-2" />}
+              onClick={() => router.push('/')}
+            >
+              Về trang chủ
+            </Button>
+          </div>
+
+          {/* Order Tracking Modal */}
+          <Modal
+            title={<div className="text-xl font-semibold">Theo dõi đơn hàng #{orderData.id}</div>}
+            open={isTrackingModalOpen}
+            onCancel={handleTrackingModalClose}
+            footer={null}
+            width={800}
+          >
+            <div className="py-6">
+              <Steps
+                current={0} // Cần logic để cập nhật trạng thái theo dõi
+                progressDot
+                className="custom-steps mb-8"
+              >
+                <Step title="Đặt hàng thành công" />
+                <Step title="Đã xác nhận" />
+                <Step title="Đang chuẩn bị hàng" />
+                <Step title="Đang giao hàng" />
+                <Step title="Đã giao hàng" />
+              </Steps>
+
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h4 className="font-semibold mb-3">Thông tin vận chuyển</h4>
+                <div className="space-y-2 text-sm">
+                  <p><span className="text-gray-600">Đơn vị vận chuyển:</span> <span className="font-medium">N/A</span></p> {/* Lấy từ API nếu có */}
+                  <p><span className="text-gray-600">Mã vận đơn:</span> <span className="font-medium">N/A</span></p> {/* Lấy từ API nếu có */}
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-start">
+                  <i className="fas fa-info-circle text-blue-600 mt-1"></i>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-800">Đơn hàng của bạn đã được thanh toán thành công và đang được xử lý.</p>
+                    <p className="text-sm text-blue-600 mt-2">Bạn có thể theo dõi đơn hàng ở trên.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Modal>
+
         </div>
-      </div>
-      <Footer />
+      </main>
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 py-8 mt-12">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* ... Footer content ... */}
+          </div>
+          <Divider className="my-6" />
+          <div className="text-center text-sm text-gray-600">
+            <p>© 2025 TechStore. Tất cả các quyền được bảo lưu.</p>
+            <p className="mt-1">Địa chỉ: 123 Đường Công Nghệ, Quận 1, TP. Hồ Chí Minh</p>
+          </div>
+        </div>
+      </footer>
+      {/* Add custom styles */}
+      <style jsx>{`
+        .custom-steps .ant-steps-item-tail {
+          padding: 3.5px 0;
+        }
+        .custom-steps .ant-steps-item-content {
+          margin-top: 8px;
+        }
+      `}</style>
     </div>
   );
 };

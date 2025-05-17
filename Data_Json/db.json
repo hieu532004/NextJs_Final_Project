@@ -603,6 +603,441 @@
       "password": "123123",
       "confirmPassword": "123123",
       "agreement": true
+    },
+    {
+      "id": "8ad8",
+      "username": "namle4",
+      "name": "ledanghoainam",
+      "email": "namle4@gmail.com",
+      "phone": "0987654321",
+      "password": "123123",
+      "confirmPassword": "123123",
+      "agreement": true
+    },
+    {
+      "id": "56aa",
+      "username": "namlevip",
+      "name": "namle pro",
+      "email": "namlepro@gmail.com",
+      "phone": "0987654232",
+      "password": "111111",
+      "confirmPassword": "111111",
+      "agreement": true
+    }
+  ],
+  "orders": [
+    {
+      "order_id": 1,
+      "user_id": 101,
+      "order_date": "2025-05-17T13:30:00Z",
+      "shipping_address": "123 Đường ABC, Phường XYZ",
+      "shipping_city": "Đà Nẵng",
+      "shipping_district": "Hải Châu",
+      "shipping_phone": "090xxxxxxx",
+      "shipping_name": "Nguyễn Văn A",
+      "payment_method": "ewallet",
+      "payment_status": "paid",
+      "discount_code": "SALE10",
+      "discount_amount": 100000,
+      "shipping_fee": 30000,
+      "total_amount": 430000,
+      "order_status": "delivered",
+      "order_items": [
+        {
+          "order_item_id": 1,
+          "product_id": 1,
+          "quantity": 2,
+          "price_per_unit": 200000,
+          "total_price": 400000
+        },
+        {
+          "order_item_id": 2,
+          "product_id": 3,
+          "quantity": 1,
+          "price_per_unit": 60000,
+          "total_price": 60000
+        }
+      ],
+      "id": "3d72"
+    },
+    {
+      "order_id": 2,
+      "user_id": 102,
+      "order_date": "2025-05-16T10:00:00Z",
+      "shipping_address": "456 Đường DEF, Phường UVW",
+      "shipping_city": "Hà Nội",
+      "shipping_district": "Đống Đa",
+      "shipping_phone": "091xxxxxxx",
+      "shipping_name": "Trần Thị B",
+      "payment_method": "card",
+      "payment_status": "pending",
+      "discount_code": null,
+      "discount_amount": 0,
+      "shipping_fee": 30000,
+      "total_amount": 230000,
+      "order_status": "processing",
+      "order_items": [
+        {
+          "order_item_id": 3,
+          "product_id": 2,
+          "quantity": 1,
+          "price_per_unit": 200000,
+          "total_price": 200000
+        }
+      ],
+      "id": "6bc2"
+    },
+    {
+      "id": "bcb0",
+      "fullName": "Nam Lê",
+      "phone": "09745241",
+      "email": "namle12h@gmail.com",
+      "city": "27",
+      "district": "260",
+      "commune": "09319",
+      "detailAddress": "1324356",
+      "paymentMethod": "cod",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74glo",
+          "quantity": 1,
+          "pricePerUnit": 2590000
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74glm",
+          "quantity": 1,
+          "pricePerUnit": 26490000
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74gls",
+          "quantity": 1,
+          "pricePerUnit": 11490000
+        }
+      ],
+      "totalAmount": 40600000,
+      "discountAmount": 0
+    },
+    {
+      "id": "fb55",
+      "fullName": "Nam Lê",
+      "phone": "09745241",
+      "email": "namle12h@gmail.com",
+      "city": "95",
+      "district": "958",
+      "commune": "31906",
+      "detailAddress": "1324356",
+      "paymentMethod": "ewallet",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74gln",
+          "quantity": 1,
+          "pricePerUnit": 19990000
+        }
+      ],
+      "totalAmount": 20020000,
+      "discountAmount": 0
+    },
+    {
+      "id": "02cc",
+      "fullName": "Nam Lê",
+      "phone": "09745241",
+      "email": "namle12h@gmail.com",
+      "city": "95",
+      "district": "956",
+      "commune": "31849",
+      "detailAddress": "1324356",
+      "paymentMethod": "ewallet",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74glp",
+          "quantity": 1,
+          "pricePerUnit": 1790000
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74glq",
+          "quantity": 2,
+          "pricePerUnit": 5990000
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74gln",
+          "quantity": 1,
+          "pricePerUnit": 19990000
+        }
+      ],
+      "totalAmount": 33790000,
+      "discountAmount": 0
+    },
+    {
+      "id": "1160",
+      "fullName": "Phương Anh",
+      "phone": "09745241",
+      "email": "hoainam003h@gmail.com",
+      "city": "06",
+      "district": "065",
+      "commune": "02095",
+      "detailAddress": "1324356",
+      "paymentMethod": "ewallet",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74glt",
+          "quantity": 1,
+          "pricePerUnit": 290000
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74gls",
+          "quantity": 1,
+          "pricePerUnit": 11490000
+        }
+      ],
+      "totalAmount": 11810000,
+      "discountAmount": 0
+    },
+    {
+      "id": "7219",
+      "fullName": "Nam Lê",
+      "phone": "987-654-3210",
+      "email": "ledanghoainam2000.yahoo@gmail.com",
+      "city": "77",
+      "district": "748",
+      "commune": "26572",
+      "detailAddress": "1324356",
+      "paymentMethod": "cod",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74glo",
+          "quantity": 1,
+          "pricePerUnit": 2590000
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74glm",
+          "quantity": 1,
+          "pricePerUnit": 26490000
+        }
+      ],
+      "totalAmount": 29110000,
+      "discountAmount": 0
+    },
+    {
+      "id": "e717",
+      "fullName": "Nam Lê",
+      "phone": "987-654-3210",
+      "email": "admin@example.com",
+      "city": "27",
+      "district": "262",
+      "commune": "09403",
+      "detailAddress": "123 ĐN",
+      "note": "a",
+      "userId": "5c89",
+      "paymentMethod": "card",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74glo",
+          "quantity": 1,
+          "pricePerUnit": 2590000
+        }
+      ],
+      "totalAmount": 2620000,
+      "discountAmount": 0
+    },
+    
+    
+    {
+      "id": "7ca8",
+      "fullName": "Phương Anh Đào",
+      "phone": "987-654-3210",
+      "email": "admin@example.com",
+      "city": "77",
+      "district": "754",
+      "commune": "26713",
+      "detailAddress": "123 ĐN",
+      "paymentMethod": "ewallet",
+      "orderItems": [
+        {
+          "productname": "Bàn phím cơ Keychron K2",
+          "quantity": 1,
+          "pricePerUnit": 1790000,
+          "image": "https://readdy.ai/api/search-image?query=Keychron%20K2%20mechanical%20keyboard%20with%20RGB%20backlight%2C%20compact%20design%20with%20aluminum%20frame%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=4&orientation=landscape"
+        }
+      ],
+      "totalAmount": 1820000,
+      "discountAmount": 0
+    },
+    {
+      "id": "bb67",
+      "fullName": "Phương Anh Đào",
+      "phone": "123-456-7890",
+      "email": "hoainam003h@gmail.com",
+      "city": "06",
+      "district": "066",
+      "commune": "02146",
+      "detailAddress": "123 ĐN",
+      "paymentMethod": "ewallet",
+      "orderItems": [
+        {
+          "productname": "Cáp sạc USB-C Anker PowerLine III",
+          "quantity": 1,
+          "pricePerUnit": 290000,
+          "image": "https://readdy.ai/api/search-image?query=Anker%20PowerLine%20III%20USB-C%20charging%20cable%2C%20premium%20braided%20design%2C%20durable%20connector%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=8&orientation=landscape"
+        },
+        {
+          "productname": "Màn hình Dell UltraSharp U2720Q",
+          "quantity": 1,
+          "pricePerUnit": 11490000,
+          "image": "https://readdy.ai/api/search-image?query=Dell%20UltraSharp%20U2720Q%204K%20monitor%20with%20thin%20bezels%2C%20professional%20design%20with%20adjustable%20stand%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=7&orientation=landscape"
+        }
+      ],
+      "totalAmount": 11810000,
+      "discountAmount": 0
+    },
+    {
+      "id": "a93d",
+      "fullName": "Phương Anh Đào",
+      "phone": "987-654-3210",
+      "email": "hoainam003h@gmail.com",
+      "city": "89",
+      "district": "889",
+      "commune": "30484",
+      "detailAddress": "123 ĐN",
+      "paymentMethod": "bank",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74glo",
+          "quantity": 1,
+          "pricePerUnit": 2590000,
+          "name": "Chuột Gaming Logitech G Pro X Superlight",
+          "imageUrl": "https://readdy.ai/api/search-image?query=Logitech%20G%20Pro%20X%20Superlight%20gaming%20mouse%2C%20sleek%20white%20design%2C%20ergonomic%20shape%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=3&orientation=landscape"
+        }
+      ],
+      "totalAmount": 2620000,
+      "discountAmount": 0
+    },
+    {
+      "id": "60e5",
+      "fullName": "lee min ho",
+      "phone": "09745241",
+      "email": "ledanghoainam2000.yahoo@gmail.com",
+      "city": "27",
+      "district": "260",
+      "commune": "09334",
+      "detailAddress": "123 ĐNsdd",
+      "paymentMethod": "bank",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74glp",
+          "quantity": 1,
+          "pricePerUnit": 1790000,
+          "name": "Bàn phím cơ Keychron K2",
+          "imageUrl": "https://readdy.ai/api/search-image?query=Keychron%20K2%20mechanical%20keyboard%20with%20RGB%20backlight%2C%20compact%20design%20with%20aluminum%20frame%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=4&orientation=landscape"
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74glo",
+          "quantity": 1,
+          "pricePerUnit": 2590000,
+          "name": "Chuột Gaming Logitech G Pro X Superlight",
+          "imageUrl": "https://readdy.ai/api/search-image?query=Logitech%20G%20Pro%20X%20Superlight%20gaming%20mouse%2C%20sleek%20white%20design%2C%20ergonomic%20shape%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=3&orientation=landscape"
+        }
+      ],
+      "totalAmount": 4410000,
+      "discountAmount": 0
+    },
+    {
+      "id": "87f9",
+      "fullName": "Phương Anh Đào Lửa",
+      "phone": "987-654-3210",
+      "email": "admin@example.com",
+      "city": "77",
+      "district": "751",
+      "commune": "26632",
+      "detailAddress": "1324356",
+      "userfullname": "John Doe",
+      "paymentMethod": "cod",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74glq",
+          "quantity": 1,
+          "pricePerUnit": 5990000,
+          "name": "Tai nghe Sony WH-1000XM4",
+          "imageUrl": "https://readdy.ai/api/search-image?query=Sony%20WH-1000XM4%20wireless%20noise%20cancelling%20headphones%2C%20premium%20black%20design%20with%20gold%20accents%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=5&orientation=landscape"
+        }
+      ],
+      "totalAmount": 6020000,
+      "discountAmount": 0
+    },
+    {
+      "id": "f1e2",
+      "fullName": "Phương Anh Đào",
+      "phone": "987-654-3210",
+      "email": "namle12h@gmail.com",
+      "city": "24",
+      "district": "218",
+      "commune": "07462",
+      "detailAddress": "123 ĐNsdd",
+      "userid": "1",
+      "userfullname": "John Doe",
+      "paymentMethod": "ewallet",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74glo",
+          "quantity": 2,
+          "pricePerUnit": 2590000,
+          "name": "Chuột Gaming Logitech G Pro X Superlight",
+          "imageUrl": "https://readdy.ai/api/search-image?query=Logitech%20G%20Pro%20X%20Superlight%20gaming%20mouse%2C%20sleek%20white%20design%2C%20ergonomic%20shape%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=3&orientation=landscape"
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74glp",
+          "quantity": 2,
+          "pricePerUnit": 1790000,
+          "name": "Bàn phím cơ Keychron K2",
+          "imageUrl": "https://readdy.ai/api/search-image?query=Keychron%20K2%20mechanical%20keyboard%20with%20RGB%20backlight%2C%20compact%20design%20with%20aluminum%20frame%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=4&orientation=landscape"
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74gls",
+          "quantity": 1,
+          "pricePerUnit": 11490000,
+          "name": "Màn hình Dell UltraSharp U2720Q",
+          "imageUrl": "https://readdy.ai/api/search-image?query=Dell%20UltraSharp%20U2720Q%204K%20monitor%20with%20thin%20bezels%2C%20professional%20design%20with%20adjustable%20stand%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=7&orientation=landscape"
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74glm",
+          "quantity": 1,
+          "pricePerUnit": 26490000,
+          "name": "Laptop Apple MacBook Air M2 2022",
+          "imageUrl": "https://readdy.ai/api/search-image?query=Modern%20sleek%20Apple%20MacBook%20Air%20M2%202022%20laptop%20with%20minimalist%20design%2C%20silver%20color%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=1&orientation=landscape"
+        }
+      ],
+      "totalAmount": 46770000,
+      "discountAmount": 0
+    },
+    {
+      "id": "8fe3",
+      "fullName": "Nam Lê SS1",
+      "phone": "09745241",
+      "email": "admin@example.com",
+      "city": "27",
+      "district": "261",
+      "commune": "09370",
+      "detailAddress": "QN",
+      "userid": "56aa",
+      "userfullname": "namle pro",
+      "paymentMethod": "cod",
+      "orderItems": [
+        {
+          "productId": "68b1f4h599h7fh57i9h74glp",
+          "quantity": 1,
+          "pricePerUnit": 1790000,
+          "name": "Bàn phím cơ Keychron K2",
+          "imageUrl": "https://readdy.ai/api/search-image?query=Keychron%20K2%20mechanical%20keyboard%20with%20RGB%20backlight%2C%20compact%20design%20with%20aluminum%20frame%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=4&orientation=landscape"
+        },
+        {
+          "productId": "68b1f4h599h7fh57i9h74glm",
+          "quantity": 1,
+          "pricePerUnit": 26490000,
+          "name": "Laptop Apple MacBook Air M2 2022",
+          "imageUrl": "https://readdy.ai/api/search-image?query=Modern%20sleek%20Apple%20MacBook%20Air%20M2%202022%20laptop%20with%20minimalist%20design%2C%20silver%20color%2C%20on%20a%20clean%20white%20background%2C%20professional%20product%20photography%20with%20soft%20lighting%2C%20high%20resolution%2C%20detailed%20texture%2C%20commercial%20quality&width=300&height=200&seq=1&orientation=landscape"
+        }
+      ],
+      "totalAmount": 28310000,
+      "discountAmount": 0
     }
   ]
 }

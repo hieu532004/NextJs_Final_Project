@@ -3,20 +3,31 @@ import { Button, Card, Rate } from 'antd';
 import { ShoppingCartOutlined, RightOutlined } from '@ant-design/icons';
 import { Product } from '@/app/types';
 import Link from 'next/link';
-
+import { useCart } from '@/app/contexts/CartContext';
 interface BestSellingProductsProps {
   products: Product[];
 }
 
 const BestSellingProducts: React.FC<BestSellingProductsProps> = ({ products }) => {
+  const { addToCart } = useCart(); // Lấy hàm addToCart từ CartContext
+
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product._id,
+      name: product.name,
+      price: product.salePrice,
+      quantity: 1,
+      image: product.image,
+    });
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Sản phẩm bán chạy</h2>
         <Link href="/products">
-        <Button type="link" className="text-blue-600 font-medium !rounded-button whitespace-nowrap">
-          Xem tất cả <RightOutlined />
-        </Button>
+          <Button type="link" className="text-blue-600 font-medium !rounded-button whitespace-nowrap">
+            Xem tất cả <RightOutlined />
+          </Button>
         </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -62,6 +73,7 @@ const BestSellingProducts: React.FC<BestSellingProductsProps> = ({ products }) =
               block
               className="bg-blue-600 hover:bg-blue-700 !rounded-button whitespace-nowrap"
               icon={<ShoppingCartOutlined />}
+              onClick={() => handleAddToCart(product)}
             >
               Thêm vào giỏ
             </Button>
