@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Card, Row, Col, Menu, Slider, Checkbox, Select, Rate, Tag, Button, Space, Pagination, Modal, notification } from 'antd';
+import { Card, Row, Col, Menu, Slider, Checkbox, Select, Rate, Tag, Button, Space, Pagination, Modal, notification, Skeleton } from 'antd';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -27,12 +27,12 @@ const categoryMap: { [key: string]: string } = {
 };
 
 export default function ProductList() {
-  const { setCartCount } = useCart();
+  const { setCartCount, addToCart } = useCart();
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryCategory = searchParams.get('category');
   const queryBrand = searchParams.get('brand');
-  const querySearch = searchParams.get('search'); // Đọc query parameter search
+  const querySearch = searchParams.get('search');
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -45,10 +45,10 @@ export default function ProductList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>(querySearch || ''); // State cho tìm kiếm
+  const [searchQuery, setSearchQuery] = useState<string>(querySearch || '');
   const pageSize = 6;
 
-  // Thiết lập selectedCategory từ query parameter khi trang tải
+  // Thiết lập selectedCategory từ query parameter
   useEffect(() => {
     if (queryCategory) {
       const matchedCategoryName = categoryMap[queryCategory];
@@ -63,7 +63,7 @@ export default function ProductList() {
     }
   }, [queryCategory, categories]);
 
-  // Thiết lập selectedBrands từ query parameter brand khi trang tải
+  // Thiết lập selectedBrands từ query parameter
   useEffect(() => {
     if (queryBrand) {
       const matchedBrand = products.find(product => product.brand.toLowerCase() === queryBrand.toLowerCase())?.brand;
@@ -77,7 +77,7 @@ export default function ProductList() {
     }
   }, [queryBrand, products]);
 
-  // Cập nhật searchQuery từ query parameter search
+  // Cập nhật searchQuery từ query parameter
   useEffect(() => {
     if (querySearch) {
       setSearchQuery(querySearch);
@@ -92,8 +92,8 @@ export default function ProductList() {
       try {
         setLoading(true);
         const [productsResponse, categoriesResponse] = await Promise.all([
-          axios.get('http://localhost:3001/products'),
-          axios.get('http://localhost:3001/categories'),
+          axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products`),
+          axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/categories`),
         ]);
         const productsData = productsResponse.data.data.products;
         const categoriesData = categoriesResponse.data.data.categories;
@@ -219,37 +219,65 @@ export default function ProductList() {
 
   const selectedBrandName = selectedBrands.length > 0 ? selectedBrands.join(', ') : '';
 
-  // Thêm vào giỏ hàng
-  const addToCart = async (product: Product) => {
-    try {
-      await axios.post('http://localhost:3001/cart', {
-        product_id: product._id,
-        quantity: 1,
-      });
-      const response = await axios.get('http://localhost:3001/cart');
-      const cartData = response.data as { items: { quantity: number }[] };
-      setCartCount(cartData.items.reduce((total, item) => total + item.quantity, 0));
-      notification.success({
-        message: 'Thêm vào giỏ hàng thành công!',
-        description: `${product.name} đã được thêm vào giỏ hàng.`,
-        duration: 2,
-      });
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      notification.error({
-        message: 'Lỗi',
-        description: 'Không thể thêm sản phẩm vào giỏ hàng.',
-        duration: 2,
-      });
-    }
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product._id,
+      name: product.name,
+      price: product.salePrice,
+      quantity: 1,
+      image: product.image,
+    });
+    setCartCount(prev => prev + 1); // Sử dụng callback để tăng số lượng
+    notification.success({
+      message: 'Thêm vào giỏ hàng thành công!',
+      description: `${product.name} đã được thêm vào giỏ hàng.`,
+      duration: 2,
+    });
   };
 
   if (loading) {
-    return <div className="container mx-auto p-4">Đang tải...</div>;
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header searchValue={searchQuery} setSearchValue={setSearchQuery} />
+        <main className="flex-grow container mx-auto p-4">
+          <Skeleton active paragraph={{ rows: 2 }} className="mb-4" />
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={6}>
+              <Card className="shadow-sm">
+                <Skeleton active paragraph={{ rows: 10 }} />
+              </Card>
+            </Col>
+            <Col xs={24} md={18}>
+              <div className="mb-4 flex justify-between items-center">
+                <Skeleton.Input active style={{ width: 200 }} />
+                <Skeleton.Input active style={{ width: 200 }} />
+              </div>
+              <Row gutter={[16, 16]}>
+                {[...Array(6)].map((_, index) => (
+                  <Col xs={24} sm={12} md={8} key={index}>
+                    <Card className="shadow-md">
+                      <Skeleton.Image active style={{ width: '100%', height: 192 }} />
+                      <Skeleton active paragraph={{ rows: 3 }} />
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </Col>
+          </Row>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="container mx-auto p-4 text-red-500">{error}</div>;
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header searchValue={searchQuery} setSearchValue={setSearchQuery} />
+        <main className="flex-grow container mx-auto p-4 text-red-500">{error}</main>
+        <Footer />
+      </div>
+    );
   }
 
   return (
@@ -269,8 +297,8 @@ export default function ProductList() {
             {searchQuery
               ? `Kết quả tìm kiếm cho "${searchQuery}"`
               : selectedBrandName
-              ? `Sản phẩm thương hiệu ${selectedBrandName}`
-              : selectedCategoryName}
+                ? `Sản phẩm thương hiệu ${selectedBrandName}`
+                : selectedCategoryName}
           </h1>
           <p className="text-sm text-gray-600">
             Tìm thấy {filteredProducts.length} sản phẩm
@@ -380,21 +408,16 @@ export default function ProductList() {
                         key="add-to-cart"
                         type="primary"
                         icon={<ShoppingCartOutlined />}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          addToCart(product);
-                        }}
+                        onClick={() => handleAddToCart(product)}
                         disabled={product.stock === 0}
+                        className="bg-blue-600 hover:bg-blue-700"
                       >
                         Thêm vào giỏ
                       </Button>,
                       <Button
                         key="quick-view"
                         icon={<EyeOutlined />}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setQuickViewProduct(product);
-                        }}
+                        onClick={() => setQuickViewProduct(product)}
                       >
                         Xem nhanh
                       </Button>,
@@ -490,11 +513,9 @@ export default function ProductList() {
                   <Button
                     type="primary"
                     icon={<ShoppingCartOutlined />}
-                    onClick={() => {
-                      addToCart(quickViewProduct);
-                      setQuickViewProduct(null);
-                    }}
+                    onClick={() => handleAddToCart(quickViewProduct)}
                     disabled={quickViewProduct.stock === 0}
+                    className="bg-blue-600 hover:bg-blue-700"
                   >
                     Thêm vào giỏ hàng
                   </Button>

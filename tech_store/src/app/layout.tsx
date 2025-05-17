@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google';
 import SupportWidget from './components/SupportWidget';
 import { CartProvider } from './contexts/CartContext';
+import { AuthProvider } from './contexts/authContext'; // Make sure the path is correct
 import './styles/globals.css';
 
 // Tích hợp font Inter (hoặc font khác nếu bạn muốn)
@@ -20,10 +21,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className={inter.className}>
-        <CartProvider>
-          {children}
-          <SupportWidget />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            {children}
+            <SupportWidget />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

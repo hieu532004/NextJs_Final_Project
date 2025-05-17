@@ -6,7 +6,7 @@ import { Category, Product, Banner, Brand, Review, Cart } from '@/app/types';
 
 async function fetchData<T>(endpoint: string): Promise<T> {
   try {
-    const response = await axios.get(`http://localhost:3001${endpoint}`);
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}${endpoint}`);
     if (response.data.statusCode && response.data.statusCode !== 200) {
       throw new Error(`Failed to fetch ${endpoint}`);
     }

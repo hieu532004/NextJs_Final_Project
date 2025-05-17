@@ -31,7 +31,7 @@ const SupportWidget: React.FC = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:3001/products');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products`);
         setProducts(response.data.data.products || []);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -202,7 +202,7 @@ const SupportWidget: React.FC = () => {
         width={window.innerWidth < 640 ? '100%' : 400}
         className="sm:!rounded-l-lg"
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full ">
           {/* Khu vực tin nhắn */}
           <div className="flex-1 overflow-y-auto p-4 bg-gray-100 rounded-lg mb-4 space-y-3">
             {loading ? (

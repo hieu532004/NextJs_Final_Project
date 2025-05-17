@@ -41,7 +41,7 @@ export default function PromotionsPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3001/products');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products`);
         const productsData = response.data.data.products || [];
         // Lọc sản phẩm khuyến mãi (discount > 0 hoặc isNew = true)
         let promotedProducts = productsData.filter(
@@ -67,11 +67,11 @@ export default function PromotionsPage() {
 
   const addToCart = async (product: Product) => {
     try {
-      await axios.post('http://localhost:3001/cart', {
+      await axios.post('${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/cart', {
         product_id: product._id,
         quantity: 1,
       });
-      const response = await axios.get('http://localhost:3001/cart');
+      const response = await axios.get('${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/cart');
       const cartData = response.data as { items: { quantity: number }[] };
       setCartCount(cartData.items.reduce((total, item) => total + item.quantity, 0));
       notification.success({

@@ -18,14 +18,19 @@ import { useCart } from '../contexts/CartContext';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
 import { useRouter } from 'next/navigation';
+import LoginModal from './LoginModal';
+import RegisterModal from './RegisterModal';
+import { useAuth } from '../contexts/authContext';
 
 const { Panel } = Collapse;
 
+
+
 interface HeaderProps {
-  searchValue: string;
-  setSearchValue: (value: string) => void;
-  toggleMobileMenu?: () => void;
-}
+    searchValue: string;
+    setSearchValue: (value: string) => void;
+    toggleMobileMenu?: () => void;
+  }
 
 interface Product {
   _id: string;
@@ -38,12 +43,13 @@ interface Product {
   brand?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobileMenu }) => {
+const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobileMenu  }) => {
   const { cartCount } = useCart();
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { user: loggedInUser, logout } = useAuth();
 
   const handleMobileMenuToggle = () => {
     if (toggleMobileMenu) {
@@ -52,7 +58,6 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
     setMobileMenuVisible(!mobileMenuVisible);
   };
 
-  // Hàm tạo URL với query parameter category
   const createQueryString = (category: string) => {
     const params = new URLSearchParams();
     params.set('category', category);
@@ -108,7 +113,8 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
       }
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:3001/products');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products`);
+        // Truy cập đúng vào data.products từ response
         const products = response.data.data.products || [];
         const filteredResults = products.filter((product: Product) =>
           product.name.toLowerCase().includes(query.toLowerCase())
@@ -140,7 +146,30 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
       params.set('search', searchValue.trim());
       router.push(`/products?${params.toString()}`);
       setSearchResults([]);
+      setMobileMenuVisible(false); // Đóng menu trên mobile sau khi tìm kiếm
     }
+  };
+
+  // Login/Logout Logic
+  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
+  const [isRegisterModalVisible, setIsRegisterModalVisible] = useState(false);
+
+  const showLoginModal = () => setIsLoginModalVisible(true);
+  const handleCancelLogin = () => setIsLoginModalVisible(false);
+
+  const handleLoginSuccess = (user: any) => {
+    console.log('Đăng nhập thành công:', user);
+    setIsLoginModalVisible(false);
+  };
+
+  const showRegisterModal = () => setIsRegisterModalVisible(true);
+  const showRegisterFromLogin = () => {
+    setIsLoginModalVisible(false);
+    setIsRegisterModalVisible(true);
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   return (
@@ -211,13 +240,38 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
                     <ShoppingCartOutlined className="text-2xl text-gray-700" />
                   </Badge>
                 </Link>
-                <Link href="/account" className="flex items-center cursor-pointer">
-                  <UserOutlined className="text-2xl text-gray-700" />
-                  <span className="ml-2 text-gray-700">Đăng nhập</span>
-                </Link>
-                <Link href="/signup" className="flex items-center cursor-pointer">
-                  <span className="text-gray-700 border-l pl-4">Đăng ký</span>
-                </Link>
+                {loggedInUser ? (
+                  <Dropdown
+                    overlay={
+                      <Menu>
+                        <Menu.Item key="0">
+                          <Link href="/account">
+                            <UserOutlined className="mr-2" /> Tài khoản của tôi
+                          </Link>
+                        </Menu.Item>
+                        <Menu.Divider />
+                        <Menu.Item key="3" onClick={handleLogout}>
+                          Đăng xuất
+                        </Menu.Item>
+                      </Menu>
+                    }
+                    trigger={['click']}
+                  >
+                    <span className="flex items-center cursor-pointer">
+                      <UserOutlined className="text-2xl text-blue-600" />
+                      <span className="ml-2 text-blue-600 font-semibold">{loggedInUser.name}</span>
+                      <DownOutlined className="ml-1 text-gray-500 text-sm" />
+                    </span>
+                  </Dropdown>
+                ) : (
+                  <span
+                    className="flex items-center cursor-pointer"
+                    onClick={showLoginModal}
+                  >
+                    <UserOutlined className="text-2xl text-gray-700" />
+                    <span className="ml-2 text-gray-700">Đăng nhập</span>
+                  </span>
+                )}
               </div>
               <div className="block lg:hidden">
                 <Button
@@ -314,7 +368,195 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
         </div>
       </header>
 
-      
+      <Drawer
+        title="Menu"
+        placement="left"
+        onClose={() => setMobileMenuVisible(false)}
+        open={mobileMenuVisible}
+        width={280}
+      >
+        <div className="space-y-4">
+          <div className="py-2">
+            <Input
+              size="large"
+              placeholder="Tìm kiếm sản phẩm..."
+              prefix={<SearchOutlined className="text-gray-400" />}
+              suffix={loading ? <Spin size="small" /> : null}
+              className="!rounded-full"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onPressEnter={handleSearchSubmit}
+            />
+            {searchResults.length > 0 && (
+              <div className="mt-1 bg-white shadow-lg rounded-md">
+                <List
+                  dataSource={searchResults}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <Link
+                        href={`/products/${item.slug}`}
+                        className="w-full flex items-center p-2 hover:bg-gray-100"
+                        onClick={() => setSearchResults([])}
+                      >
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={40}
+                          height={40}
+                          style={{ objectFit: 'contain', marginRight: 8 }}
+                        />
+                        <div>
+                          <div className="text-gray-800">{item.name}</div>
+                          <div className="text-red-500 font-semibold">
+                            {item.salePrice.toLocaleString('vi-VN')}₫
+                          </div>
+                        </div>
+                      </Link>
+                    </List.Item>
+                  )}
+                />
+              </div>
+            )}
+            {searchValue && searchResults.length === 0 && !loading && (
+              <div className="mt-1 bg-white shadow-lg rounded-md p-4 text-gray-600">
+                Không tìm thấy sản phẩm nào.
+              </div>
+            )}
+          </div>
+
+          <Link href="/cart" className="flex items-center justify-between py-3 border-b">
+            <Badge
+              count={cartCount}
+              className="[&_.ant-badge-count]:!bg-red-600 [&_.ant-badge-count]:!text-white cursor-pointer"
+            >
+              <ShoppingCartOutlined className="text-2xl text-gray-700" />
+              <span className="ml-2 text-gray-700">Giỏ hàng</span>
+            </Badge>
+          </Link>
+
+          {loggedInUser ? (
+            <Link href="/account" className="flex items-center py-3 border-b cursor-pointer">
+              <UserOutlined className="text-2xl text-blue-600" />
+              <span className="ml-2 text-blue-600">{loggedInUser.name}</span>
+            </Link>
+          ) : (
+            <>
+              <span
+                className="flex items-center py-3 border-b cursor-pointer"
+                onClick={showLoginModal}
+              >
+                <UserOutlined className="text-2xl text-gray-700" />
+                <span className="ml-2 text-gray-700">Đăng nhập</span>
+              </span>
+              <span
+                className="flex items-center py-3 border-b cursor-pointer"
+                onClick={showRegisterModal}
+              >
+                <UserOutlined className="text-2xl text-gray-700" />
+                <span className="ml-2 text-gray-700">Đăng ký</span>
+              </span>
+            </>
+          )}
+
+          <Collapse ghost expandIconPosition="right">
+            <Panel
+              header={
+                <span className="text-gray-700">
+                  <LaptopOutlined className="mr-2" /> Laptop
+                </span>
+              }
+              key="1"
+            >
+              <div className="pl-8 space-y-3">
+                <Link href="/laptop/gaming" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Laptop Gaming
+                </Link>
+                <Link href="/laptop/office" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Laptop Văn Phòng
+                </Link>
+                <Link href="/laptop/design" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Laptop Đồ Họa
+                </Link>
+                <Link href="/laptop/macbook" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  MacBook
+                </Link>
+              </div>
+            </Panel>
+            <Panel
+              header={
+                <span className="text-gray-700">
+                  <TabletOutlined className="mr-2" /> Phụ kiện
+                </span>
+              }
+              key="2"
+            >
+              <div className="pl-8 space-y-3">
+                <Link href="/accessories/mouse" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Chuột
+                </Link>
+                <Link href="/accessories/keyboard" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Bàn phím
+                </Link>
+                <Link href="/accessories/headphones" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Tai nghe
+                </Link>
+                <Link href="/accessories/backpack" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Balo laptop
+                </Link>
+              </div>
+            </Panel>
+            <Panel
+              header={
+                <span className="text-gray-700">
+                  <AudioOutlined className="mr-2" /> Thiết bị văn phòng
+                </span>
+              }
+              key="3"
+            >
+              <div className="pl-8 space-y-3">
+                <Link href="/office/monitor" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Màn hình
+                </Link>
+                <Link href="/office/printer" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Máy in
+                </Link>
+                <Link href="/office/scanner" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Máy scan
+                </Link>
+                <Link href="/office/projector" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+                  Máy chiếu
+                </Link>
+              </div>
+            </Panel>
+          </Collapse>
+
+          <Link href="/promotions" className="flex items-center py-3 border-b cursor-pointer">
+            <ThunderboltOutlined className="mr-2 text-gray-700" />
+            <span className="text-gray-700">Khuyến mãi</span>
+          </Link>
+
+          <div className="pt-4">
+            <div className="text-red-600 font-medium">Hotline: 1900 1234</div>
+          </div>
+        </div>
+      </Drawer>
+
+      <LoginModal
+        isVisible={isLoginModalVisible}
+        onCancel={handleCancelLogin}
+        onLoginSuccess={handleLoginSuccess}
+        onShowRegister={showRegisterFromLogin}
+      />
+
+      <RegisterModal
+        isVisible={isRegisterModalVisible}
+        onCancel={() => setIsRegisterModalVisible(false)}
+        onRegisterSuccess={() => console.log('Registered successfully')}
+        onShowLogin={() => {
+          setIsRegisterModalVisible(false);
+          setIsLoginModalVisible(true);
+        }}
+      />
     </>
   );
 };
