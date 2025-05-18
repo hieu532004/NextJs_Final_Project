@@ -107,6 +107,7 @@ export interface Order {
   commune: string;
   district: string;
   city: string;
+  orderDate?: string;
   paymentMethod: "card" | "ewallet" | "bank" | "cod";
   status?: "placed" | "confirmed" | "preparing" | "shipping" | "delivered";
 }
