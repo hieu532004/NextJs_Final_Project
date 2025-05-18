@@ -544,7 +544,6 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
       <LoginModal
         isVisible={isLoginModalVisible}
         onCancel={handleCancelLogin}
-        onLoginSuccess={handleLoginSuccess}
         onShowRegister={showRegisterFromLogin}
       />
 

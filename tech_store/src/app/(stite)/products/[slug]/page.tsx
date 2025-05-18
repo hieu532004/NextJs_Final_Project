@@ -9,7 +9,6 @@ import {
   Button,
   Card,
   Rate,
-  notification,
   Tag,
   Divider,
   Row,
@@ -31,7 +30,6 @@ import {
 import {
   ShoppingCartOutlined,
   GiftOutlined,
-  StarOutlined,
   ShareAltOutlined,
   CarOutlined,
   LoginOutlined,
@@ -154,7 +152,6 @@ function ProductDetailSkeleton() {
 }
 
 export default function ProductDetail({ params }: ProductDetailProps) {
-  const { setCartCount } = useCart();
   const router = useRouter();
   const searchParams = useSearchParams();
   const carouselRef = useRef<any>(null);
@@ -172,7 +169,6 @@ export default function ProductDetail({ params }: ProductDetailProps) {
   const [loading, setLoading] = useState(true);
   const [loadingCategory, setLoadingCategory] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loadingAddToCart, setLoadingAddToCart] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string>('Silver');
   const [selectedStorage, setSelectedStorage] = useState<string>('256GB');
   const [currentPrice, setCurrentPrice] = useState<number>(0);
@@ -520,7 +516,6 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                 icon={<ShoppingCartOutlined />}
                 size="large"
                 onClick={() => handleAddToCart(product)}
-                loading={loadingAddToCart}
                 disabled={product.stock === 0}
                 className="bg-blue-600 hover:bg-blue-700"
               >

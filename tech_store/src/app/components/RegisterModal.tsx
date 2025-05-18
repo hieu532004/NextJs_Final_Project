@@ -31,11 +31,9 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
   const [form] = Form.useForm();
   const { login } = useAuth();
   const router = useRouter();
-  const [notificationData, setNotificationData] = React.useState<{ message: string; type: 'success' | 'info' | 'warning' | 'error' } | null>(null);
 
 
   const handleFinish = async (values: any) => {
-    setNotificationData(null);
 
     try {
       // 1. Lấy danh sách người dùng hiện có (GET /users)
@@ -46,7 +44,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
       if (!usersResponse.ok) {
         const errorData = await usersResponse.json();
         const errorMessage = errorData?.message || 'Không thể lấy danh sách người dùng để kiểm tra trùng lặp.';
-        setNotificationData({ message: errorMessage, type: 'error' });
         return; // Dừng nếu không lấy được danh sách người dùng
       }
 
@@ -62,16 +59,13 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
         form.setFields([
           { name: 'email', errors: ['Email hoặc số điện thoại đã tồn tại. Vui lòng sử dụng email hoặc số điện thoại khác.'] },
         ]);
-        setNotificationData({ message: 'Email hoặc số điện thoại đã tồn tại. Vui lòng sử dụng email hoặc số điện thoại khác.', type: 'error' });
         return;
       }
 
       if (isUsernameTaken) {
         form.setFields([
           { name: 'username', errors: ['Tên đăng nhập đã tồn tại. Vui lòng chọn tên đăng nhập khác.'] },
-        ]);
-        setNotificationData({ message: 'Tên đăng nhập đã tồn tại. Vui lòng chọn tên đăng nhập khác.', type: 'error' });
-        return;
+        ]);        return;
       }
 
       // 3. Tạo người dùng mới (POST /users)
@@ -85,25 +79,19 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
 
       if (!response.ok) {
         const errorData = await response.json();
-        const errorMessage = errorData?.message || 'Đăng ký thất bại. Vui lòng thử lại sau.';
-        setNotificationData({ message: errorMessage, type: 'error' });
-        return;
+        const errorMessage = errorData?.message || 'Đăng ký thất bại. Vui lòng thử lại sau.';        return;
       }
 
       const newUser = await response.json(); // Lấy dữ liệu người dùng mới từ response
 
       login(newUser);
       onRegisterSuccess();
-      form.resetFields();
-      setNotificationData({ message: 'Đăng ký thành công! Đang chuyển hướng...', type: 'success' });
-      setTimeout(() => {
+      form.resetFields();      setTimeout(() => {
         router.push('/account');
       }, 1500);
 
     } catch (error: any) {
-      console.error('Lỗi trong quá trình đăng ký:', error);
-      setNotificationData({ message: 'Đã có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.', type: 'error' });
-    }
+      console.error('Lỗi trong quá trình đăng ký:', error);    }
   };
 
 

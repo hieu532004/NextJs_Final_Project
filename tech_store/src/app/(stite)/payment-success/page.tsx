@@ -1,7 +1,7 @@
 
 "use client"
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Divider, Modal, Steps } from 'antd';
+import { Button, Divider, Modal, Steps } from 'antd';
 import { CheckCircleFilled, HomeOutlined, ShoppingOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';

@@ -35,7 +35,6 @@ export default function HomeClient({
 }: HomeClientProps) {
   const { setCartCount } = useCart();
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState('all');
   const [priceRange, setPriceRange] = useState([0, 50000000]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [filterDrawerVisible, setFilterDrawerVisible] = useState(false);
@@ -88,7 +87,6 @@ export default function HomeClient({
         selectedBrands={selectedBrands}
         handleBrandChange={handleBrandChange}
         resetFilters={resetFilters}
-        priceRange={priceRange}
       />
     </>
   );

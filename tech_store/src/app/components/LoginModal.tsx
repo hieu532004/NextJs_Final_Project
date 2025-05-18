@@ -12,10 +12,9 @@ interface LoginModalProps {
     isVisible: boolean;
     onCancel: () => void;
     onShowRegister: () => void;
-    onLoginSuccess: (user: any) => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isVisible, onCancel, onShowRegister,onLoginSuccess }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ isVisible, onCancel, onShowRegister }) => {
     const [form] = Form.useForm();
     const router = useRouter();
     const [loading, setLoading] = useState(false);

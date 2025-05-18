@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Rate, notification, Skeleton } from 'antd';
+import { Button, Card, Rate, Skeleton } from 'antd';
 import { ShoppingCartOutlined, RightOutlined } from '@ant-design/icons';
 import { Product } from '../types';
 import Image from 'next/image';

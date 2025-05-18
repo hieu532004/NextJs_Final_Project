@@ -289,7 +289,7 @@ export default function ProductList() {
           <Link href="/">Trang chủ</Link> / <span>Sản phẩm</span>
           {selectedCategory !== 'all' && <> / <span>{selectedCategoryName}</span></>}
           {selectedBrandName && <> / <span>{selectedBrandName}</span></>}
-          {searchQuery && <> / <span>Kết quả tìm kiếm: "{searchQuery}"</span></>}
+          {searchQuery && <> / <span>Kết quả tìm kiếm: '{searchQuery}'</span></>}
         </div>
 
         <div className="mb-6">

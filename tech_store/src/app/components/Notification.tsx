@@ -33,7 +33,7 @@ const Notification: React.FC<NotificationProps> = ({ message, type, duration = 3
     let backgroundColorClass = '';
     let textColorClass = '';
     let borderColorClass = '';
-    let positionClass = isInline ? '' : 'fixed top-4 right-4 z-50'; // Thay đổi class vị trí
+    const positionClass = 'top-right'; // Thay đổi class vị trí
 
     switch (type) {
         case 'success':

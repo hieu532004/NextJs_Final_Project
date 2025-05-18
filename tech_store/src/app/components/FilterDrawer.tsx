@@ -8,7 +8,6 @@ interface FilterDrawerProps {
   selectedBrands: string[];
   handleBrandChange: (brand: string) => void;
   resetFilters: () => void;
-  priceRange: number[];
 }
 
 const FilterDrawer: React.FC<FilterDrawerProps> = ({
@@ -18,7 +17,6 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
   selectedBrands,
   handleBrandChange,
   resetFilters,
-  priceRange,
 }) => {
   return (
     <Drawer
