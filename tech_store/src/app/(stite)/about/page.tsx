@@ -10,7 +10,7 @@ export default function AboutPage() {
             <Header searchValue="" setSearchValue={() => {}} />
             <main className="flex-grow container mx-auto px-4 py-12">
                 <div className="max-w-4xl mx-auto">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-gray-800 to-purple-600 bg-clip-text text-transparent">
+                    <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-purple-600 bg-clip-text text-transparent">
                         Về Chúng Tôi
                     </h1>
                     <p className="text-gray-700 mb-6">
