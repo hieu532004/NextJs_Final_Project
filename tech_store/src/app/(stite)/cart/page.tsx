@@ -20,8 +20,7 @@ export interface CartItem {
 }
 
 export default function CartPage() {
-  const { cart, setCartCount, removeFromCart, updateQuantity, clearCart, loadCartFromLocalStorage } = useCart();
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const { cart, removeFromCart, updateQuantity, clearCart, loadCartFromLocalStorage } = useCart();
   const [searchValue, setSearchValue] = useState('');
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const toggleMobileMenu = () => setMobileMenuVisible(!mobileMenuVisible);
@@ -33,18 +32,8 @@ export default function CartPage() {
 
   useEffect(() => {
     loadCartFromLocalStorage();
-  }, []);
+  }, [loadCartFromLocalStorage]);
 
-  // Handle checkout
-  const handleCheckout = () => {
-    setIsCheckingOut(true);
-    // Simulate checkout process
-    setTimeout(() => {
-      clearCart();
-      setIsCheckingOut(false);
-      alert("Đặt hàng thành công!");
-    }, 2000);
-  };
 
   if (cart.length === 0) {
     return (

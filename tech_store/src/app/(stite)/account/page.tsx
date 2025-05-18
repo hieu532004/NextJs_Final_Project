@@ -22,7 +22,7 @@ import Header from '@/app/components/Header';
 import { useAuth } from '@/app/contexts/authContext';
 import { useRouter } from 'next/navigation';
 import Footer from '@/app/components/Footer';
-import { Order } from '@/app/types';
+import { Order, OrderItem, User } from '@/app/types';
 
 const { TabPane } = Tabs;
 
@@ -65,7 +65,7 @@ const UserAccount = () => {
         return <div>Đang chuyển hướng...</div>;
     }
 
-    const onFinishProfile = (values: any) => {
+    const onFinishProfile = (values: User) => {
         console.log('Cập nhật thông tin:', values);
         // TODO: Gửi API cập nhật thông tin người dùng nếu cần
     };
@@ -134,7 +134,7 @@ const UserAccount = () => {
                             <p>Không có đơn hàng nào.</p>
                         ) : (
                             <ul className="space-y-4">
-                                {orders.map((order: any) => (
+                                {orders.map((order: Order) => (
                                     <li key={order.id} className="border p-4 rounded-lg shadow-sm">
                                         <p><strong>Mã đơn hàng:</strong> {order.id}</p>
                                         <p><strong>Người nhận:</strong> {order.fullName}</p>
@@ -144,7 +144,7 @@ const UserAccount = () => {
                                         <p><strong>Sản phẩm:</strong></p>
                                         <ul className="pl-4 list-disc">
                                             {order.orderItems && order.orderItems.length > 0 ? (
-                                                order.orderItems.map((item: any, idx: number) => (
+                                                order.orderItems.map((item: OrderItem, idx: number) => (
                                                     <li key={idx}>
                                                         {item.name} x {item.quantity} ({item.pricePerUnit.toLocaleString()}đ)
                                                     </li>

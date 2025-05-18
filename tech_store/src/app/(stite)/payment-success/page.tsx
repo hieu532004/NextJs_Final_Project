@@ -1,16 +1,17 @@
 
 "use client"
 import React, { useState, useEffect } from 'react';
-import { Button, Divider, Modal, Steps } from 'antd';
-import { CheckCircleFilled, HomeOutlined, ShoppingOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { Button, Input, Divider, Modal, Steps, message } from 'antd';
+import { CheckCircleFilled, HomeOutlined, ShoppingOutlined, UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { Order } from '@/app/types';
 const { Step } = Steps;
 
 const PaymentSuccess: React.FC = () => {
   const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
-  const [orderData, setOrderData] = useState<any>(null);
+  const [orderData, setOrderData] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -129,21 +130,25 @@ const PaymentSuccess: React.FC = () => {
             </div>
 
             <div className="mt-6 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tổng tiền hàng:</span>
-                <span>{parseFloat(orderData.totalAmount + orderData.discountAmount).toLocaleString('vi-VN')} VND</span> {/* Điều chỉnh nếu có phí ship */}
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Giảm giá:</span>
-                <span>{parseFloat(orderData.discountAmount).toLocaleString('vi-VN')} VND</span>
-              </div>
-              <Divider className="my-3" />
-              <div className="flex justify-between font-bold">
-                <span>Tổng thanh toán:</span>
-                <span className="text-red-600 text-xl">{parseFloat(orderData.totalAmount).toLocaleString('vi-VN')} VND</span>
-              </div>
-              <div className="text-right text-xs text-gray-500">(Đã bao gồm VAT)</div>
-            </div>
+  <div className="flex justify-between text-sm">
+    <span className="text-gray-600">Tổng tiền hàng:</span>
+    <span>
+      {(orderData.totalAmount + orderData.discountAmount).toLocaleString('vi-VN')} VND
+    </span>
+  </div>
+  <div className="flex justify-between text-sm">
+    <span className="text-gray-600">Giảm giá:</span>
+    <span>{orderData.discountAmount.toLocaleString('vi-VN')} VND</span>
+  </div>
+  <Divider className="my-3" />
+  <div className="flex justify-between font-bold">
+    <span>Tổng thanh toán:</span>
+    <span className="text-red-600 text-xl">
+      {orderData.totalAmount.toLocaleString('vi-VN')} VND
+    </span>
+  </div>
+  <div className="text-right text-xs text-gray-500">(Đã bao gồm VAT)</div>
+</div>
           </div>
 
           <Divider className="my-6" />

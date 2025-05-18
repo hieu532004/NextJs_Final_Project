@@ -1,8 +1,15 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from 'react';
 
-// Định nghĩa kiểu dữ liệu cho sản phẩm trong giỏ hàng
+// Kiểu dữ liệu cho sản phẩm trong giỏ hàng
 export interface CartItem {
   id: string | number;
   name: string;
@@ -13,11 +20,11 @@ export interface CartItem {
   color?: string;
 }
 
-// Định nghĩa kiểu dữ liệu cho context
+// Kiểu dữ liệu cho context
 interface CartContextType {
   cart: CartItem[];
   cartCount: number;
-  setCartCount: React.Dispatch<React.SetStateAction<number>>; // Hỗ trợ callback
+  setCartCount: React.Dispatch<React.SetStateAction<number>>;
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string | number) => void;
   updateQuantity: (id: string | number, quantity: number) => void;
@@ -42,54 +49,60 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartCount, setCartCount] = useState<number>(0);
 
-  // Load dữ liệu từ localStorage khi mount
-  useEffect(() => {
+  // Hàm load từ localStorage (được memo hóa để tránh lặp)
+  const loadCartFromLocalStorage = useCallback(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       try {
-        const parsedCart = JSON.parse(savedCart);
-        if (Array.isArray(parsedCart) && parsedCart.every((item: any) => item && item.id !== undefined)) {
-          setCart(parsedCart);
-          setCartCount(parsedCart.reduce((count, item) => count + item.quantity, 0));
+        const parsed = JSON.parse(savedCart) as unknown;
+        if (Array.isArray(parsed) && parsed.every(item => typeof item === 'object' && item && 'id' in item)) {
+          const validCart = parsed as CartItem[];
+          setCart(validCart);
+          setCartCount(validCart.reduce((count, item) => count + item.quantity, 0));
         } else {
-          console.warn('Dữ liệu giỏ hàng không hợp lệ, khởi tạo lại giỏ hàng rỗng');
+          console.warn('Dữ liệu giỏ hàng không hợp lệ, khởi tạo lại');
           setCart([]);
           setCartCount(0);
-          localStorage.removeItem('cart'); // Xóa dữ liệu không hợp lệ
+          localStorage.removeItem('cart');
         }
       } catch (error) {
-        console.error('Lỗi khi phân tích dữ liệu giỏ hàng từ localStorage:', error);
+        console.error('Lỗi phân tích localStorage:', error);
         setCart([]);
         setCartCount(0);
-        localStorage.removeItem('cart'); // Xóa dữ liệu lỗi
+        localStorage.removeItem('cart');
       }
     }
   }, []);
 
-  // Ghi lại vào localStorage khi cart thay đổi
+  // Gọi load khi component mount
+  useEffect(() => {
+    loadCartFromLocalStorage();
+  }, [loadCartFromLocalStorage]);
+
+  // Ghi cart vào localStorage mỗi khi cart thay đổi
   useEffect(() => {
     try {
       localStorage.setItem('cart', JSON.stringify(cart));
-      setCartCount(cart.reduce((count, item) => count + item.quantity, 0)); // Đồng bộ cartCount
+      setCartCount(cart.reduce((count, item) => count + item.quantity, 0));
     } catch (error) {
-      console.error('Không thể lưu giỏ hàng vào localStorage:', error);
+      console.error('Lỗi khi lưu giỏ hàng:', error);
     }
   }, [cart]);
 
   const addToCart = (item: CartItem) => {
-    const quantityToAdd = item.quantity && item.quantity > 0 ? item.quantity : 1;
+    const quantityToAdd = item.quantity > 0 ? item.quantity : 1;
 
-    setCart((prevCart) => {
-      const existingItemIndex = prevCart.findIndex(
-        (cartItem) =>
+    setCart(prevCart => {
+      const existingIndex = prevCart.findIndex(
+        cartItem =>
           cartItem.id === item.id &&
           cartItem.size === item.size &&
           cartItem.color === item.color,
       );
 
-      if (existingItemIndex !== -1) {
+      if (existingIndex !== -1) {
         return prevCart.map((cartItem, index) =>
-          index === existingItemIndex
+          index === existingIndex
             ? { ...cartItem, quantity: cartItem.quantity + quantityToAdd }
             : cartItem,
         );
@@ -100,18 +113,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeFromCart = (id: string | number) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+    setCart(prevCart => prevCart.filter(item => item.id !== id));
   };
 
   const updateQuantity = (id: string | number, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(id);
-      return;
+    } else {
+      setCart(prevCart =>
+        prevCart.map(item => (item.id === id ? { ...item, quantity } : item)),
+      );
     }
-
-    setCart((prevCart) =>
-      prevCart.map((item) => (item.id === id ? { ...item, quantity } : item)),
-    );
   };
 
   const clearCart = () => {
@@ -126,27 +138,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     return cart.reduce((count, item) => count + item.quantity, 0);
   };
 
-  const loadCartFromLocalStorage = () => {
-    const stored = localStorage.getItem('cart');
-    if (stored) {
-      try {
-        const parsedCart = JSON.parse(stored);
-        if (Array.isArray(parsedCart) && parsedCart.every((item: any) => item && item.id !== undefined)) {
-          setCart(parsedCart);
-        } else {
-          console.warn('Dữ liệu giỏ hàng không hợp lệ, khởi tạo lại giỏ hàng rỗng');
-          setCart([]);
-          localStorage.removeItem('cart');
-        }
-      } catch (error) {
-        console.error('Lỗi khi phân tích dữ liệu giỏ hàng từ localStorage:', error);
-        setCart([]);
-        localStorage.removeItem('cart');
-      }
-    }
-  };
-
-  const value = {
+  const value: CartContextType = {
     cart,
     cartCount,
     setCartCount,

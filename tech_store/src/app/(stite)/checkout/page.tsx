@@ -14,6 +14,7 @@ import Header from "@/app/components/Header";
 import { useCart } from "@/app/contexts/CartContext";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/authContext";
+import { ShippingFormValues } from "@/app/types";
 
 const App: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -42,72 +43,72 @@ const App: React.FC = () => {
     }
   };
 
-  const handleFinish = async (values: any) => {
-    console.log("Success:", values);
-    const orderData = {
-      ...values,
-      userid: user?.id,
-      userfullname: user?.name,
-      paymentMethod: paymentMethod,
-      orderItems: cart.map(item => ({
-        productId: item.id,
-        quantity: item.quantity,
-        pricePerUnit: item.price,
-        name: item.name, // Lấy trực tiếp từ cart
-        imageUrl: item.image, // Lấy trực tiếp từ cart (đảm bảo tên trường backend tương ứng)
-      })),
-      totalAmount: totalAfterDiscount,
-      discountAmount: discountAmount,
-      
-    };
+  const handleFinish = async (values: ShippingFormValues) => {
+  console.log("Success:", values);
+  const orderData = {
+    ...values,
+    userid: user?.id,
+    userfullname: user?.name,
+    paymentMethod: paymentMethod,
+    orderItems: cart.map(item => ({
+      productId: item.id,
+      quantity: item.quantity,
+      pricePerUnit: item.price,
+      name: item.name,
+      imageUrl: item.image,
+    })),
+    totalAmount: totalAfterDiscount,
+    discountAmount: discountAmount,
+  };
 
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
-      });
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData),
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Order created:", data);
-        message.success("Đặt hàng thành công!");
-        setOrderIdFromServer(data.id);
-        clearCart();
-        document.cookie = "paymentStatus=success; max-age=3600; path=/";
-        if (paymentMethod === "ewallet" || paymentMethod === "bank") {
-          setShowQRCodeModal(true);
-        } else {
-          router.push(`/payment-success?orderId=${data.id}`);
-        }
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Order created:", data);
+      message.success("Đặt hàng thành công!");
+      setOrderIdFromServer(data.id);
+      clearCart();
+      document.cookie = "paymentStatus=success; max-age=3600; path=/";
+      if (paymentMethod === "ewallet" || paymentMethod === "bank") {
+        setShowQRCodeModal(true);
       } else {
-        const errorData = await response.json();
-        console.error("Failed to create order:", errorData);
-        message.error("Đã có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.");
+        router.push(`/payment-success?orderId=${data.id}`);
       }
-    } catch (error: any) {
-      console.error("Error creating order:", error.message);
+    } else {
+      const errorData = await response.json();
+      console.error("Failed to create order:", errorData);
       message.error("Đã có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.");
     }
-  };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error creating order:", error.message);
+    }
+    message.error("Đã có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.");
+  }
+};
 
-  const handleSubmit = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        handleFinish(values);
-        if (paymentMethod === "card") {
-          setShowCardPayment(true);
-        } else if (paymentMethod === "cod") {
-          setShowCODPayment(true);
-        }
-      })
-      .catch((errorInfo) => {
-        console.log("Validation Failed:", errorInfo);
-      });
-  };
+const handleSubmit = () => {
+  form
+    .validateFields()
+    .then((values: ShippingFormValues) => {
+      handleFinish(values);
+      if (paymentMethod === "card") {
+        setShowCardPayment(true);
+      } else if (paymentMethod === "cod") {
+        setShowCODPayment(true);
+      }
+    })
+    .catch((errorInfo) => {
+      console.log("Validation Failed:", errorInfo);
+    });
+};
+
 
   const originalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const shippingFee = 30000;

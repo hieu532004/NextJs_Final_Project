@@ -1,8 +1,7 @@
+'use client';
 
-
-
-import React from "react";
-import { Modal, Button, Form, Input, Checkbox } from "antd";
+import React from 'react';
+import { Modal, Button, Form, Input, Checkbox, message } from 'antd';
 import {
   EyeInvisibleOutlined,
   EyeTwoTone,
@@ -11,9 +10,10 @@ import {
   MailOutlined,
   PhoneOutlined,
   LockOutlined,
-} from "@ant-design/icons";
-import { useAuth } from "@/app/contexts/authContext";
-import { useRouter } from "next/navigation";
+} from '@ant-design/icons';
+import { useAuth } from '@/app/contexts/authContext';
+import { useRouter } from 'next/navigation';
+import { User } from '@/app/types'; // Import User type
 
 interface RegisterModalProps {
   isVisible: boolean;
@@ -32,9 +32,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
   const { login } = useAuth();
   const router = useRouter();
 
-
   const handleFinish = async (values: any) => {
-
     try {
       // 1. Lấy danh sách người dùng hiện có (GET /users)
       const usersResponse = await fetch(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/users`, {
@@ -44,20 +42,22 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
       if (!usersResponse.ok) {
         const errorData = await usersResponse.json();
         const errorMessage = errorData?.message || 'Không thể lấy danh sách người dùng để kiểm tra trùng lặp.';
-        return; // Dừng nếu không lấy được danh sách người dùng
+        message.error(errorMessage);
+        return;
       }
 
-      const existingUsers = await usersResponse.json();
+      const existingUsers: User[] = await usersResponse.json();
 
       // 2. Kiểm tra trùng lặp
       const isEmailOrPhoneTaken = existingUsers.some(
-        (user: any) => user.email === values.email || user.phone === values.phone
+        (user) => user.email === values.email || user.phone === values.phone
       );
-      const isUsernameTaken = existingUsers.some((user: any) => user.username === values.username);
+      const isUsernameTaken = existingUsers.some((user) => user.username === values.username);
 
       if (isEmailOrPhoneTaken) {
         form.setFields([
           { name: 'email', errors: ['Email hoặc số điện thoại đã tồn tại. Vui lòng sử dụng email hoặc số điện thoại khác.'] },
+          { name: 'phone', errors: ['Email hoặc số điện thoại đã tồn tại. Vui lòng sử dụng email hoặc số điện thoại khác.'] },
         ]);
         return;
       }
@@ -65,7 +65,8 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
       if (isUsernameTaken) {
         form.setFields([
           { name: 'username', errors: ['Tên đăng nhập đã tồn tại. Vui lòng chọn tên đăng nhập khác.'] },
-        ]);        return;
+        ]);
+        return;
       }
 
       // 3. Tạo người dùng mới (POST /users)
@@ -74,26 +75,36 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          username: values.username,
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          password: values.password, // Note: In a real app, hash the password server-side
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        const errorMessage = errorData?.message || 'Đăng ký thất bại. Vui lòng thử lại sau.';        return;
+        const errorMessage = errorData?.message || 'Đăng ký thất bại. Vui lòng thử lại sau.';
+        message.error(errorMessage);
+        return;
       }
 
-      const newUser = await response.json(); // Lấy dữ liệu người dùng mới từ response
+      const newUser: User = await response.json(); // Lấy dữ liệu người dùng mới từ response
 
       login(newUser);
+      message.success('Đăng ký thành công!');
       onRegisterSuccess();
-      form.resetFields();      setTimeout(() => {
+      form.resetFields();
+      setTimeout(() => {
         router.push('/account');
       }, 1500);
-
     } catch (error: any) {
-      console.error('Lỗi trong quá trình đăng ký:', error);    }
+      console.error('Lỗi trong quá trình đăng ký:', error);
+      message.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+    }
   };
-
 
   return (
     <Modal
@@ -124,7 +135,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
       >
         <Form.Item
           name="username"
-          rules={[{ required: true, message: "Vui lòng nhập tên đăng nhập!" }]}
+          rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon text-gray-400 mr-2" />}
@@ -136,7 +147,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
 
         <Form.Item
           name="name"
-          rules={[{ required: true, message: "Vui lòng nhập họ tên đầy đủ!" }]}
+          rules={[{ required: true, message: 'Vui lòng nhập họ tên đầy đủ!' }]}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon text-gray-400 mr-2" />}
@@ -149,8 +160,8 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: "Vui lòng nhập email!" },
-            { type: "email", message: "Email không hợp lệ!" },
+            { required: true, message: 'Vui lòng nhập email!' },
+            { type: 'email', message: 'Email không hợp lệ!' },
           ]}
         >
           <Input
@@ -164,10 +175,10 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
         <Form.Item
           name="phone"
           rules={[
-            { required: true, message: "Vui lòng nhập số điện thoại!" },
+            { required: true, message: 'Vui lòng nhập số điện thoại!' },
             {
               pattern: /^[0-9]{10}$/,
-              message: "Số điện thoại không hợp lệ!",
+              message: 'Số điện thoại không hợp lệ!',
             },
           ]}
         >
@@ -182,8 +193,8 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
         <Form.Item
           name="password"
           rules={[
-            { required: true, message: "Vui lòng nhập mật khẩu!" },
-            { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" },
+            { required: true, message: 'Vui lòng nhập mật khẩu!' },
+            { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' },
           ]}
         >
           <Input.Password
@@ -197,15 +208,15 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
 
         <Form.Item
           name="confirmPassword"
-          dependencies={["password"]}
+          dependencies={['password']}
           rules={[
-            { required: true, message: "Vui lòng xác nhận mật khẩu!" },
+            { required: true, message: 'Vui lòng xác nhận mật khẩu!' },
             ({ getFieldValue }) => ({
               validator(_, value) {
-                if (!value || getFieldValue("password") === value) {
+                if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error("Mật khẩu xác nhận không khớp!"));
+                return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));
               },
             }),
           ]}
@@ -219,12 +230,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
           />
         </Form.Item>
 
-
-
-
-
-
-
         <Form.Item
           name="agreement"
           valuePropName="checked"
@@ -233,13 +238,13 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
               validator: (_, value) =>
                 value
                   ? Promise.resolve()
-                  : Promise.reject(new Error("Vui lòng đồng ý với điều khoản sử dụng!")),
+                  : Promise.reject(new Error('Vui lòng đồng ý với điều khoản sử dụng!')),
             },
           ]}
         >
           <Checkbox>
-            Tôi đồng ý với{" "}
-            <a className="text-blue-600 hover:text-blue-800">
+            Tôi đồng ý với{' '}
+            <a className="text-blue-600 hover:text-blue-800" href="/terms">
               điều khoản sử dụng
             </a>
           </Checkbox>
@@ -251,7 +256,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
             htmlType="submit"
             block
             size="large"
-            className="bg-blue-600 hover:bg-blue-700 !rounded-button whitespace-nowrap cursor-pointer"
+            className="bg-blue-600 hover:bg-blue-700 rounded-md"
           >
             Đăng ký
           </Button>
@@ -260,9 +265,9 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
 
       <div className="text-center mt-4">
         <p className="text-gray-600">
-          Đã có tài khoản?
+          Đã có tài khoản?{' '}
           <a
-            className="text-blue-600 hover:text-blue-800 ml-1 font-medium cursor-pointer"
+            className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
             onClick={onShowLogin}
           >
             Đăng nhập

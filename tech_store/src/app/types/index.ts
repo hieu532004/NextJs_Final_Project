@@ -23,6 +23,7 @@ export interface Product {
   brand: string;
   installment_available: boolean;
   description?: string;
+  storage?: string; // Added to support storage field used in ProductTabs
   __v: number;
 }
 
@@ -52,7 +53,7 @@ export interface Brand {
 export interface Review {
   _id: string;
   id: number;
-  product_id: string; // Thêm product_id để liên kết với sản phẩm
+  product_id: string;
   name: string;
   rating: number;
   comment: string;
@@ -61,8 +62,16 @@ export interface Review {
   __v: number;
 }
 
+export interface CartItem {
+  id: string; // Changed from product_id to id to match CartContext usage
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
 export interface Cart {
-  items: { product_id: string; quantity: number }[];
+  items: CartItem[];
 }
 
 export interface User {
@@ -73,26 +82,41 @@ export interface User {
   name: string;
   address?: string;
   phone?: string;
-  birthDate?: string; // Hoặc Date nếu bạn muốn làm việc với kiểu Date
-  gender?: string;
-  // ... các thông tin khác liên quan đến người dùng
+  birthDate?: string;
+  gender?: 'male' | 'female'; // Updated to match useAuth expectation
 }
 
 export interface OrderItem {
-  product_id: string;
+  productId: string;
   name: string;
+  imageUrl?: string;
   quantity: number;
   pricePerUnit: number;
 }
 
 export interface Order {
-  id: number;
-  userid: number;
-  fullName: string;
-  detailAddress: string;
-  paymentMethod: string;
-  totalAmount: number;
+  id: string;
   orderItems: OrderItem[];
-  orderDate: string;
-  status: string;
+  totalAmount: number;
+  discountAmount: number;
+  fullName: string;
+  phone: string;
+  email: string;
+  userfullname?: string;
+  detailAddress: string;
+  commune: string;
+  district: string;
+  city: string;
+  paymentMethod: "card" | "ewallet" | "bank" | "cod";
+  status?: "placed" | "confirmed" | "preparing" | "shipping" | "delivered";
+}
+
+export interface ShippingFormValues {
+  fullname: string;
+  phone: string;
+  address: string;
+  city: string;
+  commune?: string; // Added to align with Order interface
+  district?: string; // Added to align with Order interface
+  [key: string]: any;
 }

@@ -145,7 +145,7 @@ const PaymentQRCodeModal = ({
                   <li>1. Mở ứng dụng ngân hàng hoặc ví điện tử</li>
                   <li>2. Quét mã QR hoặc chuyển khoản theo thông tin</li>
                   <li>3. Kiểm tra thông tin và xác nhận thanh toán</li>
-                  <li>4. Nhấn "Đã thanh toán" sau khi hoàn tất</li>
+                  <li>4. Nhấn &quot;Đã thanh toán&quot; sau khi hoàn tất</li>
                 </ol>
               </div>
             </div>
