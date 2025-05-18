@@ -191,16 +191,16 @@ export default function PromotionsPage() {
                       <div className="mt-4 flex space-x-2">
                         <Button
                           type="primary"
-                block
-                icon={<ShoppingCartOutlined />}
-                onClick={() => handleAddToCart(product)}
+                        block
+                        icon={<ShoppingCartOutlined />}
+                        onClick={() => handleAddToCart(product)}
                           className="w-full"
                         >
                           Mua ngay
                         </Button>
                         <Link href={`/products/${product.slug}`} passHref>
                           <Button
-                            icon={<EyeOutlined />}
+                            
                             className="w-full"
                           >
                             Xem chi tiết

@@ -23,3 +23,20 @@
 .customer-reviews-swiper .swiper-pagination-bullet-active {
   background: #1890ff;
 }
+
+.not-found-page {
+  overflow: hidden;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
+}

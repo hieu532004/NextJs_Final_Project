@@ -32,6 +32,18 @@ const nextConfig: NextConfig = {
         hostname: 'cdn.tgdd.vn',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'th.bing.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'mega.com.vn',
+      },
+      {
+        protocol: 'https',
+        hostname: 'urbancrypto.com',
+      },
     ],
   },
 };

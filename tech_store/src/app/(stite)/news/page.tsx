@@ -3,6 +3,7 @@
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function NewsPage() {
     const articles = [
@@ -40,25 +41,25 @@ export default function NewsPage() {
                             key={index}
                             className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
                         >
-                            <div className="relative w-full h-48">
-  <Image
-    src={article.image}
-    alt={article.title}
-    layout="fill"
-    style={{ objectFit: 'cover' }}
-    className="rounded-t-lg"
-  />
-</div>
-                            <h2 className="text-xl font-semibold text-gray-800 mt-4 mb-2">
+                            <div className="relative w-full h-48 mb-4">
+                                <Image
+                                    src={article.image}
+                                    alt={article.title}
+                                    fill
+                                    className="object-cover rounded-lg"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                />
+                            </div>
+                            <h2 className="text-xl font-semibold text-gray-800 mb-2">
                                 {article.title}
                             </h2>
                             <p className="text-gray-600 mb-4">{article.description}</p>
-                            <a
+                            <Link
                                 href={article.link}
                                 className="text-blue-600 hover:underline font-medium"
                             >
                                 Đọc thêm
-                            </a>
+                            </Link>
                         </div>
                     ))}
                 </div>

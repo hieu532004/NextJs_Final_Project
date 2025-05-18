@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
+import Link from 'next/link';
 
 export default function AboutPage() {
     return (
@@ -14,8 +15,10 @@ export default function AboutPage() {
                         Về Chúng Tôi
                     </h1>
                     <p className="text-gray-700 mb-6">
-                        TechStore là đơn vị hàng đầu trong lĩnh vực cung cấp các sản phẩm công nghệ chính hãng tại Việt Nam. Với sứ mệnh mang đến trải nghiệm mua sắm hiện đại và đáng tin cậy, chúng tôi cam kết cung cấp sản phẩm chất lượng cao với giá cả cạnh tranh.
+                        TechStore là đơn vị hàng đầu trong lĩnh vực cung cấp các sản phẩm công nghệ chính hãng tại Việt Nam.
                     </p>
+                    
+                    {/* Thêm unoptimized cho Image trong quá trình build */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
                             <div className="relative w-full h-40 mb-4">
@@ -44,13 +47,14 @@ export default function AboutPage() {
                             <p className="text-gray-600">Trở thành thương hiệu công nghệ hàng đầu tại khu vực Đông Nam Á.</p>
                         </div>
                     </div>
+                    
                     <div className="text-center">
-                        <a
+                        <Link
                             href="/contact"
                             className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300"
                         >
                             Liên hệ với chúng tôi
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </main>

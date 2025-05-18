@@ -315,15 +315,20 @@ export default function ProductList() {
             <Card title="Bộ lọc sản phẩm" className="shadow-sm">
               <h3 className="text-lg font-semibold mb-2">Danh mục</h3>
               <Menu
-                mode="vertical"
-                selectedKeys={selectedCategory ? [selectedCategory] : ['all']}
-                onClick={({ key }) => handleCategorySelect(key)}
-              >
-                <Menu.Item key="all">Tất cả sản phẩm</Menu.Item>
-                {categories.map(category => (
-                  <Menu.Item key={category._id}>{category.name}</Menu.Item>
-                ))}
-              </Menu>
+  mode="vertical"
+  selectedKeys={selectedCategory ? [selectedCategory] : ['all']}
+  onClick={({ key }) => handleCategorySelect(key)}
+  items={[
+    {
+      key: 'all',
+      label: 'Tất cả sản phẩm',
+    },
+    ...categories.map(category => ({
+      key: category._id,
+      label: category.name,
+    }))
+  ]}
+/>
 
               <h3 className="text-lg font-semibold mt-4 mb-2">Khoảng giá</h3>
               <Slider
