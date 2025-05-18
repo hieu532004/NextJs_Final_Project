@@ -191,12 +191,9 @@ export default function PromotionsPage() {
                       <div className="mt-4 flex space-x-2">
                         <Button
                           type="primary"
-                          icon={<ShoppingCartOutlined />}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleAddToCart(product);
-                          }}
-                          disabled={product.stock === 0}
+                block
+                icon={<ShoppingCartOutlined />}
+                onClick={() => handleAddToCart(product)}
                           className="w-full"
                         >
                           Mua ngay

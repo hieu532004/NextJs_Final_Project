@@ -65,44 +65,60 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
   };
 
   // Dropdown Menus for Desktop
-  const laptopMenu = (
-    <Menu>
-      <Menu.Item key="1" onClick={() => router.push(createQueryString('laptop'))}>
-        Laptop
-      </Menu.Item>
-    </Menu>
-  );
+  const laptopMenu = {
+  items: [
+    {
+      key: '1',
+      label: 'Laptop',
+      onClick: () => router.push(createQueryString('laptop'))
+    }
+  ]
+};
+const accessoriesMenu = {
+  items: [
+    {
+      key: '1',
+      label: 'Chuột',
+      onClick: () => router.push(createQueryString('chuot'))
+    },
+    {
+      key: '2',
+      label: 'Bàn phím',
+      onClick: () => router.push(createQueryString('ban-phim'))
+    },
+    {
+      key: '3',
+      label: 'Tai nghe',
+      onClick: () => router.push(createQueryString('tai-nghe'))
+    },
+    {
+      key: '4',
+      label: 'Cáp sạc',
+      onClick: () => router.push(createQueryString('cap-sac'))
+    },
+    {
+      key: '5',
+      label: 'Balo laptop',
+      onClick: () => router.push(createQueryString('balo-laptop'))
+    },
+    {
+      key: '6',
+      label: 'Phụ kiện khác',
+      onClick: () => router.push(createQueryString('phu-kien-khac'))
+    }
+  ]
+};
+  
 
-  const accessoriesMenu = (
-    <Menu>
-      <Menu.Item key="1" onClick={() => router.push(createQueryString('chuot'))}>
-        Chuột
-      </Menu.Item>
-      <Menu.Item key="2" onClick={() => router.push(createQueryString('ban-phim'))}>
-        Bàn phím
-      </Menu.Item>
-      <Menu.Item key="3" onClick={() => router.push(createQueryString('tai-nghe'))}>
-        Tai nghe
-      </Menu.Item>
-      <Menu.Item key="4" onClick={() => router.push(createQueryString('cap-sac'))}>
-        Cáp sạc
-      </Menu.Item>
-      <Menu.Item key="5" onClick={() => router.push(createQueryString('balo-laptop'))}>
-        Balo laptop
-      </Menu.Item>
-      <Menu.Item key="6" onClick={() => router.push(createQueryString('phu-kien-khac'))}>
-        Phụ kiện khác
-      </Menu.Item>
-    </Menu>
-  );
-
-  const officeEquipmentMenu = (
-    <Menu>
-      <Menu.Item key="1" onClick={() => router.push(createQueryString('man-hinh'))}>
-        Màn hình
-      </Menu.Item>
-    </Menu>
-  );
+const officeEquipmentMenu = {
+  items: [
+    {
+      key: '1',
+      label: 'Màn hình',
+      onClick: () => router.push(createQueryString('man-hinh'))
+    }
+  ]
+};
 
   // Debounced search function
   const performSearch = useCallback(
@@ -242,19 +258,26 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
                 </Link>
                 {loggedInUser ? (
                   <Dropdown
-                    overlay={
-                      <Menu>
-                        <Menu.Item key="0">
-                          <Link href="/account">
-                            <UserOutlined className="mr-2" /> Tài khoản của tôi
-                          </Link>
-                        </Menu.Item>
-                        <Menu.Divider />
-                        <Menu.Item key="3" onClick={handleLogout}>
-                          Đăng xuất
-                        </Menu.Item>
-                      </Menu>
-                    }
+                    menu={{
+  items: [
+    {
+      key: '0',
+      label: (
+        <Link href="/account">
+          <UserOutlined className="mr-2" /> Tài khoản của tôi
+        </Link>
+      )
+    },
+    {
+      type: 'divider'
+    },
+    {
+      key: '3',
+      label: 'Đăng xuất',
+      onClick: handleLogout
+    }
+  ]
+}}
                     trigger={['click']}
                   >
                     <span className="flex items-center cursor-pointer">
@@ -335,19 +358,19 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
           <div className="hidden lg:block border-t border-gray-200">
             <div className="flex items-center justify-between py-3">
               <div className="flex items-center space-x-8">
-                <Dropdown overlay={laptopMenu}>
+                <Dropdown menu={laptopMenu}>
                   <a className="text-gray-700 hover:text-blue-600 cursor-pointer flex items-center">
                     <LaptopOutlined className="mr-1" /> Laptop{' '}
                     <DownOutlined className="text-xs ml-1" />
                   </a>
                 </Dropdown>
-                <Dropdown overlay={accessoriesMenu}>
+                <Dropdown menu={accessoriesMenu}>
                   <a className="text-gray-700 hover:text-blue-600 cursor-pointer flex items-center">
                     <TabletOutlined className="mr-1" /> Phụ kiện{' '}
                     <DownOutlined className="text-xs ml-1" />
                   </a>
                 </Dropdown>
-                <Dropdown overlay={officeEquipmentMenu}>
+                <Dropdown menu={officeEquipmentMenu}>
                   <a className="text-gray-700 hover:text-blue-600 cursor-pointer flex items-center">
                     <AudioOutlined className="mr-1" /> Thiết bị văn phòng{' '}
                     <DownOutlined className="text-xs ml-1" />
@@ -458,77 +481,84 @@ const Header: React.FC<HeaderProps> = ({ searchValue, setSearchValue, toggleMobi
             </>
           )}
 
-          <Collapse ghost expandIconPosition="right">
-            <Panel
-              header={
-                <span className="text-gray-700">
-                  <LaptopOutlined className="mr-2" /> Laptop
-                </span>
-              }
-              key="1"
-            >
-              <div className="pl-8 space-y-3">
-                <Link href="/laptop/gaming" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Laptop Gaming
-                </Link>
-                <Link href="/laptop/office" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Laptop Văn Phòng
-                </Link>
-                <Link href="/laptop/design" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Laptop Đồ Họa
-                </Link>
-                <Link href="/laptop/macbook" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  MacBook
-                </Link>
-              </div>
-            </Panel>
-            <Panel
-              header={
-                <span className="text-gray-700">
-                  <TabletOutlined className="mr-2" /> Phụ kiện
-                </span>
-              }
-              key="2"
-            >
-              <div className="pl-8 space-y-3">
-                <Link href="/accessories/mouse" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Chuột
-                </Link>
-                <Link href="/accessories/keyboard" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Bàn phím
-                </Link>
-                <Link href="/accessories/headphones" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Tai nghe
-                </Link>
-                <Link href="/accessories/backpack" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Balo laptop
-                </Link>
-              </div>
-            </Panel>
-            <Panel
-              header={
-                <span className="text-gray-700">
-                  <AudioOutlined className="mr-2" /> Thiết bị văn phòng
-                </span>
-              }
-              key="3"
-            >
-              <div className="pl-8 space-y-3">
-                <Link href="/office/monitor" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Màn hình
-                </Link>
-                <Link href="/office/printer" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Máy in
-                </Link>
-                <Link href="/office/scanner" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Máy scan
-                </Link>
-                <Link href="/office/projector" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-                  Máy chiếu
-                </Link>
-              </div>
-            </Panel>
-          </Collapse>
+<Collapse
+  ghost
+  expandIconPosition="right"
+  items={[
+    {
+      key: '1',
+      label: (
+        <span className="text-gray-700">
+          <LaptopOutlined className="mr-2" /> Laptop
+        </span>
+      ),
+      children: (
+        <div className="pl-8 space-y-3">
+          <Link href="/laptop/gaming" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Laptop Gaming
+          </Link>
+          <Link href="/laptop/office" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Laptop Văn Phòng
+          </Link>
+          <Link href="/laptop/design" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Laptop Đồ Họa
+          </Link>
+          <Link href="/laptop/macbook" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            MacBook
+          </Link>
+        </div>
+      )
+    },
+    {
+      key: '2',
+      label: (
+        <span className="text-gray-700">
+          <TabletOutlined className="mr-2" /> Phụ kiện
+        </span>
+      ),
+      children: (
+        <div className="pl-8 space-y-3">
+          <Link href="/accessories/mouse" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Chuột
+          </Link>
+          <Link href="/accessories/keyboard" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Bàn phím
+          </Link>
+          <Link href="/accessories/headphones" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Tai nghe
+          </Link>
+          <Link href="/accessories/backpack" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Balo laptop
+          </Link>
+        </div>
+      )
+    },
+    {
+      key: '3',
+      label: (
+        <span className="text-gray-700">
+          <AudioOutlined className="mr-2" /> Thiết bị văn phòng
+        </span>
+      ),
+      children: (
+        <div className="pl-8 space-y-3">
+          <Link href="/office/monitor" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Màn hình
+          </Link>
+          <Link href="/office/printer" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Máy in
+          </Link>
+          <Link href="/office/scanner" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Máy scan
+          </Link>
+          <Link href="/office/projector" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
+            Máy chiếu
+          </Link>
+        </div>
+      )
+    }
+  ]}
+/>
 
           <Link href="/promotions" className="flex items-center py-3 border-b cursor-pointer">
             <ThunderboltOutlined className="mr-2 text-gray-700" />

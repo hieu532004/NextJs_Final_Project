@@ -9,7 +9,6 @@ import { Product, Category, Review } from '@/app/types';
 const { TabPane } = Tabs;
 const { TextArea } = Input;
 
-// Define a minimal Router interface for the push method
 interface Router {
   push: (href: string) => void;
 }
@@ -20,7 +19,7 @@ interface ProductTabsProps {
   reviews: Review[];
   setReviews: (reviews: Review[]) => void;
   isLoggedIn: boolean;
-  router: Router; // Use custom Router interface
+  router: Router;
 }
 
 export default function ProductTabs({
@@ -105,13 +104,19 @@ export default function ProductTabs({
   };
 
   return (
-    <Tabs defaultActiveKey="1" className="mb-4">
-      <TabPane tab="Mô tả sản phẩm" key="1">
+    <Tabs 
+  defaultActiveKey="1" 
+  className="mb-4"
+  items={[
+    {
+      key: "1",
+      label: "Mô tả sản phẩm",
+      children: (
         <div className="text-gray-700">
           <p className="mb-2">
             MacBook Air M2 2022 là dòng laptop cao cấp mới nhất của Apple, mang đến hiệu năng vượt trội với chip M2 mạnh mẽ. Thiết kế mỏng nhẹ, sang trọng cùng màn hình Retina 13.6 inch sắc nét, đây là lựa chọn hoàn hảo cho công việc và giải trí.
           </p>
-          <p className="mb-2">
+          <div className="mb-2">
             <strong>Tính năng nổi bật:</strong>
             <ul className="list-disc pl-5">
               <li>Chip M2 với CPU 8 nhân và GPU 8 nhân, hiệu năng vượt trội.</li>
@@ -120,10 +125,14 @@ export default function ProductTabs({
               <li>Hệ thống 4 loa với âm thanh vòm Spatial Audio và Dolby Atmos.</li>
               <li>Thiết kế không quạt, hoạt động êm ái và mát mẻ.</li>
             </ul>
-          </p>
+          </div>
         </div>
-      </TabPane>
-      <TabPane tab="Thông số kỹ thuật" key="2">
+      )
+    },
+    {
+      key: "2",
+      label: "Thông số kỹ thuật",
+      children: (
         <Row gutter={[16, 16]}>
           <Col span={12}>
             <p><strong>Thương hiệu:</strong> {product.brand}</p>
@@ -140,110 +149,118 @@ export default function ProductTabs({
             <p><strong>Trọng lượng:</strong> 1.24 kg</p>
           </Col>
         </Row>
-      </TabPane>
-      <TabPane tab="Đánh giá khách hàng" key="3">
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Thống kê đánh giá</h3>
-          <div className="flex items-center mb-4">
-            <div className="mr-4">
-              <Rate disabled value={averageRating} allowHalf className="text-lg" />
-              <span className="ml-2 text-lg font-semibold">{averageRating.toFixed(1)}/5</span>
-            </div>
-            <div className="text-sm text-gray-600">
-              ({reviews.length} đánh giá)
-            </div>
-          </div>
-          <div className="space-y-2">
-            {[5, 4, 3, 2, 1].map((star) => (
-              <div key={star} className="flex items-center">
-                <span className="w-16 text-sm">{star} sao</span>
-                <Progress percent={ratingDistribution[star - 1]} showInfo={false} className="w-48 mx-2" />
-                <span className="text-sm text-gray-600">
-                  {Math.round(ratingDistribution[star - 1])}%
-                </span>
+      )
+    },
+    {
+      key: "3",
+      label: "Đánh giá khách hàng",
+      children: (
+        <>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Thống kê đánh giá</h3>
+            <div className="flex items-center mb-4">
+              <div className="mr-4">
+                <Rate disabled value={averageRating} allowHalf className="text-lg" />
+                <span className="ml-2 text-lg font-semibold">{averageRating.toFixed(1)}/5</span>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Gửi đánh giá của bạn</h3>
-          {isLoggedIn ? (
-            <Form form={form} onFinish={onFinishReview} layout="vertical">
-              <Form.Item
-                name="name"
-                label="Tên của bạn (không bắt buộc)"
-              >
-                <Input placeholder="Nhập tên của bạn" />
-              </Form.Item>
-              <Form.Item
-                name="rating"
-                label="Đánh giá"
-                rules={[{ required: true, message: 'Vui lòng chọn số sao đánh giá!' }]}
-              >
-                <Rate />
-              </Form.Item>
-              <Form.Item
-                name="comment"
-                label="Bình luận"
-                rules={[{ required: true, message: 'Vui lòng nhập bình luận!' }]}
-              >
-                <TextArea rows={4} placeholder="Nhập bình luận của bạn" />
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Gửi đánh giá
-                </Button>
-              </Form.Item>
-            </Form>
-          ) : (
-            <div className="text-gray-600">
-              <p>Vui lòng đăng nhập để gửi đánh giá.</p>
-              <Button
-                type="link"
-                icon={<LoginOutlined />}
-                onClick={() => router.push('/login')}
-                className="p-0"
-              >
-                Đăng nhập ngay
-              </Button>
+              <div className="text-sm text-gray-600">
+                ({reviews.length} đánh giá)
+              </div>
             </div>
-          )}
-        </div>
+            <div className="space-y-2">
+              {[5, 4, 3, 2, 1].map((star) => (
+                <div key={star} className="flex items-center">
+                  <span className="w-16 text-sm">{star} sao</span>
+                  <Progress percent={ratingDistribution[star - 1]} showInfo={false} className="w-48 mx-2" />
+                  <span className="text-sm text-gray-600">
+                    {Math.round(ratingDistribution[star - 1])}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
 
-        <List
-          itemLayout="horizontal"
-          dataSource={displayedReviews}
-          renderItem={(review) => (
-            <List.Item>
-              <List.Item.Meta
-                avatar={<Avatar>{review.avatar}</Avatar>}
-                title={
-                  <div>
-                    {review.name} <Rate disabled value={review.rating} allowHalf className="text-sm ml-2" />
-                  </div>
-                }
-                description={
-                  <div>
-                    <p>{review.comment}</p>
-                    <p className="text-gray-500 text-sm">
-                      {new Date(review.created_at).toLocaleDateString('vi-VN')}
-                    </p>
-                  </div>
-                }
-              />
-            </List.Item>
-          )}
-        />
-        <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          total={reviews.length}
-          onChange={(page) => setCurrentPage(page)}
-          className="mt-4 text-center"
-          showSizeChanger={false}
-        />
-      </TabPane>
-    </Tabs>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Gửi đánh giá của bạn</h3>
+            {isLoggedIn ? (
+              <Form form={form} onFinish={onFinishReview} layout="vertical">
+                <Form.Item
+                  name="name"
+                  label="Tên của bạn (không bắt buộc)"
+                >
+                  <Input placeholder="Nhập tên của bạn" />
+                </Form.Item>
+                <Form.Item
+                  name="rating"
+                  label="Đánh giá"
+                  rules={[{ required: true, message: 'Vui lòng chọn số sao đánh giá!' }]}
+                >
+                  <Rate />
+                </Form.Item>
+                <Form.Item
+                  name="comment"
+                  label="Bình luận"
+                  rules={[{ required: true, message: 'Vui lòng nhập bình luận!' }]}
+                >
+                  <TextArea rows={4} placeholder="Nhập bình luận của bạn" />
+                </Form.Item>
+                <Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Gửi đánh giá
+                  </Button>
+                </Form.Item>
+              </Form>
+            ) : (
+              <div className="text-gray-600">
+                <p>Vui lòng đăng nhập để gửi đánh giá.</p>
+                <Button
+                  type="link"
+                  icon={<LoginOutlined />}
+                  onClick={() => router.push('/login')}
+                  className="p-0"
+                >
+                  Đăng nhập ngay
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <List
+            itemLayout="horizontal"
+            dataSource={displayedReviews}
+            renderItem={(review) => (
+              <List.Item>
+                <List.Item.Meta
+                  avatar={<Avatar>{review.avatar}</Avatar>}
+                  title={
+                    <div>
+                      {review.name} <Rate disabled value={review.rating} allowHalf className="text-sm ml-2" />
+                    </div>
+                  }
+                  description={
+                    <div>
+                      <p>{review.comment}</p>
+                      <p className="text-gray-500 text-sm">
+                        {new Date(review.created_at).toLocaleDateString('vi-VN')}
+                      </p>
+                    </div>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+          <Pagination
+            current={currentPage}
+            pageSize={pageSize}
+            total={reviews.length}
+            onChange={(page) => setCurrentPage(page)}
+            className="mt-4 text-center"
+            showSizeChanger={false}
+          />
+        </>
+      )
+    }
+  ]}
+/>
   );
 }
