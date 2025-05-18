@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Card, Row, Col, Button, Tag, Rate, notification } from 'antd';
+import { Card, Row, Col, Button, Tag, Rate, notification, Skeleton } from 'antd';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
@@ -10,6 +9,7 @@ import { ShoppingCartOutlined, EyeOutlined } from '@ant-design/icons';
 import { useCart } from '@/app/contexts/CartContext';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
+import axios from 'axios';
 
 interface Product {
   _id: string;
@@ -29,9 +29,9 @@ interface Product {
 }
 
 export default function PromotionsPage() {
-  const { setCartCount } = useCart();
+  const { addToCart } = useCart();
   const searchParams = useSearchParams();
-  const queryCategory = searchParams.get('category'); // Đọc category từ URL
+  const queryCategory = searchParams.get('category');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,11 +43,9 @@ export default function PromotionsPage() {
         setLoading(true);
         const response = await axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products`);
         const productsData = response.data.data.products || [];
-        // Lọc sản phẩm khuyến mãi (discount > 0 hoặc isNew = true)
         let promotedProducts = productsData.filter(
           (product: Product) => product.discount > 0 || product.isNew
         );
-        // Nếu có query category, lọc thêm theo danh mục
         if (queryCategory) {
           promotedProducts = promotedProducts.filter(
             (product: Product) => product.category_id === queryCategory
@@ -65,35 +63,48 @@ export default function PromotionsPage() {
     fetchData();
   }, [queryCategory]);
 
-  const addToCart = async (product: Product) => {
-    try {
-      await axios.post('${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/cart', {
-        product_id: product._id,
-        quantity: 1,
-      });
-      const response = await axios.get('${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/cart');
-      const cartData = response.data as { items: { quantity: number }[] };
-      setCartCount(cartData.items.reduce((total, item) => total + item.quantity, 0));
-      notification.success({
-        message: 'Thêm vào giỏ hàng thành công!',
-        description: `${product.name} đã được thêm vào giỏ hàng.`,
-        duration: 2,
-      });
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      notification.error({
-        message: 'Lỗi',
-        description: 'Không thể thêm sản phẩm vào giỏ hàng.',
-        duration: 2,
-      });
-    }
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product._id,
+      name: product.name,
+      price: product.salePrice,
+      quantity: 1,
+      image: product.image,
+    });
+    notification.success({
+      message: 'Thêm vào giỏ hàng thành công!',
+      description: `${product.name} đã được thêm vào giỏ hàng.`,
+      duration: 2,
+    });
   };
 
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header searchValue={searchValue} setSearchValue={setSearchValue} />
-        <main className="flex-grow container mx-auto p-4">Đang tải...</main>
+        <main className="flex-grow container mx-auto p-4">
+          <div className="mb-6">
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">
+              {queryCategory ? `Khuyến mãi ${queryCategory}` : 'Khuyến Mãi Nổi Bật'}
+            </h1>
+            <p className="text-gray-600">
+              Khám phá các sản phẩm giảm giá và ưu đãi đặc biệt. Chỉ áp dụng đến hết ngày 15/05/2025!
+            </p>
+          </div>
+          <Row gutter={[24, 24]}>
+            {Array.from({ length: 8 }).map((_, index) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={index}>
+                <Card className="shadow-md rounded-lg overflow-hidden">
+                  <Skeleton.Image active className="!w-full !h-64" />
+                  <div className="p-4">
+                    <Skeleton active paragraph={{ rows: 2 }} title={{ width: '75%' }} />
+                    <Skeleton.Button active block className="!h-10 mt-4" />
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </main>
         <Footer />
       </div>
     );
@@ -183,23 +194,21 @@ export default function PromotionsPage() {
                           icon={<ShoppingCartOutlined />}
                           onClick={(e) => {
                             e.preventDefault();
-                            addToCart(product);
+                            handleAddToCart(product);
                           }}
                           disabled={product.stock === 0}
                           className="w-full"
                         >
                           Mua ngay
                         </Button>
-                        <Button
-                          icon={<EyeOutlined />}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            // Logic xem nhanh (tùy chọn)
-                          }}
-                          className="w-full"
-                        >
-                          Xem chi tiết
-                        </Button>
+                        <Link href={`/products/${product.slug}`} passHref>
+                          <Button
+                            icon={<EyeOutlined />}
+                            className="w-full"
+                          >
+                            Xem chi tiết
+                          </Button>
+                        </Link>
                       </div>
                     </div>
                   }
