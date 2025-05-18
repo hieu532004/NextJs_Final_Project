@@ -2,6 +2,7 @@
 
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
+import Image from 'next/image';
 
 export default function NewsPage() {
     const articles = [
@@ -39,11 +40,15 @@ export default function NewsPage() {
                             key={index}
                             className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
                         >
-                            <img
-                                src={article.image}
-                                alt={article.title}
-                                className="w-full h-48 object-cover rounded-t-lg"
-                            />
+                            <div className="relative w-full h-48">
+  <Image
+    src={article.image}
+    alt={article.title}
+    layout="fill"
+    style={{ objectFit: 'cover' }}
+    className="rounded-t-lg"
+  />
+</div>
                             <h2 className="text-xl font-semibold text-gray-800 mt-4 mb-2">
                                 {article.title}
                             </h2>

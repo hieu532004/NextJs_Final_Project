@@ -8,7 +8,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import axios from 'axios';
 import { useCart } from '../contexts/CartContext';
-import { Category, Product, Brand } from '../types';
+import { Category, Product } from '../types';
 
 interface MobileMenuDrawerProps {
   visible: boolean;

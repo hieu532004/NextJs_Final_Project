@@ -1,10 +1,10 @@
 
 "use client"
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Divider, Modal, Steps, message } from 'antd';
-import { CheckCircleFilled, HomeOutlined, ShoppingOutlined, UserOutlined, SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { Button, Input, Divider, Modal, Steps } from 'antd';
+import { CheckCircleFilled, HomeOutlined, ShoppingOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/app/contexts/authContext';
+import Image from 'next/image';
 const { Step } = Steps;
 
 const PaymentSuccess: React.FC = () => {
@@ -15,7 +15,6 @@ const PaymentSuccess: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user } = useAuth();
 
   useEffect(() => {
     const orderIdFromQuery = searchParams.get('orderId');
@@ -110,10 +109,12 @@ const PaymentSuccess: React.FC = () => {
               {orderData.orderItems && orderData.orderItems.map((item: any) => (
                 <div key={item.productId} className="flex items-center p-4 border border-gray-100 rounded-lg">
                   <div className="w-16 h-16 overflow-hidden rounded-md flex-shrink-0">
-                    <img
+                    <Image
                       src={item.imageUrl || `https://via.placeholder.com/100x100?text=Product+${item.productId}`} // Sử dụng item.imageUrl, fallback nếu không có
                       alt={`Sản phẩm ${item.productId}`}
-                      className="w-full h-full object-cover object-top"
+                      width={100}
+  height={100}
+  className="object-cover object-top w-full h-full"
                     />
                   </div>
                   <div className="ml-4 flex-grow">

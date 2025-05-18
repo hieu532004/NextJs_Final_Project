@@ -2,6 +2,7 @@
 import { Carousel, Button } from 'antd';
 import { Banner } from '@/app/types';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface HeroBannerProps {
   banners: Banner[];
@@ -32,19 +33,22 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ banners }) => {
                    
                   </div>
                   <div className="hidden md:block w-1/2 relative">
-                    <img
-                      src={banner.image}
-                      alt={banner.title}
-                      className="absolute inset-0 w-full h-full object-cover object-top"
-                    />
+                    <Image
+  src={banner.image}
+  alt={banner.title}
+  fill
+  className="object-cover object-top rounded-lg"
+  priority
+/>
                   </div>
                 </div>
                 <div className="block md:hidden absolute inset-0">
-                  <img
-                    src={banner.image}
-                    alt={banner.title}
-                    className="w-full h-full object-cover object-top opacity-20"
-                  />
+                  <Image
+  src={banner.image}
+  alt={banner.title}
+  fill
+  className="w-full h-full object-cover object-top opacity-20"
+/>
                 </div>
               </div>
             </div>

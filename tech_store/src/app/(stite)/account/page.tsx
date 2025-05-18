@@ -22,7 +22,7 @@ import Header from '@/app/components/Header';
 import { useAuth } from '@/app/contexts/authContext';
 import { useRouter } from 'next/navigation';
 import Footer from '@/app/components/Footer';
-import Link from 'next/link'; // Import Link for navigation
+import { Order } from '@/app/types';
 
 const { TabPane } = Tabs;
 
@@ -30,7 +30,7 @@ const UserAccount = () => {
     const [activeTab, setActiveTab] = useState<string>('profile');
     const [profileForm] = Form.useForm();
     const [searchValue, setSearchValue] = useState('');
-    const [orders, setOrders] = useState<any[]>([]);
+    const [orders, setOrders] = useState<Order[]>([]);
     const { user: loggedInUser, logout } = useAuth();
     const router = useRouter();
 

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 
@@ -17,20 +18,28 @@ export default function AboutPage() {
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-                            <img
-                                src="https://jobsgo.vn/blog/wp-content/uploads/2022/08/su-menh-la-gi.jpg"
-                                alt="Sứ mệnh"
-                                className="w-full h-40 object-cover rounded-lg mb-4"
-                            />
+                            <div className="relative w-full h-40 mb-4">
+                                <Image
+                                    src="https://jobsgo.vn/blog/wp-content/uploads/2022/08/su-menh-la-gi.jpg"
+                                    alt="Sứ mệnh"
+                                    fill
+                                    className="object-cover rounded-lg"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                />
+                            </div>
                             <h2 className="text-xl font-semibold text-gray-800 mb-2">Sứ mệnh</h2>
                             <p className="text-gray-600">Đem công nghệ tiên tiến đến mọi nhà với dịch vụ tận tâm.</p>
                         </div>
                         <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-                            <img
-                                src="https://www.ellisbates.com/wp-content/uploads/2019/04/ISA-planning.png"
-                                alt="Tầm nhìn"
-                                className="w-full h-40 object-cover rounded-lg mb-4"
-                            />
+                            <div className="relative w-full h-40 mb-4">
+                                <Image
+                                    src="https://www.ellisbates.com/wp-content/uploads/2019/04/ISA-planning.png"
+                                    alt="Tầm nhìn"
+                                    fill
+                                    className="object-cover rounded-lg"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                />
+                            </div>
                             <h2 className="text-xl font-semibold text-gray-800 mb-2">Tầm nhìn</h2>
                             <p className="text-gray-600">Trở thành thương hiệu công nghệ hàng đầu tại khu vực Đông Nam Á.</p>
                         </div>

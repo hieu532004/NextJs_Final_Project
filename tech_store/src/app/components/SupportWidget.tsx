@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button, Input, Drawer, message, Spin } from 'antd';
+import { Button, Input, Drawer, Spin } from 'antd';
 import { CustomerServiceOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import axios from 'axios';
+import Image from 'next/image';
 
 interface Product {
   _id: string;
@@ -174,11 +175,13 @@ const SupportWidget: React.FC = () => {
           rel="noopener noreferrer"
           className="bg-green-500 rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110"
         >
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"
-            alt="Zalo"
-            className="w-8 h-8"
-          />
+          <Image
+  src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"
+  alt="Zalo"
+  width={32}
+  height={32}
+  className="w-8 h-8"
+/>
         </a>
 
         {/* Nút lên đầu trang */}

@@ -3,8 +3,6 @@
 import { Button, Card, Rate, notification, Skeleton } from 'antd';
 import { ShoppingCartOutlined, RightOutlined } from '@ant-design/icons';
 import { Product } from '../types';
-import axios from 'axios';
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '../contexts/CartContext';

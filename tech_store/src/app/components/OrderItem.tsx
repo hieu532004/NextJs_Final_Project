@@ -1,5 +1,6 @@
 
 import { FC, useEffect, useState } from "react";
+import Image from "next/image";
 
 // Interface cho OrderItemProps (đã cập nhật để sử dụng 'image')
 interface OrderItemProps {
@@ -19,13 +20,15 @@ const OrderItem: FC<OrderItemProps> = ({ name, quantity, price, image }) => {
 
   return (
     <div className="flex items-center py-4 border-b">
-      <div className="w-16 h-16 flex-shrink-0">
-        <img
-          src={image || "/placeholder.svg"} // Sử dụng 'image'
-          alt={name}
-          className="w-full h-full object-cover object-top rounded-md"
-        />
-      </div>
+      <div className="w-16 h-16 flex-shrink-0 relative">
+  <Image
+    src={image || "/placeholder.svg"} // Fallback if image is undefined
+    alt={name}
+    layout="fill"
+    style={{ objectFit: 'cover', objectPosition: 'top' }} // Replace object-cover and object-top
+    className="rounded-md" // Keep rounded corners
+  />
+</div>
       <div className="ml-4 flex-grow">
         <h3 className="font-medium">{name}</h3>
         <p className="text-gray-500">SL: {quantity}</p>

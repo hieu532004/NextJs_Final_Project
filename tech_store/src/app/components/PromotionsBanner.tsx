@@ -3,7 +3,7 @@
 import { Button } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import Image from 'next/image';
 
 interface PromotionBanner {
   id: number;
@@ -96,16 +96,18 @@ const PromotionsBanner: React.FC = () => {
                   </Button>
                 </Link>
               </div>
-              <div className="md:w-1/2 flex justify-center">
-                <img
-                  src={promo.image}
-                  alt={promo.title}
-                  className="w-full max-w-xs object-contain rounded-lg"
-                  onError={(e) => {
-                    e.currentTarget.src = '/fallback-image.jpg'; // Fallback image nếu lỗi
-                  }}
-                />
-              </div>
+              <div className="md:w-1/2 flex justify-center relative max-w-xs h-60"> {/* Added height for layout="fill" */}
+  <Image
+    src={promo.image || '/fallback-image.jpg'} // Fallback directly in src
+    alt={promo.title}
+    layout="fill"
+    style={{ objectFit: 'contain' }} // Replace object-contain
+    className="rounded-lg"
+    onError={(e) => {
+      e.currentTarget.src = '/fallback-image.jpg'; // Fallback for Image
+    }}
+  />
+</div>
             </div>
           </div>
         ))}

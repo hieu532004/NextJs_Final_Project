@@ -8,8 +8,6 @@ import Header from '../../components/Header';
 import Link from "next/link";
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from "lucide-react";
 import { Button } from "antd";
-import { ShoppingCartOutlined } from "@ant-design/icons";
-// import { Header } from "antd/es/layout/layout";
 
 export interface CartItem {
   id: string | number

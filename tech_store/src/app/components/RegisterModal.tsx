@@ -2,7 +2,7 @@
 
 
 import React from "react";
-import { Modal, Button, Form, Input, Checkbox, message, DatePicker, Select } from "antd";
+import { Modal, Button, Form, Input, Checkbox } from "antd";
 import {
   EyeInvisibleOutlined,
   EyeTwoTone,
@@ -11,12 +11,9 @@ import {
   MailOutlined,
   PhoneOutlined,
   LockOutlined,
-  HomeOutlined,
-  CalendarOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "@/app/contexts/authContext";
 import { useRouter } from "next/navigation";
-import Notification from '../components/Notification';
 
 interface RegisterModalProps {
   isVisible: boolean;
@@ -78,7 +75,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
       }
 
       // 3. Tạo người dùng mới (POST /users)
-      const response = await fetch('${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/users', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

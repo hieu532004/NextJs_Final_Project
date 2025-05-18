@@ -77,3 +77,22 @@ export interface User {
   gender?: string;
   // ... các thông tin khác liên quan đến người dùng
 }
+
+export interface OrderItem {
+  product_id: string;
+  name: string;
+  quantity: number;
+  pricePerUnit: number;
+}
+
+export interface Order {
+  id: number;
+  userid: number;
+  fullName: string;
+  detailAddress: string;
+  paymentMethod: string;
+  totalAmount: number;
+  orderItems: OrderItem[];
+  orderDate: string;
+  status: string;
+}

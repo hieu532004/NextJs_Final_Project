@@ -1,29 +1,37 @@
-
-
 "use client";
 import { useState, useEffect } from 'react';
-import { Select, message, Form, Spin } from 'antd';
+import { Select, message, Form } from 'antd';
 
 const { Option } = Select;
 
-interface AddressSelectorProps {
-  setCities?: React.Dispatch<React.SetStateAction<any[]>>;
-  setDistricts?: React.Dispatch<React.SetStateAction<any[]>>;
-  setCommunes?: React.Dispatch<React.SetStateAction<any[]>>;
+interface Location {
+  id: number;
+  full_name: string;
 }
 
-const AddressSelector: React.FC<AddressSelectorProps> = ({ setCities: setCitiesProp, setDistricts: setDistrictsProp, setCommunes: setCommunesProp }) => {
+interface AddressSelectorProps {
+  setCities?: React.Dispatch<React.SetStateAction<Location[]>>;
+  setDistricts?: React.Dispatch<React.SetStateAction<Location[]>>;
+  setCommunes?: React.Dispatch<React.SetStateAction<Location[]>>;
+}
+
+const AddressSelector: React.FC<AddressSelectorProps> = ({
+  setCities: setCitiesProp,
+  setDistricts: setDistrictsProp,
+  setCommunes: setCommunesProp,
+}) => {
   const form = Form.useFormInstance();
 
-  const [cities, setCities] = useState<any[]>([]); // Lưu danh sách tỉnh thành
-  const [districts, setDistricts] = useState<any[]>([]); // Lưu danh sách quận huyện
-  const [communes, setCommunes] = useState<any[]>([]); // Lưu danh sách phường xã
+  const [cities, setCities] = useState<Location[]>([]);
+  const [districts, setDistricts] = useState<Location[]>([]);
+  const [communes, setCommunes] = useState<Location[]>([]);
 
-  const [selectedCity, setSelectedCity] = useState<number | null>(null); // Thành phố đã chọn
-  const [selectedDistrict, setSelectedDistrict] = useState<number | null>(null); // Quận huyện đã chọn
-  const [loadingCities, setLoadingCities] = useState<boolean>(false); // Trạng thái loading cho các tỉnh thành
-  const [loadingDistricts, setLoadingDistricts] = useState<boolean>(false); // Trạng thái loading cho quận huyện
-  const [loadingCommunes, setLoadingCommunes] = useState<boolean>(false); // Trạng thái loading cho phường xã
+  const [selectedCity, setSelectedCity] = useState<number | null>(null);
+  const [selectedDistrict, setSelectedDistrict] = useState<number | null>(null);
+
+  const [loadingCities, setLoadingCities] = useState<boolean>(false);
+  const [loadingDistricts, setLoadingDistricts] = useState<boolean>(false);
+  const [loadingCommunes, setLoadingCommunes] = useState<boolean>(false);
 
   useEffect(() => {
     if (setCitiesProp) {
@@ -43,72 +51,66 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({ setCities: setCitiesP
     }
   }, [communes, setCommunesProp]);
 
-  // Hàm xử lý khi tải dữ liệu tỉnh thành
   const fetchCities = async () => {
-    setLoadingCities(true); // Bắt đầu loading
+    setLoadingCities(true);
     try {
       const response = await fetch('https://esgoo.net/api-tinhthanh/1/0.htm');
       const data = await response.json();
       if (data.error === 0) {
-        setCities(data.data); // Cập nhật danh sách tỉnh thành
+        setCities(data.data as Location[]);
       } else {
         message.error("Không thể tải thông tin tỉnh/thành phố.");
       }
     } catch {
       message.error("Lỗi khi tải thông tin tỉnh/thành phố.");
     } finally {
-      setLoadingCities(false); // Kết thúc loading
+      setLoadingCities(false);
     }
   };
 
-  // Hàm xử lý khi chọn thành phố
   const handleCityChange = async (cityId: number) => {
     form.setFieldsValue({ city: cityId, district: undefined, commune: undefined });
     setSelectedCity(cityId);
-    setSelectedDistrict(null); // Reset quận huyện khi chọn lại thành phố
-    setCommunes([]); // Reset phường xã
-    setLoadingDistricts(true); // Bắt đầu loading quận huyện
+    setSelectedDistrict(null);
+    setCommunes([]);
+    setLoadingDistricts(true);
 
-    // Fetch quận huyện của thành phố đã chọn
     try {
       const response = await fetch(`https://esgoo.net/api-tinhthanh/2/${cityId}.htm`);
       const data = await response.json();
       if (data.error === 0) {
-        setDistricts(data.data); // Cập nhật danh sách quận huyện
+        setDistricts(data.data as Location[]);
       } else {
         message.error("Không thể tải thông tin quận/huyện.");
       }
     } catch {
       message.error("Lỗi khi tải thông tin quận/huyện.");
     } finally {
-      setLoadingDistricts(false); // Kết thúc loading quận huyện
+      setLoadingDistricts(false);
     }
   };
 
-  // Hàm xử lý khi chọn quận huyện
   const handleDistrictChange = async (districtId: number) => {
     form.setFieldsValue({ district: districtId, commune: undefined });
     setSelectedDistrict(districtId);
-    setCommunes([]); // Reset phường xã khi chọn lại quận huyện
-    setLoadingCommunes(true); // Bắt đầu loading phường xã
+    setCommunes([]);
+    setLoadingCommunes(true);
 
-    // Fetch phường xã của quận huyện đã chọn
     try {
       const response = await fetch(`https://esgoo.net/api-tinhthanh/3/${districtId}.htm`);
       const data = await response.json();
       if (data.error === 0) {
-        setCommunes(data.data); // Cập nhật danh sách phường xã
+        setCommunes(data.data as Location[]);
       } else {
         message.error("Không thể tải thông tin phường/xã.");
       }
     } catch {
       message.error("Lỗi khi tải thông tin phường/xã.");
     } finally {
-      setLoadingCommunes(false); // Kết thúc loading phường xã
+      setLoadingCommunes(false);
     }
   };
 
-  // Hàm xử lý khi chọn phường xã
   const handleCommuneChange = (communeId: number) => {
     form.setFieldsValue({ commune: communeId });
   };
@@ -121,7 +123,7 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({ setCities: setCitiesP
         className="flex-1"
       >
         <div>
-          <label className="block text-lg font-medium ">Tỉnh/Thành phố</label>
+          <label className="block text-lg font-medium">Tỉnh/Thành phố</label>
           <Select
             placeholder="Chọn tỉnh/thành phố"
             style={{ width: '100%' }}
@@ -172,8 +174,8 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({ setCities: setCitiesP
             placeholder="Chọn phường/xã"
             style={{ width: '100%' }}
             onChange={handleCommuneChange}
-            disabled={!selectedDistrict} // Disable dropdown nếu chưa chọn quận
-            loading={loadingCommunes} // Hiển thị loading khi đang fetch phường xã
+            disabled={!selectedDistrict}
+            loading={loadingCommunes}
           >
             {communes.map((commune) => (
               <Option key={commune.id} value={commune.id}>
