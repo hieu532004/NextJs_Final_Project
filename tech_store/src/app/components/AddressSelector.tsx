@@ -1,3 +1,6 @@
+ 
+
+
 "use client";
 import { useState, useEffect } from 'react';
 import { Select, message, Form } from 'antd';
@@ -34,21 +37,15 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
   const [loadingCommunes, setLoadingCommunes] = useState<boolean>(false);
 
   useEffect(() => {
-    if (setCitiesProp) {
-      setCitiesProp(cities);
-    }
+    if (setCitiesProp) setCitiesProp(cities);
   }, [cities, setCitiesProp]);
 
   useEffect(() => {
-    if (setDistrictsProp) {
-      setDistrictsProp(districts);
-    }
+    if (setDistrictsProp) setDistrictsProp(districts);
   }, [districts, setDistrictsProp]);
 
   useEffect(() => {
-    if (setCommunesProp) {
-      setCommunesProp(communes);
-    }
+    if (setCommunesProp) setCommunesProp(communes);
   }, [communes, setCommunesProp]);
 
   const fetchCities = async () => {
@@ -56,11 +53,8 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
     try {
       const response = await fetch('https://esgoo.net/api-tinhthanh/1/0.htm');
       const data = await response.json();
-      if (data.error === 0) {
-        setCities(data.data as Location[]);
-      } else {
-        message.error("Không thể tải thông tin tỉnh/thành phố.");
-      }
+      if (data.error === 0) setCities(data.data as Location[]);
+      else message.error("Không thể tải thông tin tỉnh/thành phố.");
     } catch {
       message.error("Lỗi khi tải thông tin tỉnh/thành phố.");
     } finally {
@@ -78,11 +72,8 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
     try {
       const response = await fetch(`https://esgoo.net/api-tinhthanh/2/${cityId}.htm`);
       const data = await response.json();
-      if (data.error === 0) {
-        setDistricts(data.data as Location[]);
-      } else {
-        message.error("Không thể tải thông tin quận/huyện.");
-      }
+      if (data.error === 0) setDistricts(data.data as Location[]);
+      else message.error("Không thể tải thông tin quận/huyện.");
     } catch {
       message.error("Lỗi khi tải thông tin quận/huyện.");
     } finally {
@@ -99,11 +90,8 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
     try {
       const response = await fetch(`https://esgoo.net/api-tinhthanh/3/${districtId}.htm`);
       const data = await response.json();
-      if (data.error === 0) {
-        setCommunes(data.data as Location[]);
-      } else {
-        message.error("Không thể tải thông tin phường/xã.");
-      }
+      if (data.error === 0) setCommunes(data.data as Location[]);
+      else message.error("Không thể tải thông tin phường/xã.");
     } catch {
       message.error("Lỗi khi tải thông tin phường/xã.");
     } finally {
@@ -116,7 +104,7 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
   };
 
   return (
-    <div className="flex gap-4 mb-4 w-full">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 w-full">
       <Form.Item
         name="city"
         rules={[{ required: true, message: "Vui lòng chọn tỉnh/thành phố" }]}
@@ -130,6 +118,7 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
             onChange={handleCityChange}
             onFocus={fetchCities}
             loading={loadingCities}
+            className="rounded-lg"
           >
             {cities.map((city) => (
               <Option key={city.id} value={city.id}>
@@ -153,6 +142,7 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
             onChange={handleDistrictChange}
             disabled={!selectedCity}
             loading={loadingDistricts}
+            className="rounded-lg"
           >
             {districts.map((district) => (
               <Option key={district.id} value={district.id}>
@@ -176,6 +166,7 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
             onChange={handleCommuneChange}
             disabled={!selectedDistrict}
             loading={loadingCommunes}
+            className="rounded-lg"
           >
             {communes.map((commune) => (
               <Option key={commune.id} value={commune.id}>

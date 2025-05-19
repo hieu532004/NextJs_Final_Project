@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Row, Col, Spin, Skeleton, Card, Divider, message } from 'antd';
+import { Row, Col, Skeleton, Card, Divider, message } from 'antd';
 import Link from 'next/link';
 import { Product, Category, Review } from '@/app/types';
 import { useCart } from '@/app/contexts/CartContext';
