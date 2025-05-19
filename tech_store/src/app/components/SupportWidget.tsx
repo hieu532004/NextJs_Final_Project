@@ -26,8 +26,23 @@ const SupportWidget: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+  const [drawerWidth, setDrawerWidth] = useState<number | string>(400); // State for drawer width
 
-  // Lấy danh sách sản phẩm khi component mount
+  // Set drawer width based on window size (client-side only)
+  useEffect(() => {
+    const updateDrawerWidth = () => {
+      setDrawerWidth(window.innerWidth < 640 ? '100%' : 400);
+    };
+
+    // Set initial width
+    updateDrawerWidth();
+
+    // Update width on resize
+    window.addEventListener('resize', updateDrawerWidth);
+    return () => window.removeEventListener('resize', updateDrawerWidth);
+  }, []);
+
+  // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -44,13 +59,12 @@ const SupportWidget: React.FC = () => {
     fetchProducts();
   }, []);
 
-  // Chatbot logic thông minh
+  // Chatbot logic
   const chatbotResponse = (userMessage: string) => {
     const lowerMessage = userMessage.toLowerCase();
     let response = '';
     let link: string | undefined;
 
-    // Tìm kiếm sản phẩm
     if (lowerMessage.includes('tìm') || lowerMessage.includes('sản phẩm')) {
       const searchTerm = lowerMessage.replace(/tìm|sản phẩm/gi, '').trim();
       const foundProducts = products.filter((product) =>
@@ -66,9 +80,7 @@ const SupportWidget: React.FC = () => {
         response = 'Rất tiếc, mình không tìm thấy sản phẩm nào. Bạn có thể thử từ khóa khác hoặc xem tất cả sản phẩm tại ';
         link = '/products';
       }
-    }
-    // Giá cả
-    else if (lowerMessage.includes('giá') || lowerMessage.includes('bao nhiêu')) {
+    } else if (lowerMessage.includes('giá') || lowerMessage.includes('bao nhiêu')) {
       const searchTerm = lowerMessage.replace(/giá|bao nhiêu/gi, '').trim();
       const product = products.find((p) => p.name.toLowerCase().includes(searchTerm));
       if (product) {
@@ -78,38 +90,24 @@ const SupportWidget: React.FC = () => {
         response = 'Vui lòng cung cấp tên sản phẩm để mình kiểm tra giá. Hoặc xem tại ';
         link = '/products';
       }
-    }
-    // Vận chuyển
-    else if (lowerMessage.includes('giao hàng') || lowerMessage.includes('vận chuyển')) {
-      response = 'Giao hàng miễn phí cho đơn từ 2 triệu VNĐ trong nội thành Đà Nẵng, phí 20.000 VNĐ - 50.000 VNĐ tùy khu vực. Xem chi tiết tại ';
+    } else if (lowerMessage.includes('giao hàng') || lowerMessage.includes('vận chuyển')) {
+      response = 'Giao hàng miễn phí cho đơn từ 2 triệu VNĐ trong nội thành Đà Nẵng, phí 20.000 VNĐ - 50.000 VNĐ tùy khu vực. Xem chi tiết tại 8 tại ';
       link = '/shipping';
-    }
-    // Bảo hành
-    else if (lowerMessage.includes('bảo hành')) {
+    } else if (lowerMessage.includes('bảo hành')) {
       response = 'Sản phẩm được bảo hành 12-24 tháng. Xem chi tiết tại ';
       link = '/warranty';
-    }
-    // Đổi trả
-    else if (lowerMessage.includes('đổi trả')) {
+    } else if (lowerMessage.includes('đổi trả')) {
       response = 'Chính sách đổi trả trong 7 ngày nếu còn nguyên seal. Xem chi tiết tại ';
       link = '/return';
-    }
-    // Khuyến mãi
-    else if (lowerMessage.includes('khuyến mãi')) {
+    } else if (lowerMessage.includes('khuyến mãi')) {
       response = 'Khám phá các ưu đãi tại ';
       link = '/promotions';
-    }
-    // Liên hệ
-    else if (lowerMessage.includes('liên hệ')) {
+    } else if (lowerMessage.includes('liên hệ')) {
       response = 'Liên hệ qua hotline 1900 1234 hoặc email info@techstore.vn. Hoặc nhắn trực tiếp tại ';
       link = '/contact';
-    }
-    // Chào hỏi
-    else if (lowerMessage.includes('chào') || lowerMessage.includes('hi')) {
+    } else if (lowerMessage.includes('chào') || lowerMessage.includes('hi')) {
       response = 'Chào bạn! Mình là chatbot của TechStore. Bạn cần hỗ trợ gì? (Tìm sản phẩm, giá, vận chuyển, v.v.)';
-    }
-    // Không hiểu
-    else {
+    } else {
       response = 'Mình chưa hiểu rõ. Bạn có thể hỏi: "Tìm sản phẩm X", "Giá sản phẩm Y", hoặc "Chính sách vận chuyển"? Hoặc kết nối nhân viên tại ';
       link = '/contact';
     }
@@ -117,7 +115,6 @@ const SupportWidget: React.FC = () => {
     return { text: response, link };
   };
 
-  // Mở/đóng chat
   const toggleChat = () => {
     setChatVisible(!chatVisible);
     if (!chatVisible && messages.length === 0) {
@@ -125,14 +122,11 @@ const SupportWidget: React.FC = () => {
     }
   };
 
-  // Gửi tin nhắn
   const sendMessage = () => {
     if (!inputMessage.trim()) return;
 
-    // Thêm tin nhắn người dùng
     setMessages([...messages, { sender: 'user', text: inputMessage }]);
 
-    // Trả lời từ chatbot
     setTimeout(() => {
       const { text, link } = chatbotResponse(inputMessage);
       setMessages((prev) => [...prev, { sender: 'bot', text, link }]);
@@ -141,12 +135,10 @@ const SupportWidget: React.FC = () => {
     setInputMessage('');
   };
 
-  // Điều hướng lên đầu trang
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Kiểm tra vị trí cuộn
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 200);
@@ -158,7 +150,6 @@ const SupportWidget: React.FC = () => {
   return (
     <>
       <div className="fixed bottom-6 right-6 z-50 flex flex-col space-y-4">
-        {/* Nút chat với nhân viên */}
         <Button
           type="primary"
           shape="circle"
@@ -168,23 +159,21 @@ const SupportWidget: React.FC = () => {
           onClick={toggleChat}
         />
 
-        {/* Icon Zalo */}
         <a
-          href="https://zalo.me/0347854097" 
+          href="https://zalo.me/0347854097"
           target="_blank"
           rel="noopener noreferrer"
           className="bg-green-500 rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110"
         >
           <Image
-  src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"
-  alt="Zalo"
-  width={32}
-  height={32}
-  className="w-8 h-8"
-/>
+            src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"
+            alt="Zalo"
+            width={32}
+            height={32}
+            className="w-8 h-8"
+          />
         </a>
 
-        {/* Nút lên đầu trang */}
         {isScrolled && (
           <Button
             shape="circle"
@@ -196,17 +185,15 @@ const SupportWidget: React.FC = () => {
         )}
       </div>
 
-      {/* Drawer chat */}
       <Drawer
         title="Chat với TechStore"
         placement="right"
         onClose={toggleChat}
         open={chatVisible}
-        width={window.innerWidth < 640 ? '100%' : 400}
+        width={drawerWidth} // Use state variable
         className="sm:!rounded-l-lg"
       >
         <div className="flex flex-col h-full">
-          {/* Khu vực tin nhắn */}
           <div className="flex-1 overflow-y-auto p-4 bg-gray-100 rounded-lg mb-4 space-y-3">
             {loading ? (
               <div className="flex justify-center">
@@ -237,7 +224,6 @@ const SupportWidget: React.FC = () => {
             )}
           </div>
 
-          {/* Input gửi tin nhắn */}
           <div className="flex items-center space-x-2">
             <Input
               placeholder="Nhập tin nhắn..."

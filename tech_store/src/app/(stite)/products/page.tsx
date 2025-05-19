@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { Card, Row, Col, Menu, Slider, Checkbox, Select, Rate, Tag, Button, Space, Pagination, Modal, notification, Skeleton } from 'antd';
 import Link from 'next/link';
@@ -14,7 +14,6 @@ import { useCart } from '@/app/contexts/CartContext';
 
 const { Option } = Select;
 
-// Định nghĩa categoryMap dựa trên data.json
 const categoryMap: { [key: string]: string } = {
   'laptop': 'Laptop',
   'chuot': 'Chuột',
@@ -48,7 +47,6 @@ export default function ProductList() {
   const [searchQuery, setSearchQuery] = useState<string>(querySearch || '');
   const pageSize = 6;
 
-  // Thiết lập selectedCategory từ query parameter
   useEffect(() => {
     if (queryCategory) {
       const matchedCategoryName = categoryMap[queryCategory];
@@ -63,7 +61,6 @@ export default function ProductList() {
     }
   }, [queryCategory, categories]);
 
-  // Thiết lập selectedBrands từ query parameter
   useEffect(() => {
     if (queryBrand) {
       const matchedBrand = products.find(product => product.brand.toLowerCase() === queryBrand.toLowerCase())?.brand;
@@ -77,7 +74,6 @@ export default function ProductList() {
     }
   }, [queryBrand, products]);
 
-  // Cập nhật searchQuery từ query parameter
   useEffect(() => {
     if (querySearch) {
       setSearchQuery(querySearch);
@@ -86,7 +82,6 @@ export default function ProductList() {
     }
   }, [querySearch]);
 
-  // Lấy dữ liệu từ API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -122,10 +117,8 @@ export default function ProductList() {
     fetchData();
   }, []);
 
-  // Lấy danh sách thương hiệu duy nhất
-  const brands = Array.from(new Set(products.map(product => product.brand)));
+  const brands = useMemo(() => Array.from(new Set(products.map(product => product.brand))), [products]);
 
-  // Xử lý lọc và sắp xếp
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setCurrentPage(1);
@@ -188,7 +181,6 @@ export default function ProductList() {
     setCurrentPage(page);
   };
 
-  // Lọc sản phẩm
   let filteredProducts = products.filter(product => {
     const inCategory = selectedCategory === 'all' || product.category_id === selectedCategory;
     const inPriceRange = product.salePrice >= priceRange[0] && product.salePrice <= priceRange[1];
@@ -200,7 +192,6 @@ export default function ProductList() {
     return inCategory && inPriceRange && inBrands && aboveMinRating && matchesSearch;
   });
 
-  // Sắp xếp sản phẩm
   if (sortOrder === 'priceAsc') {
     filteredProducts = [...filteredProducts].sort((a, b) => a.salePrice - b.salePrice);
   } else if (sortOrder === 'priceDesc') {
@@ -209,10 +200,8 @@ export default function ProductList() {
     filteredProducts = [...filteredProducts].sort((a, b) => b.rating - a.rating);
   }
 
-  // Phân trang
   const paginatedProducts = filteredProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  // Tìm tên danh mục hoặc thương hiệu đang chọn
   const selectedCategoryName = selectedCategory === 'all'
     ? 'Tất cả sản phẩm'
     : categories.find(cat => cat._id === selectedCategory)?.name || 'Không xác định';
@@ -227,7 +216,7 @@ export default function ProductList() {
       quantity: 1,
       image: product.image,
     });
-    setCartCount(prev => prev + 1); // Sử dụng callback để tăng số lượng
+    setCartCount(prev => prev + 1);
     notification.success({
       message: 'Thêm vào giỏ hàng thành công!',
       description: `${product.name} đã được thêm vào giỏ hàng.`,
@@ -274,7 +263,16 @@ export default function ProductList() {
     return (
       <div className="flex flex-col min-h-screen">
         <Header searchValue={searchQuery} setSearchValue={setSearchQuery} />
-        <main className="flex-grow container mx-auto p-4 text-red-500">{error}</main>
+        <main className="flex-grow container mx-auto p-4">
+          <p className="text-red-500">{error}</p>
+          <Button
+            type="primary"
+            onClick={() => fetchData()}
+            className="mt-4"
+          >
+            Thử lại
+          </Button>
+        </main>
         <Footer />
       </div>
     );
@@ -283,18 +281,17 @@ export default function ProductList() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header searchValue={searchQuery} setSearchValue={setSearchQuery} />
-
       <main className="flex-grow container mx-auto p-4">
         <div className="mb-4 text-sm">
           <Link href="/">Trang chủ</Link> / <span>Sản phẩm</span>
           {selectedCategory !== 'all' && <> / <span>{selectedCategoryName}</span></>}
           {selectedBrandName && <> / <span>{selectedBrandName}</span></>}
           {searchQuery && (
-  <>
-    <span> / </span>
-    <span>Kết quả tìm kiếm: '{searchQuery}'</span>
-  </>
-)}
+            <>
+              <span> / </span>
+              <span>Kết quả tìm kiếm: '{searchQuery}'</span>
+            </>
+          )}
         </div>
 
         <div className="mb-6">
@@ -302,8 +299,8 @@ export default function ProductList() {
             {searchQuery
               ? `Kết quả tìm kiếm cho "${searchQuery}"`
               : selectedBrandName
-                ? `Sản phẩm thương hiệu ${selectedBrandName}`
-                : selectedCategoryName}
+              ? `Sản phẩm thương hiệu ${selectedBrandName}`
+              : selectedCategoryName}
           </h1>
           <p className="text-sm text-gray-600">
             Tìm thấy {filteredProducts.length} sản phẩm
@@ -315,20 +312,20 @@ export default function ProductList() {
             <Card title="Bộ lọc sản phẩm" className="shadow-sm">
               <h3 className="text-lg font-semibold mb-2">Danh mục</h3>
               <Menu
-  mode="vertical"
-  selectedKeys={selectedCategory ? [selectedCategory] : ['all']}
-  onClick={({ key }) => handleCategorySelect(key)}
-  items={[
-    {
-      key: 'all',
-      label: 'Tất cả sản phẩm',
-    },
-    ...categories.map(category => ({
-      key: category._id,
-      label: category.name,
-    }))
-  ]}
-/>
+                mode="vertical"
+                selectedKeys={selectedCategory ? [selectedCategory] : ['all']}
+                onClick={({ key }) => handleCategorySelect(key)}
+                items={[
+                  {
+                    key: 'all',
+                    label: 'Tất cả sản phẩm',
+                  },
+                  ...categories.map(category => ({
+                    key: category._id,
+                    label: category.name,
+                  }))
+                ]}
+              />
 
               <h3 className="text-lg font-semibold mt-4 mb-2">Khoảng giá</h3>
               <Slider
@@ -342,7 +339,9 @@ export default function ProductList() {
                   }
                 }}
                 step={100000}
-                tipFormatter={(value) => value?.toLocaleString('vi-VN') + 'đ'}
+                tooltip={{
+                  formatter: (value) => `${value?.toLocaleString('vi-VN')}đ`,
+                }}
               />
               <p className="text-sm text-gray-600">
                 {priceRange[0].toLocaleString('vi-VN')}đ - {priceRange[1].toLocaleString('vi-VN')}đ
@@ -391,7 +390,7 @@ export default function ProductList() {
                 <Col xs={24} sm={12} md={8} key={product._id}>
                   <Card
                     cover={
-                      <Link href={`/products/${product.slug}`}>
+                      <Link href={`/products/${product.slug}`} aria-label={`Xem chi tiết ${product.name}`}>
                         <div className="relative h-48">
                           <Image
                             src={product.image}
@@ -436,7 +435,7 @@ export default function ProductList() {
                   >
                     <Card.Meta
                       title={
-                        <Link href={`/products/${product.slug}`}>
+                        <Link href={`/products/${product.slug}`} aria-label={`Xem chi tiết ${product.name}`}>
                           <span className="text-lg font-semibold">{product.name}</span>
                         </Link>
                       }
@@ -488,54 +487,54 @@ export default function ProductList() {
             width={800}
           >
             <Row gutter={[16, 16]}>
-              <Col xs={24} md={12}>
-                <div className="relative h-64">
-                  <Image
-                    src={quickViewProduct.image}
-                    alt={quickViewProduct.name}
-                    fill
-                    style={{ objectFit: 'contain' }}
-                    className="p-2"
-                  />
-                </div>
-              </Col>
-              <Col xs={24} md={12}>
-                <h2 className="text-xl font-bold">{quickViewProduct.name}</h2>
-                <div className="flex items-center mb-2">
-                  <Rate disabled value={quickViewProduct.rating} allowHalf className="text-sm mr-2" />
-                  <span className="text-sm text-gray-500">
-                    ({Math.round(quickViewProduct.rating * 20)} đánh giá)
-                  </span>
-                </div>
-                <p className="text-red-500 font-bold text-lg mb-2">
-                  {quickViewProduct.salePrice.toLocaleString('vi-VN')}đ
-                </p>
-                {quickViewProduct.salePrice < quickViewProduct.price && (
-                  <p className="text-gray-500 line-through text-sm mb-2">
-                    {quickViewProduct.price.toLocaleString('vi-VN')}đ
-                  </p>
-                )}
-                <p className="text-gray-600 mb-2">Thương hiệu: {quickViewProduct.brand}</p>
-                <p className="text-gray-600 mb-4">
-                  Tình trạng: {quickViewProduct.stock > 0 ? `Còn ${quickViewProduct.stock} sản phẩm` : 'Hết hàng'}
-                </p>
-                <Space>
-                  <Button
-                    type="primary"
-                    icon={<ShoppingCartOutlined />}
-                    onClick={() => handleAddToCart(quickViewProduct)}
-                    disabled={quickViewProduct.stock === 0}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    Thêm vào giỏ hàng
-                  </Button>
-                  <Link href={`/products/${quickViewProduct.slug}`}>
-                    <Button onClick={() => setQuickViewProduct(null)}>
-                      Xem chi tiết
-                    </Button>
-                  </Link>
-                </Space>
-              </Col>
+<Col xs={24} md={12}>
+  <div className="relative h-64">
+    <Image
+      src={quickViewProduct.image}
+      alt={quickViewProduct.name}
+      fill
+      style={{ objectFit: 'contain' }}
+      className="p-2"
+    />
+  </div>
+</Col>
+<Col xs={24} md={12}>
+  <h2 className="text-xl font-bold">{quickViewProduct.name}</h2>
+  <div className="flex items-center mb-2">
+    <Rate disabled value={quickViewProduct.rating} allowHalf className="text-sm mr-2" />
+    <span className="text-sm text-gray-500">
+      ({Math.round(quickViewProduct.rating * 20)} đánh giá)
+    </span>
+  </div>
+  <p className="text-red-500 font-bold text-lg mb-2">
+    {quickViewProduct.salePrice.toLocaleString('vi-VN')}đ
+  </p>
+  {quickViewProduct.salePrice < quickViewProduct.price && (
+    <p className="text-gray-500 line-through text-sm mb-2">
+      {quickViewProduct.price.toLocaleString('vi-VN')}đ
+    </p>
+  )}
+  <p className="text-gray-600 mb-2">Thương hiệu: {quickViewProduct.brand}</p>
+  <p className="text-gray-600 mb-4">
+    Tình trạng: {quickViewProduct.stock > 0 ? `Còn ${quickViewProduct.stock} sản phẩm` : 'Hết hàng'}
+  </p>
+  <Space>
+    <Button
+      type="primary"
+      icon={<ShoppingCartOutlined />}
+      onClick={() => handleAddToCart(quickViewProduct)}
+      disabled={quickViewProduct.stock === 0}
+      className="bg-blue-600 hover:bg-blue-700"
+    >
+      Thêm vào giỏ hàng
+    </Button>
+    <Link href={`/products/${quickViewProduct.slug}`}>
+      <Button onClick={() => setQuickViewProduct(null)}>
+        Xem chi tiết
+      </Button>
+    </Link>
+  </Space>
+</Col>
             </Row>
           </Modal>
         )}
@@ -544,4 +543,39 @@ export default function ProductList() {
       <Footer />
     </div>
   );
+
+  function fetchData() {
+    const fetchDataAsync = async () => {
+      try {
+        setLoading(true);
+        const [productsResponse, categoriesResponse] = await Promise.all([
+          axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/products`),
+          axios.get(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/categories`),
+        ]);
+        const productsData = productsResponse.data.data.products;
+        const categoriesData = categoriesResponse.data.data.categories;
+
+        if (!Array.isArray(productsData)) {
+          throw new Error('Dữ liệu sản phẩm không đúng định dạng.');
+        }
+        if (!Array.isArray(categoriesData)) {
+          throw new Error('Dữ liệu danh mục không đúng định dạng.');
+        }
+
+        setProducts(productsData);
+        setCategories(categoriesData);
+        setError(null);
+
+        const prices = productsData.map((p: Product) => p.salePrice);
+        const maxPrice = Math.max(...prices, 100000000);
+        setPriceRange([0, maxPrice]);
+      } catch (err) {
+        setError('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDataAsync();
+  }
 }
