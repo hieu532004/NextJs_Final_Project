@@ -44,6 +44,22 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'urbancrypto.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.pixabay.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.pexels.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.freepik.com',
+      },
     ],
   },
 };
