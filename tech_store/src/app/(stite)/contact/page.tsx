@@ -4,7 +4,7 @@ import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import { Button, Input } from 'antd';
 import { MailOutlined, PhoneOutlined } from '@ant-design/icons';
-
+import '@ant-design/v5-patch-for-react-19';
 export default function ContactPage() {
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-100 to-gray-300">

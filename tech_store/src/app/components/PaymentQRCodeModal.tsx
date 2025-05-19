@@ -95,14 +95,14 @@ const PaymentQRCodeModal = ({
             <div className="text-center">
               <h3 className="text-lg font-semibold mb-4">Quét mã để thanh toán</h3>
               <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-  <Image
-    src="https://readdy.ai/api/search-image?query=QR%20code%20payment%20example%20with%20modern%20design%20and%20clear%20pattern%2C%20high%20resolution%20on%20white%20background&width=200&height=200&seq=3&orientation=squarish"
-    alt="QR Code"
-    width={200} // Matches URL query
-    height={200} // Matches URL query
-    className="w-48 h-48 mx-auto" // 192x192 pixels
-  />
-</div>
+                <Image
+                  src="https://readdy.ai/api/search-image?query=QR%20code%20payment%20example%20with%20modern%20design%20and%20clear%20pattern%2C%20high%20resolution%20on%20white%20background&width=200&height=200&seq=3&orientation=squarish"
+                  alt="QR Code"
+                  width={200} // Matches URL query
+                  height={200} // Matches URL query
+                  className="w-48 h-48 mx-auto" // 192x192 pixels
+                />
+              </div>
               <div className="flex items-center justify-center space-x-2 text-blue-600">
                 <i className="fas fa-clock"></i>
                 <span className="font-medium">

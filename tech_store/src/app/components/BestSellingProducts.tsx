@@ -6,7 +6,7 @@ import { Product } from '@/app/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/app/contexts/CartContext';
-
+import '@ant-design/v5-patch-for-react-19';
 interface BestSellingProductsProps {
   products: Product[];
   loading?: boolean;

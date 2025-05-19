@@ -8,6 +8,7 @@ import Header from '../../components/Header';
 import Link from "next/link";
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from "lucide-react";
 import { Button } from "antd";
+import '@ant-design/v5-patch-for-react-19';
 
 export interface CartItem {
   id: string | number

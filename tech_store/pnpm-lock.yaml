@@ -14,6 +14,9 @@ importers:
       '@ant-design/icons':
         specifier: ^6.0.0
         version: 6.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ant-design/v5-patch-for-react-19':
+        specifier: ^1.0.3
+        version: 1.0.3(antd@5.25.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@fortawesome/fontawesome-free':
         specifier: ^6.7.2
         version: 6.7.2
@@ -163,6 +166,14 @@ packages:
     resolution: {integrity: sha512-EzlvzE6xQUBrZuuhSAFTdsr4P2bBBHGZwKFemEfq8gIGyIQCxalYfZW/T2ORbtQx5rU69o+WycP3exY/7T1hGA==}
     peerDependencies:
       react: '>=16.9.0'
+
+  '@ant-design/v5-patch-for-react-19@1.0.3':
+    resolution: {integrity: sha512-iWfZuSUl5kuhqLUw7jJXUQFMMkM7XpW7apmKzQBQHU0cpifYW4A79xIBt9YVO5IBajKpPG5UKP87Ft7Yrw1p/w==}
+    engines: {node: '>=12.x'}
+    peerDependencies:
+      antd: '>=5.22.6'
+      react: '>=19.0.0'
+      react-dom: '>=19.0.0'
 
   '@babel/runtime@7.27.1':
     resolution: {integrity: sha512-1x3D2xEk2fRo3PAhwQwu5UubzgiVWSXTBfWpVd2Mx2AzRqJuDJCsgaDVZ7HB5iGzDW1Hl1sWN2mFyKjmR9uAog==}
@@ -2451,6 +2462,12 @@ snapshots:
       react: 18.3.1
       resize-observer-polyfill: 1.5.1
       throttle-debounce: 5.0.2
+
+  '@ant-design/v5-patch-for-react-19@1.0.3(antd@5.25.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      antd: 5.25.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@babel/runtime@7.27.1': {}
 

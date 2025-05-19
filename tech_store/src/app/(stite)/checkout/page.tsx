@@ -14,6 +14,7 @@ import Header from "@/app/components/Header";
 import { useCart } from "@/app/contexts/CartContext";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/authContext";
+import '@ant-design/v5-patch-for-react-19';
 
 const App: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -73,13 +74,20 @@ const App: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Order created:", data);
-        message.success("Đặt hàng thành công!");
+        // message.success("Đặt hàng thành công!");
         setOrderIdFromServer(data.id);
         clearCart();
         document.cookie = "paymentStatus=success; max-age=3600; path=/";
         if (paymentMethod === "ewallet" || paymentMethod === "bank") {
           setShowQRCodeModal(true);
-        } else {
+        } 
+        else if (paymentMethod === "cod" ){
+            setShowCODPayment(true);
+        }
+        else if (paymentMethod === "card" ){
+            setShowCardPayment(true);
+        }
+        else {
           router.push(`/payment-success?orderId=${data.id}`);
         }
       } else {
@@ -152,7 +160,7 @@ const App: React.FC = () => {
                 >
                   Hoàn tất thanh toán
                 </Button>
-                <Button
+                <Button 
                   type="default"
                   size="large"
                   className="!rounded-button whitespace-nowrap"

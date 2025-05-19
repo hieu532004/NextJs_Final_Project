@@ -3,6 +3,7 @@ import { CartProvider } from '@/app/contexts/CartContext';
 import HomeClient from '@/app/components/HomeClient';
 import { Category, Product, Banner, Brand, Review } from '@/app/types';
 import axios from 'axios';
+import '@ant-design/v5-patch-for-react-19';
 
 async function fetchData<T>(endpoint: string): Promise<T> {
   try {
