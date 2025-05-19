@@ -1,20 +1,20 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import React from "react"
-import axios from "axios"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Row, Col, Skeleton, Card, Divider, message } from "antd"
-import Link from "next/link"
-import type { Product, Category, Review } from "@/app/types"
-import { useCart } from "@/app/contexts/CartContext"
-import Header from "@/app/components/Header"
-import Footer from "@/app/components/Footer"
-import ProductImages from "@/app/components/ProductImages"
-import ProductInfo from "@/app/components/ProductInfo"
-import ProductTabs from "@/app/components/ProductTabs"
-import RelatedProducts from "@/app/components/RelatedProducts"
-import PaymentOffer from "@/app/components/PaymentOffer"
+import { useEffect, useState } from 'react';
+import React from 'react';
+import axios from 'axios';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Row, Col, Skeleton, Card, Divider, message } from 'antd';
+import Link from 'next/link';
+import { Product, Category, Review } from '@/app/types';
+import { useCart } from '@/app/contexts/CartContext';
+import Header from '@/app/components/Header';
+import Footer from '@/app/components/Footer';
+import ProductImages from '@/app/components/ProductImages';
+import ProductInfo from '@/app/components/ProductInfo';
+import ProductTabs from '@/app/components/ProductTabs';
+import RelatedProducts from '@/app/components/RelatedProducts';
+import PaymentOffer from '@/app/components/PaymentOffer';
 
 // Component Skeleton
 function ProductDetailSkeleton() {

@@ -31,6 +31,8 @@ const App: React.FC = () => {
   const router = useRouter();
   const [orderIdFromServer, setOrderIdFromServer] = useState<string | null>(null);
   const { user } = useAuth();
+  const [orderDataForPayment, setOrderDataForPayment] = useState<any>(null);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -43,53 +45,25 @@ const App: React.FC = () => {
     }
   };
 
-  const handleFinish = async (values: any) => {
-    console.log("Success:", values);
-    const orderData = {
-      ...values,
-      userid: user?.id,
-      userfullname: user?.name,
-      paymentMethod: paymentMethod,
-      orderItems: cart.map(item => ({
-        productId: item.id,
-        quantity: item.quantity,
-        pricePerUnit: item.price,
-        name: item.name, // Lấy trực tiếp từ cart
-        imageUrl: item.image, // Lấy trực tiếp từ cart (đảm bảo tên trường backend tương ứng)
-      })),
-      totalAmount: totalAfterDiscount,
-      discountAmount: discountAmount,
-      
-    };
-
+  const handleCreateOrder = async (finalOrderData: any) => {
+    setLoadingSubmit(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(orderData),
+        body: JSON.stringify(finalOrderData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Order created:", data);
-        // message.success("Đặt hàng thành công!");
+        console.log("Order created (success):", data);
+        message.success("Đặt hàng thành công!");
         setOrderIdFromServer(data.id);
         clearCart();
         document.cookie = "paymentStatus=success; max-age=3600; path=/";
-        if (paymentMethod === "ewallet" || paymentMethod === "bank") {
-          setShowQRCodeModal(true);
-        } 
-        else if (paymentMethod === "cod" ){
-            setShowCODPayment(true);
-        }
-        else if (paymentMethod === "card" ){
-            setShowCardPayment(true);
-        }
-        else {
-          router.push(`/payment-success?orderId=${data.id}`);
-        }
+        router.push(`/payment-success?orderId=${data.id}`);
       } else {
         const errorData = await response.json();
         console.error("Failed to create order:", errorData);
@@ -98,6 +72,11 @@ const App: React.FC = () => {
     } catch (error: any) {
       console.error("Error creating order:", error.message);
       message.error("Đã có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.");
+    } finally {
+      setLoadingSubmit(false);
+      setShowQRCodeModal(false);
+      setShowCardPayment(false);
+      setShowCODPayment(false);
     }
   };
 
@@ -105,8 +84,27 @@ const App: React.FC = () => {
     form
       .validateFields()
       .then((values) => {
-        handleFinish(values);
-        if (paymentMethod === "card") {
+        const orderData = {
+          ...values,
+          userid: user?.id,
+          userfullname: user?.name,
+          paymentMethod: paymentMethod,
+          orderItems: cart.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+            pricePerUnit: item.price,
+            name: item.name,
+            imageUrl: item.image,
+          })),
+          totalAmount: totalAfterDiscount,
+          discountAmount: discountAmount,
+        };
+
+        setOrderDataForPayment(orderData);
+
+        if (paymentMethod === "ewallet" || paymentMethod === "bank") {
+          setShowQRCodeModal(true);
+        } else if (paymentMethod === "card") {
           setShowCardPayment(true);
         } else if (paymentMethod === "cod") {
           setShowCODPayment(true);
@@ -157,10 +155,11 @@ const App: React.FC = () => {
                   className="!rounded-button bg-blue-500 h-12 whitespace-nowrap"
                   icon={<CheckCircleOutlined />}
                   onClick={handleSubmit}
+                  loading={loadingSubmit}
                 >
                   Hoàn tất thanh toán
                 </Button>
-                <Button 
+                <Button
                   type="default"
                   size="large"
                   className="!rounded-button whitespace-nowrap"
@@ -173,23 +172,28 @@ const App: React.FC = () => {
           </div>
         </Form>
       </div>
-      {showQRCodeModal && orderIdFromServer && (
+      {showQRCodeModal && orderDataForPayment && (
         <PaymentQRCodeModal
           totalAfterDiscount={totalAfterDiscount}
           onCancel={() => setShowQRCodeModal(false)}
-          orderId={orderIdFromServer}
+          orderData={orderDataForPayment}
+          onCreateOrder={handleCreateOrder}
         />
       )}
-      {showCardPayment && (
+      {showCardPayment && orderDataForPayment && (
         <CardPayment
           totalAfterDiscount={totalAfterDiscount}
           onCancel={() => setShowCardPayment(false)}
+          orderData={orderDataForPayment}
+          onCreateOrder={handleCreateOrder}
         />
       )}
-      {showCODPayment && (
+      {showCODPayment && orderDataForPayment && (
         <CODPayment
           totalAfterDiscount={totalAfterDiscount}
           onCancel={() => setShowCODPayment(false)}
+          orderData={orderDataForPayment}
+          onCreateOrder={handleCreateOrder}
         />
       )}
     </div>

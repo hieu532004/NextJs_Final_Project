@@ -4,47 +4,48 @@ import React, { useState } from "react";
 import { Modal, Form, Input, Button, Alert } from "antd";
 import { useRouter } from "next/navigation";
 
-const CardPayment: React.FC<{ totalAfterDiscount: number; onCancel: () => void }> = ({
+const CardPayment: React.FC<{
+  totalAfterDiscount: number;
+  onCancel: () => void;
+  orderData: any; // Nhận dữ liệu đơn hàng từ component cha
+  onCreateOrder: (orderData: any) => Promise<void>; // Callback để gọi khi thanh toán thành công
+}> = ({
   onCancel,
+  orderData,
+  onCreateOrder,
 }) => {
   const [loading, setLoading] = useState(false); // Để kiểm tra trạng thái loading
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null); // Trạng thái thanh toán
   const [showAlert, setShowAlert] = useState(false); // Để hiển thị Alert thông báo
   const router = useRouter(); // Khởi tạo useRouter
-
   const [form] = Form.useForm();
 
   // Hàm xử lý thanh toán
-  const handleCardPayment = () => {
+  const handleCardPayment = async () => {
     // Validate các trường trước khi xử lý thanh toán
     form
       .validateFields()
-      .then(() => {
+      .then(async (values) => {
         setLoading(true); // Hiển thị trạng thái loading khi bắt đầu xử lý thanh toán
         setShowAlert(false); // Reset trạng thái alert khi bắt đầu thanh toán
 
-        // Mô phỏng quá trình thanh toán (50% thành công, 50% thất bại)
-        const isSuccess = Math.random() > 0.5;
+        // Mô phỏng quá trình thanh toán thành công ở frontend
+        setPaymentStatus("Thanh toán thành công!");
+        setShowAlert(true);
 
-        setTimeout(() => {
+        // Gọi callback onCreateOrder để tạo đơn hàng thực tế ở backend
+        // và chuyển hướng đến trang thành công
+        try {
+          await onCreateOrder({ ...orderData, paymentStatus: "card", paymentDetails: values });
+          // Chuyển hướng sẽ được xử lý ở component cha sau khi onCreateOrder thành công
+        } catch (error: any) {
+          console.error("Lỗi khi tạo đơn hàng bằng thẻ:", error.message);
+          setPaymentStatus("Thanh toán thất bại. Vui lòng thử lại.");
+          setShowAlert(true);
           setLoading(false);
-
-          if (isSuccess) {
-            setPaymentStatus("Thanh toán thành công!");
-            setShowAlert(true);
-
-            // Lưu trạng thái thanh toán vào cookie
-            document.cookie = "paymentStatus=success; path=/; max-age=3600"; // Cookie hết hạn sau 1 giờ
-
-            setTimeout(() => {
-              router.push("/payment-success"); // Chuyển hướng tới trang thanh toán thành công
-              onCancel();
-            }, 5000); // Đóng modal sau 5 giây
-          } else {
-            setPaymentStatus("Thanh toán thất bại. Vui lòng thử lại.");
-            setShowAlert(true);
-          }
-        }, 2000); // Giả lập thời gian thanh toán (2 giây)
+        } finally {
+          setLoading(false);
+        }
       })
       .catch((errorInfo) => {
         console.log("Validation Failed:", errorInfo);
@@ -52,12 +53,21 @@ const CardPayment: React.FC<{ totalAfterDiscount: number; onCancel: () => void }
   };
 
   return (
-    <Modal title="Thanh toán bằng thẻ" open={true} onCancel={onCancel} footer={null} width={600}>
+    <Modal
+      title="Thanh toán bằng thẻ"
+      open={true}
+      onCancel={onCancel}
+      footer={null}
+      width={600} // Kích thước cố định
+    >
       <Form form={form} layout="vertical">
         <Form.Item
           label="Số thẻ"
           name="cardNumber"
-          rules={[{ required: true, message: "Vui lòng nhập số thẻ" }, { len: 16, message: "Số thẻ phải có 16 ký tự", whitespace: true }]}
+          rules={[
+            { required: true, message: "Vui lòng nhập số thẻ" },
+            { len: 16, message: "Số thẻ phải có 16 ký tự", whitespace: true },
+          ]}
         >
           <Input placeholder="1234 5678 9012 3456" />
         </Form.Item>
@@ -69,10 +79,21 @@ const CardPayment: React.FC<{ totalAfterDiscount: number; onCancel: () => void }
           <Input placeholder="NGUYEN VAN A" />
         </Form.Item>
         <div className="grid grid-cols-2 gap-4">
-          <Form.Item label="Ngày hết hạn" name="expiryDate" rules={[{ required: true, message: "Vui lòng nhập ngày hết hạn" }]}>
+          <Form.Item
+            label="Ngày hết hạn"
+            name="expiryDate"
+            rules={[{ required: true, message: "Vui lòng nhập ngày hết hạn" }]}
+          >
             <Input placeholder="MM/YY" />
           </Form.Item>
-          <Form.Item label="CVV" name="cvv" rules={[{ required: true, message: "Vui lòng nhập CVV" }, { len: 3, message: "CVV phải có 3 ký tự" }]}>
+          <Form.Item
+            label="CVV"
+            name="cvv"
+            rules={[
+              { required: true, message: "Vui lòng nhập CVV" },
+              { len: 3, message: "CVV phải có 3 ký tự" },
+            ]}
+          >
             <Input placeholder="123" />
           </Form.Item>
         </div>
@@ -84,6 +105,7 @@ const CardPayment: React.FC<{ totalAfterDiscount: number; onCancel: () => void }
           type={paymentStatus?.includes("thành công") ? "success" : "error"}
           showIcon
           closable
+          className="mt-4"
         />
       )}
 
