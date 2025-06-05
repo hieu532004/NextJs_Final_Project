@@ -1,5 +1,6 @@
 
 
+
 "use client";
 import { useState, useEffect } from "react";
 import { Button, Form, message } from "antd";
@@ -14,9 +15,10 @@ import Header from "@/app/components/Header";
 import { useCart } from "@/app/contexts/CartContext";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/authContext";
+import { Location } from "@/app/types";
 import '@ant-design/v5-patch-for-react-19';
 
-const App: React.FC = () => {
+export default function Page() {
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [discountCode, setDiscountCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
@@ -33,6 +35,9 @@ const App: React.FC = () => {
   const { user } = useAuth();
   const [orderDataForPayment, setOrderDataForPayment] = useState<any>(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [cities, setCities] = useState<Location[]>([]);
+  const [districts, setDistricts] = useState<Location[]>([]);
+  const [communes, setCommunes] = useState<Location[]>([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -40,9 +45,14 @@ const App: React.FC = () => {
 
   const applyDiscount = () => {
     if (discountCode.trim() !== "") {
-      setDiscountAmount(100000);
+      setDiscountAmount(100000); // Example discount
       setDiscountApplied(true);
     }
+  };
+
+  const getLocationNameById = (list: Location[], id: number): string => {
+    const item = list.find(loc => loc.id === id);
+    return item ? item.full_name : '';
   };
 
   const handleCreateOrder = async (finalOrderData: any) => {
@@ -50,20 +60,20 @@ const App: React.FC = () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/orders`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalOrderData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Order created (success):", data);
         message.success("Đặt hàng thành công!");
         setOrderIdFromServer(data.id);
         clearCart();
         document.cookie = "paymentStatus=success; max-age=3600; path=/";
-        router.push(`/payment-success?orderId=${data.id}`);
+
+        setTimeout(() => {
+          router.push(`/payment-success?orderId=${data.id}`);
+        }, 3000);
       } else {
         const errorData = await response.json();
         console.error("Failed to create order:", errorData);
@@ -81,38 +91,51 @@ const App: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        const orderData = {
-          ...values,
-          userid: user?.id,
-          userfullname: user?.name,
-          paymentMethod: paymentMethod,
-          orderItems: cart.map(item => ({
-            productId: item.id,
-            quantity: item.quantity,
-            pricePerUnit: item.price,
-            name: item.name,
-            imageUrl: item.image,
-          })),
-          totalAmount: totalAfterDiscount,
-          discountAmount: discountAmount,
-        };
+    if (!cart || cart.length === 0) {
+      message.error("Giỏ hàng của bạn đang trống. Vui lòng thêm sản phẩm để thanh toán.");
+      return;
+    }
 
-        setOrderDataForPayment(orderData);
+    form.validateFields().then((values) => {
+      const cityName = getLocationNameById(cities, values.city);
+      const districtName = getLocationNameById(districts, values.district);
+      const communeName = getLocationNameById(communes, values.commune);
+      const statuses = ['pending', 'confirmed', 'shipping', 'delivered'];
+      const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+      const orderData = {
+        ...values,
+        city_name: cityName,
+        district_name: districtName,
+        commune_name: communeName,
+        userid: user?.id,
+        userfullname: user?.name,
+        paymentMethod: paymentMethod,
+        status: randomStatus,
+        orderItems: cart.map(item => ({
+          productId: item.id,
+          quantity: item.quantity,
+          pricePerUnit: item.price,
+          name: item.name,
+          imageUrl: item.image,
 
-        if (paymentMethod === "ewallet" || paymentMethod === "bank") {
-          setShowQRCodeModal(true);
-        } else if (paymentMethod === "card") {
-          setShowCardPayment(true);
-        } else if (paymentMethod === "cod") {
-          setShowCODPayment(true);
-        }
-      })
-      .catch((errorInfo) => {
-        console.log("Validation Failed:", errorInfo);
-      });
+        })),
+        totalAmount: totalAfterDiscount,
+        discountAmount: discountAmount,
+        orderDate: new Date().toISOString(),
+      };
+
+      setOrderDataForPayment(orderData);
+
+      if (paymentMethod === "ewallet" || paymentMethod === "bank") {
+        setShowQRCodeModal(true);
+      } else if (paymentMethod === "card") {
+        setShowCardPayment(true);
+      } else if (paymentMethod === "cod") {
+        setShowCODPayment(true);
+      }
+    }).catch((errorInfo) => {
+      console.log("Validation Failed:", errorInfo);
+    });
   };
 
   const originalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -120,9 +143,7 @@ const App: React.FC = () => {
   const totalBeforeDiscount = originalPrice + shippingFee;
   const totalAfterDiscount = totalBeforeDiscount - discountAmount;
 
-  if (!isClient) {
-    return <div>Loading...</div>;
-  }
+  if (!isClient) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -132,7 +153,15 @@ const App: React.FC = () => {
           <div className="flex flex-wrap -mx-4">
             <div className="w-full lg:w-2/3 px-4 mb-8">
               <PaymentMethod paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} />
-              <ShippingInfo />
+              <ShippingInfo
+                form={form}
+                cities={cities}
+                setCities={setCities}
+                districts={districts}
+                setDistricts={setDistricts}
+                communes={communes}
+                setCommunes={setCommunes}
+              />
             </div>
             <div className="w-full lg:w-1/3 px-4">
               <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -172,6 +201,7 @@ const App: React.FC = () => {
           </div>
         </Form>
       </div>
+
       {showQRCodeModal && orderDataForPayment && (
         <PaymentQRCodeModal
           totalAfterDiscount={totalAfterDiscount}
@@ -180,6 +210,7 @@ const App: React.FC = () => {
           onCreateOrder={handleCreateOrder}
         />
       )}
+
       {showCardPayment && orderDataForPayment && (
         <CardPayment
           totalAfterDiscount={totalAfterDiscount}
@@ -188,6 +219,7 @@ const App: React.FC = () => {
           onCreateOrder={handleCreateOrder}
         />
       )}
+
       {showCODPayment && orderDataForPayment && (
         <CODPayment
           totalAfterDiscount={totalAfterDiscount}
@@ -198,6 +230,4 @@ const App: React.FC = () => {
       )}
     </div>
   );
-};
-
-export default App;
+}
