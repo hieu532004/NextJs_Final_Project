@@ -149,41 +149,45 @@ const SupportWidget: React.FC = () => {
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col space-y-4">
-        <Button
-          type="primary"
-          shape="circle"
-          icon={<CustomerServiceOutlined />}
-          size="large"
-          className="bg-blue-600 hover:bg-blue-700 w-14 h-14 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110"
-          onClick={toggleChat}
-        />
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center space-y-4">
+  {/* Nút mở chat */}
+  <Button
+    type="primary"
+    shape="circle"
+    icon={<CustomerServiceOutlined />}
+    size="large"
+    className="bg-blue-600 hover:bg-blue-700 w-14 h-14 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110"
+    onClick={toggleChat}
+  />
 
-        <a
-          href="https://zalo.me/0347854097"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-green-500 rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110"
-        >
-          <Image
-            src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"
-            alt="Zalo"
-            width={32}
-            height={32}
-            className="w-8 h-8"
-          />
-        </a>
+  {/* Nút Zalo */}
+  <a
+    href="https://zalo.me/0347854097"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110"
+  >
+    <Image
+      src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"
+      alt="Zalo"
+      width={40}
+      height={40}
+      className="object-contain"
+    />
+  </a>
 
-        {isScrolled && (
-          <Button
-            shape="circle"
-            icon={<ArrowUpOutlined />}
-            size="large"
-            className="bg-gray-700 text-white hover:bg-gray-800 w-14 h-14 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110"
-            onClick={scrollToTop}
-          />
-        )}
-      </div>
+  {/* Nút cuộn lên đầu */}
+  {isScrolled && (
+    <Button
+      shape="circle"
+      icon={<ArrowUpOutlined />}
+      size="large"
+      className="bg-gray-700 text-white hover:bg-gray-800 w-14 h-14 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110"
+      onClick={scrollToTop}
+    />
+  )}
+</div>
+
 
       <Drawer
         title="Chat với TechStore"

@@ -6,7 +6,6 @@ import { LoginOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { Product, Category, Review } from '@/app/types';
 
-const { TabPane } = Tabs;
 const { TextArea } = Input;
 
 interface Router {
