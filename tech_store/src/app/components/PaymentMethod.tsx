@@ -1,9 +1,8 @@
 
 
-
 import { useState } from "react";
 import { Radio, Select } from "antd";
-import { RadioChangeEvent } from "antd/es/radio";
+import { RadioChangeEvent } from "antd/es/radio"; // Đảm bảo import đúng type
 
 const { Option } = Select;
 
@@ -15,18 +14,32 @@ interface PaymentMethodProps {
 const PaymentMethod: React.FC<PaymentMethodProps> = ({ paymentMethod, setPaymentMethod }) => {
   const [paymentType, setPaymentType] = useState<string>("oneTime");
   const [installmentDuration, setInstallmentDuration] = useState<string>("3");
+  // Thêm state cho ngân hàng trả góp
+  const [installmentBank, setInstallmentBank] = useState<string | undefined>(undefined);
 
- 
   const handlePaymentMethodChange = (e: RadioChangeEvent) => {
     setPaymentMethod(e.target.value);
   };
 
   const handlePaymentTypeChange = (e: RadioChangeEvent) => {
     setPaymentType(e.target.value);
+    // Khi chuyển đổi loại thanh toán, reset các lựa chọn trả góp
+    if (e.target.value === "oneTime") {
+      setInstallmentDuration("3"); // Reset về giá trị mặc định hoặc rỗng
+      setInstallmentBank(undefined); // Reset ngân hàng
+    } else { // Khi chuyển sang trả góp, chọn mặc định thanh toán qua thẻ
+      setPaymentMethod("card");
+    }
   };
 
+  // Hàm xử lý thay đổi kỳ hạn trả góp (dùng cho Radio.Group)
   const handleInstallmentDurationChange = (e: RadioChangeEvent) => {
     setInstallmentDuration(e.target.value);
+  };
+
+  // HÀM MỚI: Xử lý thay đổi ngân hàng trả góp (dùng cho Select)
+  const handleInstallmentBankChange = (value: string) => { // Ant Design Select truyền trực tiếp giá trị
+    setInstallmentBank(value);
   };
 
   return (
@@ -120,7 +133,8 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({ paymentMethod, setPayment
             <Select
               placeholder="Chọn ngân hàng"
               style={{ width: "100%" }}
-              onChange={handleInstallmentDurationChange}
+              onChange={handleInstallmentBankChange} // ĐÃ SỬA: Dùng hàm mới cho Select
+              value={installmentBank} // Gắn giá trị vào state mới
             >
               <Option value="bank1">Vietcombank</Option>
               <Option value="bank2">Techcombank</Option>

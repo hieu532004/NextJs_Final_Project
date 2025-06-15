@@ -32,6 +32,7 @@ const PaymentSuccess: React.FC = () => {
 
   useEffect(() => {
     if (orderId) {
+      console.log("Fetching order with ID:", orderId);
       setLoading(true);
       setError(null);
       fetch(`${process.env.NEXT_PUBLIC_JSON_SERVER_URL}/orders/${orderId}`)
@@ -119,7 +120,7 @@ const PaymentSuccess: React.FC = () => {
 
             <div className="mt-6 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tổng tiền hàng:</span>
+                <span className="text-gray-600 ">Tổng tiền hàng:</span>
                 <span>
                   {(orderData.totalAmount + orderData.discountAmount).toLocaleString('vi-VN')} VND
                 </span>
@@ -131,7 +132,7 @@ const PaymentSuccess: React.FC = () => {
               <Divider className="my-3" />
               <div className="flex justify-between font-bold">
                 <span>Tổng thanh toán:</span>
-                <span className="text-red-600 text-xl">
+                <span className="text-red-600 text-lg sm:text-xl md:text-2xl font-semibold ">
                   {orderData.totalAmount.toLocaleString('vi-VN')} VND
                 </span>
               </div>
@@ -154,8 +155,8 @@ const PaymentSuccess: React.FC = () => {
                 <p className="font-medium">{orderData.phone}</p>
               </div>
               <div>
-                <p className="text-gray-600 mb-1">Email:</p>
-                <p className="font-medium">{orderData.email}</p>
+                <p className="text-gray-600 mb-1 ">Email:</p>
+                <p className="font-medium  break-words whitespace-normal max-w-[250px] sm:max-w-none">{orderData.email}</p>
               </div>
 
               {orderData.userfullname && ( // Kiểm tra nếu userId tồn tại
@@ -167,7 +168,7 @@ const PaymentSuccess: React.FC = () => {
               <div className="col-span-2">
                 <p className="text-gray-600 mb-1">Địa chỉ giao hàng:</p>
                 <p className="font-medium">
-                  {orderData.detailAddress}, {orderData.commune}, {orderData.district}, {orderData.city}
+                  {orderData.detailAddress}, {orderData.commune_name}, {orderData.district_name}, {orderData.city_name}
                 </p>
               </div>
             </div>
@@ -246,8 +247,8 @@ const PaymentSuccess: React.FC = () => {
               <div className="bg-gray-50 p-4 rounded-lg mb-6">
                 <h4 className="font-semibold mb-3">Thông tin vận chuyển</h4>
                 <div className="space-y-2 text-sm">
-                  <p><span className="text-gray-600">Đơn vị vận chuyển:</span> <span className="font-medium">N/A</span></p> {/* Lấy từ API nếu có */}
-                  <p><span className="text-gray-600">Mã vận đơn:</span> <span className="font-medium">N/A</span></p> {/* Lấy từ API nếu có */}
+                  <p><span className="text-gray-600">Đơn vị vận chuyển:</span> <span className="font-medium">Express</span></p> {/* Lấy từ API nếu có */}
+                  <p><span className="text-gray-600">Mã vận đơn:</span> <span className="font-medium">743511</span></p> {/* Lấy từ API nếu có */}
                 </div>
               </div>
 

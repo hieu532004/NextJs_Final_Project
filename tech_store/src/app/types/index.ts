@@ -93,6 +93,10 @@ export interface OrderItem {
   quantity: number;
   pricePerUnit: number;
 }
+export interface Location {
+  id: number;
+  full_name: string;
+}
 
 export interface Order {
   id: string;
@@ -103,10 +107,14 @@ export interface Order {
   phone: string;
   email: string;
   userfullname?: string;
+  userid?:string;
   detailAddress: string;
   commune: string;
   district: string;
   city: string;
+  city_name: string;
+  district_name: string;
+  commune_name: string;
   orderDate?: string;
   paymentMethod: "card" | "ewallet" | "bank" | "cod";
   status?: "placed" | "confirmed" | "preparing" | "shipping" | "delivered";

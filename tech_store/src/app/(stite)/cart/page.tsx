@@ -226,7 +226,7 @@ export default function CartPage() {
               </div>
             </div>
 
-            <Link href="/checkout">
+            <Link href="/cart/checkout">
               <Button
                 type="primary"
                 block

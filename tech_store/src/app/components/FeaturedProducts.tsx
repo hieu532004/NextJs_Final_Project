@@ -55,29 +55,29 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
               hoverable
               className="h-full flex flex-col border-none shadow-sm hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden"
               cover={
-                <Link href={`/products/${product.slug}`}>
-                  <div className="relative pt-4 px-4 h-48 overflow-hidden">
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      style={{ objectFit: 'contain', objectPosition: 'top' }}
-                      className="transition-transform duration-300 hover:scale-105"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                    />
-                    {product.discount > 0 && (
-                      <div className="absolute top-2 left-2 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        -{product.discount}%
-                      </div>
-                    )}
-                    {product.isNew && (
-                      <div className="absolute top-2 right-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        Mới
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              }
+  <Link href={`/products/${product.slug}`}>
+    <div className="bg-gray-50 p-4 h-60 relative flex items-center justify-center rounded-t-xl">
+      <Image
+        src={product.image}
+        alt={product.name}
+        width={300}
+        height={300}
+        style={{ objectFit: 'contain' }}
+        className="transition-transform duration-300 hover:scale-105 !rounded-lg"
+      />
+      {product.discount > 0 && (
+        <div className="absolute top-4 left-4 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+          -{product.discount}%
+        </div>
+      )}
+      {product.isNew && (
+        <div className="absolute top-4 right-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+          Mới
+        </div>
+      )}
+    </div>
+  </Link>
+}
             >
               <div className="flex-1 p-4">
                 <h3 className="text-base font-medium text-gray-800 mb-2 line-clamp-2 h-12">{product.name}</h3>

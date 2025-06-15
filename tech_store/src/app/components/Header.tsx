@@ -1,6 +1,6 @@
 'use client';
 
-import { Input, Badge, Button, Dropdown, Menu, Drawer, Collapse, List, Spin, Image } from 'antd';
+import { Input, Badge, Button, Dropdown, Drawer, Collapse, List, Spin, Image } from 'antd';
 import {
   SearchOutlined,
   ShoppingCartOutlined,
@@ -22,7 +22,6 @@ import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import { useAuth } from '../contexts/authContext';
 
-const { Panel } = Collapse;
 
 
 
@@ -178,7 +177,6 @@ const officeEquipmentMenu = {
     setIsLoginModalVisible(false);
   };
 
-  const showRegisterModal = () => setIsRegisterModalVisible(true);
   const showRegisterFromLogin = () => {
     setIsLoginModalVisible(false);
     setIsRegisterModalVisible(true);
@@ -194,57 +192,60 @@ const officeEquipmentMenu = {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center">
-              <Link href="/" className="mr-8">
-                <h1 className="text-2xl font-bold text-blue-600 m-0">TechStore</h1>
-              </Link>
-              <div className="hidden lg:block relative">
-                <Input
-                  size="large"
-                  placeholder="Tìm kiếm sản phẩm..."
-                  prefix={<SearchOutlined className="text-gray-400" />}
-                  suffix={loading ? <Spin size="small" /> : null}
-                  className="w-96 !rounded-full"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  onPressEnter={handleSearchSubmit}
+  <Link href="/" className="mr-8">
+    <h1 className="text-2xl font-bold text-blue-600 m-0">TechStore</h1>
+  </Link>
+
+  <div className="hidden lg:block relative w-[450px]">
+    <Input
+      size="large"
+      placeholder="Tìm kiếm sản phẩm..."
+      prefix={<SearchOutlined className="text-gray-400" />}
+      suffix={loading ? <Spin size="small" /> : null}
+      className="w-full !rounded-full border border-gray-300 shadow-sm focus:shadow-md transition-shadow duration-200"
+      value={searchValue}
+      onChange={(e) => setSearchValue(e.target.value)}
+      onPressEnter={handleSearchSubmit}
+    />
+
+    {searchResults.length > 0 && (
+      <div className="absolute top-full left-0 w-full bg-white shadow-xl rounded-lg mt-2 z-50 overflow-hidden border border-gray-200">
+        <ul className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
+          {searchResults.map((item) => (
+            <li key={item._id}>
+              <Link
+                href={`/products/${item.slug}`}
+                className="flex items-start p-3 hover:bg-gray-100 transition-colors"
+                onClick={() => setSearchResults([])}
+              >
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={60}
+                  height={60}
+                  className="object-contain rounded mr-3 flex-shrink-0"
                 />
-                {searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-md mt-1 z-50">
-                    <List
-                      dataSource={searchResults}
-                      renderItem={(item) => (
-                        <List.Item>
-                          <Link
-                            href={`/products/${item.slug}`}
-                            className="w-full flex items-center p-2 hover:bg-gray-100"
-                            onClick={() => setSearchResults([])}
-                          >
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              width={40}
-                              height={40}
-                              style={{ objectFit: 'contain', marginRight: 8 }}
-                            />
-                            <div>
-                              <div className="text-gray-800">{item.name}</div>
-                              <div className="text-red-500 font-semibold">
-                                {item.salePrice.toLocaleString('vi-VN')}₫
-                              </div>
-                            </div>
-                          </Link>
-                        </List.Item>
-                      )}
-                    />
+                <div className="flex-1">
+                  <p className="text-sm text-gray-800 font-medium line-clamp-2 ml-2">{item.name}</p>
+                  <div className="text-red-600 font-bold text-sm mt-1 ml-2">
+                    {item.salePrice.toLocaleString('vi-VN')}₫
                   </div>
-                )}
-                {searchValue && searchResults.length === 0 && !loading && (
-                  <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-md mt-1 z-50 p-4 text-gray-600">
-                    Không tìm thấy sản phẩm nào.
-                  </div>
-                )}
-              </div>
-            </div>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {searchValue && searchResults.length === 0 && !loading && (
+      <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-md mt-2 z-50 p-4 text-gray-600 text-sm border border-gray-200">
+        Không tìm thấy sản phẩm nào.
+      </div>
+    )}
+  </div>
+</div>
+
 
             <div className="flex items-center space-x-4">
               <div className="hidden md:flex items-center space-x-4">
@@ -390,186 +391,6 @@ const officeEquipmentMenu = {
           </div>
         </div>
       </header>
-
-      <Drawer
-        title="Menu"
-        placement="left"
-        onClose={() => setMobileMenuVisible(false)}
-        open={mobileMenuVisible}
-        width={280}
-      >
-        <div className="space-y-4">
-          <div className="py-2">
-            <Input
-              size="large"
-              placeholder="Tìm kiếm sản phẩm..."
-              prefix={<SearchOutlined className="text-gray-400" />}
-              suffix={loading ? <Spin size="small" /> : null}
-              className="!rounded-full"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onPressEnter={handleSearchSubmit}
-            />
-            {searchResults.length > 0 && (
-              <div className="mt-1 bg-white shadow-lg rounded-md">
-                <List
-                  dataSource={searchResults}
-                  renderItem={(item) => (
-                    <List.Item>
-                      <Link
-                        href={`/products/${item.slug}`}
-                        className="w-full flex items-center p-2 hover:bg-gray-100"
-                        onClick={() => setSearchResults([])}
-                      >
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          width={40}
-                          height={40}
-                          style={{ objectFit: 'contain', marginRight: 8 }}
-                        />
-                        <div>
-                          <div className="text-gray-800">{item.name}</div>
-                          <div className="text-red-500 font-semibold">
-                            {item.salePrice.toLocaleString('vi-VN')}₫
-                          </div>
-                        </div>
-                      </Link>
-                    </List.Item>
-                  )}
-                />
-              </div>
-            )}
-            {searchValue && searchResults.length === 0 && !loading && (
-              <div className="mt-1 bg-white shadow-lg rounded-md p-4 text-gray-600">
-                Không tìm thấy sản phẩm nào.
-              </div>
-            )}
-          </div>
-
-          <Link href="/cart" className="flex items-center justify-between py-3 border-b">
-            <Badge
-              count={cartCount}
-              className="[&_.ant-badge-count]:!bg-red-600 [&_.ant-badge-count]:!text-white cursor-pointer"
-            >
-              <ShoppingCartOutlined className="text-2xl text-gray-700" />
-              <span className="ml-2 text-gray-700">Giỏ hàng</span>
-            </Badge>
-          </Link>
-
-          {loggedInUser ? (
-            <Link href="/account" className="flex items-center py-3 border-b cursor-pointer">
-              <UserOutlined className="text-2xl text-blue-600" />
-              <span className="ml-2 text-blue-600">{loggedInUser.name}</span>
-            </Link>
-          ) : (
-            <>
-              <span
-                className="flex items-center py-3 border-b cursor-pointer"
-                onClick={showLoginModal}
-              >
-                <UserOutlined className="text-2xl text-gray-700" />
-                <span className="ml-2 text-gray-700">Đăng nhập</span>
-              </span>
-              <span
-                className="flex items-center py-3 border-b cursor-pointer"
-                onClick={showRegisterModal}
-              >
-                <UserOutlined className="text-2xl text-gray-700" />
-                <span className="ml-2 text-gray-700">Đăng ký</span>
-              </span>
-            </>
-          )}
-
-<Collapse
-  ghost
-  expandIconPosition="right"
-  items={[
-    {
-      key: '1',
-      label: (
-        <span className="text-gray-700">
-          <LaptopOutlined className="mr-2" /> Laptop
-        </span>
-      ),
-      children: (
-        <div className="pl-8 space-y-3">
-          <Link href="/laptop/gaming" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Laptop Gaming
-          </Link>
-          <Link href="/laptop/office" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Laptop Văn Phòng
-          </Link>
-          <Link href="/laptop/design" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Laptop Đồ Họa
-          </Link>
-          <Link href="/laptop/macbook" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            MacBook
-          </Link>
-        </div>
-      )
-    },
-    {
-      key: '2',
-      label: (
-        <span className="text-gray-700">
-          <TabletOutlined className="mr-2" /> Phụ kiện
-        </span>
-      ),
-      children: (
-        <div className="pl-8 space-y-3">
-          <Link href="/accessories/mouse" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Chuột
-          </Link>
-          <Link href="/accessories/keyboard" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Bàn phím
-          </Link>
-          <Link href="/accessories/headphones" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Tai nghe
-          </Link>
-          <Link href="/accessories/backpack" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Balo laptop
-          </Link>
-        </div>
-      )
-    },
-    {
-      key: '3',
-      label: (
-        <span className="text-gray-700">
-          <AudioOutlined className="mr-2" /> Thiết bị văn phòng
-        </span>
-      ),
-      children: (
-        <div className="pl-8 space-y-3">
-          <Link href="/office/monitor" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Màn hình
-          </Link>
-          <Link href="/office/printer" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Máy in
-          </Link>
-          <Link href="/office/scanner" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Máy scan
-          </Link>
-          <Link href="/office/projector" className="text-gray-700 cursor-pointer hover:text-blue-600 block">
-            Máy chiếu
-          </Link>
-        </div>
-      )
-    }
-  ]}
-/>
-
-          <Link href="/promotions" className="flex items-center py-3 border-b cursor-pointer">
-            <ThunderboltOutlined className="mr-2 text-gray-700" />
-            <span className="text-gray-700">Khuyến mãi</span>
-          </Link>
-
-          <div className="pt-4">
-            <div className="text-red-600 font-medium">Hotline: 1900 1234</div>
-          </div>
-        </div>
-      </Drawer>
 
       <LoginModal
         isVisible={isLoginModalVisible}

@@ -52,13 +52,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isVisible, onCancel, onShowRegi
             );
 
             if (loggedInUser) {
-                setNotificationData({ message: 'Đăng nhập thành công! Đang chuyển hướng...', type: 'success' });
+                setNotificationData({ message: 'Đăng nhập thành công! ', type: 'success' });
                 login(loggedInUser);
                 form.resetFields();
                 setTimeout(() => {
                     onCancel();
-                    router.push('/account');
-                }, 1500); // Reduced redirect time for better UX
+                    // router.push('/account');
+                }, 1500); 
             } else {
                 const userExistsByEmailOrPhone = users.some(
                     (user: any) => user.email === values.email || user.phone === values.email

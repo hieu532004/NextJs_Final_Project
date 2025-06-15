@@ -1,7 +1,7 @@
 
 
 
-"use client";  // Đảm bảo khai báo này ở đầu file
+"use client";
 
 import { useState } from "react";
 import { Modal, Button, Alert } from "antd"; // Sử dụng Alert để thông báo
