@@ -1,20 +1,21 @@
 "use client"
 
-import { useEffect, useState } from 'react';
-import React from 'react';
-import axios from 'axios';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Row, Col, Skeleton, Card, Divider, message } from 'antd';
-import Link from 'next/link';
-import { Product, Category, Review } from '@/app/types';
-import { useCart } from '@/app/contexts/CartContext';
-import Header from '@/app/components/Header';
-import Footer from '@/app/components/Footer';
-import ProductImages from '@/app/components/ProductImages';
-import ProductInfo from '@/app/components/ProductInfo';
-import ProductTabs from '@/app/components/ProductTabs';
-import RelatedProducts from '@/app/components/RelatedProducts';
-import PaymentOffer from '@/app/components/PaymentOffer';
+import { useEffect, useState } from "react"
+import React from "react"
+import axios from "axios"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Row, Col, Skeleton, Card, Divider, message } from "antd"
+import Link from "next/link"
+import type { Product, Category, Review } from "@/app/types"
+import { useCart } from "@/app/contexts/CartContext"
+import { useAuth } from "@/app/contexts/authContext"
+import Header from "@/app/components/Header"
+import Footer from "@/app/components/Footer"
+import ProductImages from "@/app/components/ProductImages"
+import ProductInfo from "@/app/components/ProductInfo"
+import ProductTabs from "@/app/components/ProductTabs"
+import RelatedProducts from "@/app/components/RelatedProducts"
+import PaymentOffer from "@/app/components/PaymentOffer"
 
 // Component Skeleton
 function ProductDetailSkeleton() {
@@ -130,9 +131,12 @@ export default function ProductDetail({ params }: ProductDetailProps) {
   const [selectedStorage, setSelectedStorage] = useState<string>("256GB")
   const [currentPrice, setCurrentPrice] = useState<number>(0)
   const [currentImages, setCurrentImages] = useState<string[]>([])
-  const [isLoggedIn] = useState<boolean>(false)
 
   const { addToCart } = useCart()
+  const { user } = useAuth()
+
+  // Sử dụng trạng thái đăng nhập từ context
+  const isLoggedIn = !!user
 
   // Tạo mảng ảnh dựa vào loại sản phẩm với URL tùy chỉnh cho thumbnail
   const generateProductImages = (product: Product) => {
@@ -208,7 +212,43 @@ export default function ProductDetail({ params }: ProductDetailProps) {
 
         const products: Product[] = productsResponse.data?.data?.products
         const categories: Category[] = categoriesResponse.data?.data?.categories
-        const reviews: Review[] = reviewsResponse.data?.data?.reviews || []
+
+        // Xử lý dữ liệu reviews - sửa lại để xử lý đúng cấu trúc từ CodeSandbox
+        let reviews: Review[] = []
+        console.log("Raw reviews response:", reviewsResponse.data)
+
+        if (reviewsResponse.data) {
+          // Trường hợp 1: Response trực tiếp là array
+          if (Array.isArray(reviewsResponse.data)) {
+            reviews = reviewsResponse.data
+          }
+          // Trường hợp 2: Có nested structure với data.reviews
+          else if (reviewsResponse.data.data && Array.isArray(reviewsResponse.data.data.reviews)) {
+            reviews = reviewsResponse.data.data.reviews
+          }
+          // Trường hợp 3: Có reviews property là array
+          else if (Array.isArray(reviewsResponse.data.reviews)) {
+            reviews = reviewsResponse.data.reviews
+          }
+          // Trường hợp 4: reviews là object (từ CodeSandbox), chuyển thành array
+          else if (reviewsResponse.data.reviews && typeof reviewsResponse.data.reviews === "object") {
+            // Nếu reviews là object với các key là ID, chuyển thành array
+            const reviewsObj = reviewsResponse.data.reviews
+            if (reviewsObj._id) {
+              // Nếu là single object, wrap trong array
+              reviews = [reviewsObj]
+            } else {
+              // Nếu là object với multiple keys, convert values thành array
+              reviews = Object.values(reviewsObj).filter((item: any) => item && typeof item === "object" && item._id) as Review[]
+            }
+          }
+          // Trường hợp 5: reviews trực tiếp là single object
+          else if (reviewsResponse.data._id) {
+            reviews = [reviewsResponse.data]
+          }
+        }
+
+        console.log("Processed reviews:", reviews)
 
         if (!Array.isArray(products)) throw new Error("Invalid products data.")
         if (!Array.isArray(categories)) throw new Error("Invalid categories data.")
@@ -226,6 +266,8 @@ export default function ProductDetail({ params }: ProductDetailProps) {
         const productReviews = Array.isArray(reviews)
           ? reviews.filter((review) => review.product_id === foundProduct._id)
           : []
+
+        console.log("Product reviews for", foundProduct._id, ":", productReviews)
         setAllReviews(productReviews)
 
         const related = products
@@ -297,7 +339,6 @@ export default function ProductDetail({ params }: ProductDetailProps) {
   // Update price and images based on selected options
   useEffect(() => {
     if (!product) return
-
 
     let priceAdjustment = 0
     if (selectedStorage === "512GB") {
