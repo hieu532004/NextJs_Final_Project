@@ -5,6 +5,8 @@ import { useCart } from "@/app/contexts/CartContext";
 import { Button, message } from "antd";
 import { Product } from "@/app/types";
 import { ShoppingCartOutlined } from "@ant-design/icons";
+import RegisterModal from './RegisterModal';
+import RedirectLoginModal from "./RedirectLoginModal";
 
 interface AddToCartProps {
   product: Product;
@@ -14,10 +16,12 @@ const AddToCart: React.FC<AddToCartProps> = ({ product }) => {
   const { addToCart } = useCart();
   const { user: loggedInUser } = useAuth();
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
+  const [isRegisterModalVisible, setIsRegisterModalVisible] = useState(false);
+  const [isRedirectLoginModalVisible, setIsRedirectLoginModalVisible] = useState(false);
 
   const handleAddToCart = () => {
     if (!loggedInUser) {
-      setIsLoginModalVisible(true);
+      setIsRedirectLoginModalVisible(true);
       return;
     }
     addToCart({
@@ -42,11 +46,36 @@ const AddToCart: React.FC<AddToCartProps> = ({ product }) => {
       >
         Thêm vào giỏ
       </Button>
+      <RedirectLoginModal
+      isVisible={isRedirectLoginModalVisible}
+      onCancel={() => setIsRedirectLoginModalVisible(false)}
+      onShowLogin={() => {
+        setIsRedirectLoginModalVisible(false);
+        setIsLoginModalVisible(true);
+      }}
+      onShowRegister={() => {
+        setIsRedirectLoginModalVisible(false);
+        setIsRegisterModalVisible(true);
+      }}
+    />
       <LoginModal
         isVisible={isLoginModalVisible}
         onCancel={() => setIsLoginModalVisible(false)}
-        onShowRegister={() => setIsLoginModalVisible(false)}
+        onShowRegister={() => {
+          setIsLoginModalVisible(false);
+          setIsRegisterModalVisible(true);
+        }}
       />
+
+      <RegisterModal
+        isVisible={isRegisterModalVisible}
+        onCancel={() => setIsRegisterModalVisible(false)}
+        onRegisterSuccess={() => console.log('Registered successfully')}
+        onShowLogin={() => {
+          setIsRegisterModalVisible(false);
+          setIsLoginModalVisible(true);
+        }} 
+         />
     </>
   );
 };

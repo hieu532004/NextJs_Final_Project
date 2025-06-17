@@ -20,6 +20,7 @@ import debounce from 'lodash/debounce';
 import { useRouter } from 'next/navigation';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
+import RedirectLoginModal from "./RedirectLoginModal";
 import { useAuth } from "@/app/contexts/authContext";
 
 
@@ -167,6 +168,7 @@ const officeEquipmentMenu = {
   // Login/Logout Logic
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isRegisterModalVisible, setIsRegisterModalVisible] = useState(false);
+  const [isRedirectLoginModalVisible, setIsRedirectLoginModalVisible] = useState(false);
 
   const showLoginModal = () => setIsLoginModalVisible(true);
   const handleCancelLogin = () => setIsLoginModalVisible(false);
@@ -178,6 +180,7 @@ const officeEquipmentMenu = {
 
   const showRegisterFromLogin = () => {
     setIsLoginModalVisible(false);
+    const [isRedirectLoginModalVisible, setIsRedirectLoginModalVisible] = useState(false);
     setIsRegisterModalVisible(true);
   };
 
@@ -188,7 +191,7 @@ const officeEquipmentMenu = {
   const handleCartClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!loggedInUser) {
-      setIsLoginModalVisible(true);
+      setIsRedirectLoginModalVisible(true); // Hiện modal thông báo đăng nhập/đăng ký
     } else {
       router.push("/cart");
     }
@@ -402,10 +405,26 @@ const officeEquipmentMenu = {
         </div>
       </header>
 
+      <RedirectLoginModal
+      isVisible={isRedirectLoginModalVisible}
+      onCancel={() => setIsRedirectLoginModalVisible(false)}
+      onShowLogin={() => {
+        setIsRedirectLoginModalVisible(false);
+        setIsLoginModalVisible(true);
+      }}
+      onShowRegister={() => {
+        setIsRedirectLoginModalVisible(false);
+        setIsRegisterModalVisible(true);
+      }}
+    />
+
       <LoginModal
         isVisible={isLoginModalVisible}
-        onCancel={handleCancelLogin}
-        onShowRegister={showRegisterFromLogin}
+        onCancel={() => setIsLoginModalVisible(false)}
+        onShowRegister={() => {
+          setIsLoginModalVisible(false);
+          setIsRegisterModalVisible(true);
+        }}
       />
 
       <RegisterModal
