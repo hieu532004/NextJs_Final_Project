@@ -5,7 +5,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "../../components/Header"; // Assuming this Header component is external
-import { Button, Input, Badge, Divider, Empty, message } from "antd";
+import { Button, Input, Divider, Empty, message } from "antd";
 import {
   DeleteOutlined,
   ShoppingOutlined,
@@ -46,21 +46,26 @@ export default function CartPage() {
   const [searchValue, setSearchValue] = useState("");
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const toggleMobileMenu = () => setMobileMenuVisible(!mobileMenuVisible);
-
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   // Load cart from local storage on component mount
   useEffect(() => {
     loadCartFromLocalStorage();
   }, [loadCartFromLocalStorage]);
 
   // Memoized calculations for cart summary, using `cart` from context
-  const totalItems = useMemo(
-    () => cart.reduce((sum, item) => sum + item.quantity, 0),
-    [cart]
+  const selectedItems = useMemo(
+    () => cart.filter((item) => selectedIds.includes(item.id)),
+    [cart, selectedIds]
   );
 
   const subtotal = useMemo(
-    () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-    [cart]
+    () => selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [selectedItems]
+  );
+
+  const totalItems = useMemo(
+    () => selectedItems.reduce((sum, item) => sum + item.quantity, 0),
+    [selectedItems]
   );
 
   // Shipping fee is 30,000 VND if there are items, otherwise 0
@@ -157,6 +162,19 @@ export default function CartPage() {
               {cart.map((item) => (
                 <div key={item.id}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                    {/* Checkbox chọn sản phẩm */}
+                    <input
+                      type="checkbox"
+                      className="mr-2 mt-2"
+                      checked={selectedIds.includes(item.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedIds((prev) => [...prev, item.id]);
+                        } else {
+                          setSelectedIds((prev) => prev.filter((id) => id !== item.id));
+                        }
+                      }}
+                    />
                     <div className="w-24 h-16 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
                       {item.image ? (
                         <Image
@@ -323,6 +341,12 @@ export default function CartPage() {
                   size="large"
                   block
                   className="h-14 text-lg font-medium !rounded-button whitespace-nowrap cursor-pointer"
+                  disabled={selectedItems.length === 0}
+                  onClick={() => {
+                    // Lưu selectedItems vào localStorage hoặc context để dùng ở trang checkout
+                    localStorage.setItem("checkoutItems", JSON.stringify(selectedItems));
+                    window.location.href = "/cart/checkout";
+                  }}
                 >
                   Thanh toán ngay
                 </Button>
