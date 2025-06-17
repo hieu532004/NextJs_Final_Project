@@ -18,9 +18,11 @@ const AddToCart: React.FC<AddToCartProps> = ({ product }) => {
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isRegisterModalVisible, setIsRegisterModalVisible] = useState(false);
   const [isRedirectLoginModalVisible, setIsRedirectLoginModalVisible] = useState(false);
+  const [pendingProduct, setPendingProduct] = useState<Product | null>(null);
 
   const handleAddToCart = () => {
     if (!loggedInUser) {
+      setPendingProduct(product); // Lưu lại sản phẩm vừa click
       setIsRedirectLoginModalVisible(true);
       return;
     }
@@ -35,6 +37,23 @@ const AddToCart: React.FC<AddToCartProps> = ({ product }) => {
     message.success("Đã thêm vào giỏ hàng!");
   };
 
+  // Khi đăng nhập thành công, thêm sản phẩm pending vào giỏ
+  const handleLoginSuccess = () => {
+    setIsLoginModalVisible(false);
+    if (pendingProduct) {
+      addToCart({
+        id: pendingProduct._id,
+        name: pendingProduct.name,
+        price: pendingProduct.salePrice,
+        quantity: 1,
+        image: pendingProduct.image,
+        slug: pendingProduct.slug,
+      });
+      message.success("Đã thêm vào giỏ hàng!");
+      setPendingProduct(null);
+    }
+  };
+
   return (
     <>
       <Button
@@ -47,17 +66,17 @@ const AddToCart: React.FC<AddToCartProps> = ({ product }) => {
         Thêm vào giỏ
       </Button>
       <RedirectLoginModal
-      isVisible={isRedirectLoginModalVisible}
-      onCancel={() => setIsRedirectLoginModalVisible(false)}
-      onShowLogin={() => {
-        setIsRedirectLoginModalVisible(false);
-        setIsLoginModalVisible(true);
-      }}
-      onShowRegister={() => {
-        setIsRedirectLoginModalVisible(false);
-        setIsRegisterModalVisible(true);
-      }}
-    />
+        isVisible={isRedirectLoginModalVisible}
+        onCancel={() => setIsRedirectLoginModalVisible(false)}
+        onShowLogin={() => {
+          setIsRedirectLoginModalVisible(false);
+          setIsLoginModalVisible(true);
+        }}
+        onShowRegister={() => {
+          setIsRedirectLoginModalVisible(false);
+          setIsRegisterModalVisible(true);
+        }}
+      />
       <LoginModal
         isVisible={isLoginModalVisible}
         onCancel={() => setIsLoginModalVisible(false)}
@@ -65,6 +84,7 @@ const AddToCart: React.FC<AddToCartProps> = ({ product }) => {
           setIsLoginModalVisible(false);
           setIsRegisterModalVisible(true);
         }}
+        onLoginSuccess={handleLoginSuccess} // Thêm prop này
       />
 
       <RegisterModal
@@ -75,7 +95,7 @@ const AddToCart: React.FC<AddToCartProps> = ({ product }) => {
           setIsRegisterModalVisible(false);
           setIsLoginModalVisible(true);
         }} 
-         />
+      />
     </>
   );
 };

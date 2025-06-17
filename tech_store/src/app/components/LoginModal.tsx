@@ -12,9 +12,10 @@ interface LoginModalProps {
     isVisible: boolean;
     onCancel: () => void;
     onShowRegister: () => void;
+    onLoginSuccess?: () => void; // Thêm dòng này
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isVisible, onCancel, onShowRegister }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ isVisible, onCancel, onShowRegister, onLoginSuccess }) => {
     const [form] = Form.useForm();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -57,7 +58,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isVisible, onCancel, onShowRegi
                 form.resetFields();
                 setTimeout(() => {
                     onCancel();
-                    // router.push('/account');
+                    if (onLoginSuccess) onLoginSuccess(); // Gọi callback nếu có
                 }, 1500); 
             } else {
                 const userExistsByEmailOrPhone = users.some(
