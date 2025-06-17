@@ -6,6 +6,7 @@ import { Product } from '../types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '../contexts/CartContext';
+import AddToCart from "./AddToCart";
 
 interface FeaturedProductsProps {
   products: Product[];
@@ -95,15 +96,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products }) => {
                   )}
                 </div>
               </div>
-              <Button
-                type="primary"
-                block
-                icon={<ShoppingCartOutlined />}
-                onClick={() => handleAddToCart(product)}
-                className="bg-blue-600 hover:bg-blue-700 !rounded-button whitespace-nowrap"
-              >
-                Thêm vào giỏ
-              </Button>
+              <AddToCart product={product} />
             </Card>
           ))
         )}

@@ -8,6 +8,7 @@ import {
   GiftOutlined,
 } from '@ant-design/icons';
 import { Product, Category } from '@/app/types';
+import AddToCart from './AddToCart';
 
 const { Option } = Select;
 
@@ -84,16 +85,7 @@ export default function ProductInfo({
       </div>
 
       <Space size="middle" className="mb-4">
-        <Button
-          type="primary"
-          icon={<ShoppingCartOutlined />}
-          size="large"
-          onClick={() => handleAddToCart(product)}
-          disabled={product.stock === 0}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          Thêm vào giỏ hàng
-        </Button>
+        <AddToCart product={product} />
         <Button
           type="primary"
           size="large"

@@ -622,15 +622,6 @@ export default function ProductList() {
                     : "Hết hàng"}
                 </p>
                 <Space>
-                  <Button
-                    type="primary"
-                    icon={<ShoppingCartOutlined />}
-                    onClick={() => handleAddToCart(quickViewProduct)}
-                    disabled={quickViewProduct.stock === 0}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    Thêm vào giỏ hàng
-                  </Button>
                   <Link href={`/products/${quickViewProduct.slug}`}>
                     <Button onClick={() => setQuickViewProduct(null)}>
                       Xem chi tiết

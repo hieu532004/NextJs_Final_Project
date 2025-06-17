@@ -20,8 +20,7 @@ import debounce from 'lodash/debounce';
 import { useRouter } from 'next/navigation';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
-import { useAuth } from '../contexts/authContext';
-
+import { useAuth } from "@/app/contexts/authContext";
 
 
 
@@ -186,6 +185,15 @@ const officeEquipmentMenu = {
     logout();
   };
 
+  const handleCartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!loggedInUser) {
+      setIsLoginModalVisible(true);
+    } else {
+      router.push("/cart");
+    }
+  };
+
   return (
     <>
       <header className="bg-white shadow-md sticky top-0 z-50">
@@ -254,7 +262,9 @@ const officeEquipmentMenu = {
                     count={cartCount}
                     className="[&_.ant-badge-count]:!bg-red-600 [&_.ant-badge-count]:!text-white cursor-pointer"
                   >
-                    <ShoppingCartOutlined className="text-2xl text-gray-700" />
+                    <a onClick={handleCartClick}>
+                      <ShoppingCartOutlined className="text-2xl !text-gray-700" />
+                    </a>
                   </Badge>
                 </Link>
                 {loggedInUser ? (
@@ -282,8 +292,8 @@ const officeEquipmentMenu = {
                     trigger={['click']}
                   >
                     <span className="flex items-center cursor-pointer">
-                      <UserOutlined className="text-2xl text-blue-600" />
-                      <span className="ml-2 text-blue-600 font-semibold">{loggedInUser.name}</span>
+                      <UserOutlined className="text-2xl text-gray-500" />
+                      <span className="ml-2 text-gray-500 font-semibold">{loggedInUser.name}</span>
                       <DownOutlined className="ml-1 text-gray-500 text-sm" />
                     </span>
                   </Dropdown>
@@ -292,7 +302,7 @@ const officeEquipmentMenu = {
                     className="flex items-center cursor-pointer"
                     onClick={showLoginModal}
                   >
-                    <UserOutlined className="text-2xl text-gray-700" />
+                    <UserOutlined className="text-2xl !text-gray-700" />
                     <span className="ml-2 text-gray-700">Đăng nhập</span>
                   </span>
                 )}

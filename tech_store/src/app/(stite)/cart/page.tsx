@@ -1,241 +1,338 @@
 "use client";
 
 import { useCart } from "@/app/contexts/CartContext";
-import { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
-import Header from '../../components/Header';
 import Link from "next/link";
-import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from "lucide-react";
-import { Button } from "antd";
-import '@ant-design/v5-patch-for-react-19';
+import Header from "../../components/Header"; // Assuming this Header component is external
+import { Button, Input, Badge, Divider, Empty, message } from "antd";
+import {
+  DeleteOutlined,
+  ShoppingOutlined,
+  MinusOutlined,
+  PlusOutlined,
+  ShoppingCartOutlined,
+} from "@ant-design/icons";
 
+// The CartItem interface should come from your CartContext definitions
+// but defined here for clarity if it's not globally accessible
 export interface CartItem {
-  id: string | number
-  name: string
-  price: number
-  quantity: number
-  image?: string
-  size?: string
-  color?: string
+  id: string | number;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  size?: string; // Kept as it's in your original CartItem interface
+  color?: string; // Kept as it's in your original CartItem interface
 }
 
+// Utility function to format price (centralized for consistency)
+const formatPrice = (price: number): string => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(price);
+};
+
 export default function CartPage() {
-  const { cart, removeFromCart, updateQuantity, clearCart, loadCartFromLocalStorage } = useCart();
-  const [searchValue, setSearchValue] = useState('');
+  const { cart, removeFromCart, updateQuantity, loadCartFromLocalStorage, clearCart } =
+    useCart();
+
+  // State for coupon code and discount percentage, as in the target layout
+  const [couponCode, setCouponCode] = useState<string>("");
+  const [discountPercentage, setDiscountPercentage] = useState<number>(0); // Renamed for clarity
+
+  // Header specific states (from your original CartPage)
+  const [searchValue, setSearchValue] = useState("");
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const toggleMobileMenu = () => setMobileMenuVisible(!mobileMenuVisible);
 
-  // Calculate total price
-  const totalPrice = cart.reduce((total, item) => {
-    return total + item.price * item.quantity;
-  }, 0);
-
+  // Load cart from local storage on component mount
   useEffect(() => {
     loadCartFromLocalStorage();
   }, [loadCartFromLocalStorage]);
 
+  // Memoized calculations for cart summary, using `cart` from context
+  const totalItems = useMemo(
+    () => cart.reduce((sum, item) => sum + item.quantity, 0),
+    [cart]
+  );
 
+  const subtotal = useMemo(
+    () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [cart]
+  );
+
+  // Shipping fee is 30,000 VND if there are items, otherwise 0
+  const shippingFee = useMemo(() => (subtotal > 0 ? 30000 : 0), [subtotal]);
+
+  const discountAmount = useMemo(
+    () => (subtotal * discountPercentage) / 100,
+    [subtotal, discountPercentage]
+  );
+
+  const total = useMemo(
+    () => subtotal + shippingFee - discountAmount,
+    [subtotal, shippingFee, discountAmount]
+  );
+
+  // Handle applying coupon code
+  const handleApplyCoupon = () => {
+    // In a real application, you'd validate this with a backend API
+    const code = couponCode.toLowerCase();
+    if (code === "giamgia10") {
+      setDiscountPercentage(10);
+      message.success("Áp dụng mã giảm giá thành công: Giảm 10%");
+    } else if (code === "giamgia20") {
+      setDiscountPercentage(20);
+      message.success("Áp dụng mã giảm giá thành công: Giảm 20%");
+    } else {
+      setDiscountPercentage(0); // Reset discount if invalid
+      message.error("Mã giảm giá không hợp lệ");
+    }
+  };
+
+  // If cart is empty, display the Ant Design Empty component
   if (cart.length === 0) {
     return (
-      <div>
-        <div>    <Header
+      <div className="min-h-screen bg-gray-50">
+        <Header
           searchValue={searchValue}
           setSearchValue={setSearchValue}
           toggleMobileMenu={toggleMobileMenu}
-        /></div>
-        <div className="container mx-auto max-w-6xl">
-
-          <h1 className="text-2xl flex justify-center  font-bold mb-8 mt-4 ml-4">Giỏ hàng</h1>
-          <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-lg">
-            <ShoppingBag className="w-16 h-16 text-gray-300 mb-4" />
-            <p className="text-xl text-gray-500 mb-6">
-              Giỏ hàng của bạn đang trống
-            </p>
-            <Link
-              href="/"
-              className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-gray-800 transition"
+        />
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          
+          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
+            <div className="flex items-center justify-between ">
+            <div className="flex items-center">
+              <h1 className="text-xl font-bold">Giỏ hàng</h1>
+            </div>
+          </div>
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <span className="text-gray-500 text-lg">
+                  Giỏ hàng của bạn đang trống
+                </span>
+              }
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Tiếp tục mua sắm
-            </Link>
+              <Link href="/" passHref>
+                <Button
+                  type="primary"
+                  icon={<ShoppingCartOutlined />}
+                  size="large"
+                  className="mt-4 !rounded-button whitespace-nowrap cursor-pointer"
+                >
+                  Mua sắm ngay
+                </Button>
+              </Link>
+            </Empty>
           </div>
         </div>
       </div>
     );
   }
 
+  // Render cart content when not empty
   return (
-    <div>
-      <div>
-        <Header
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-          toggleMobileMenu={toggleMobileMenu}
-        />
-      </div>
-      <div className="container mx-auto max-w-6xl">
+    <div className="min-h-screen bg-gray-50">
+      <Header
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        toggleMobileMenu={toggleMobileMenu}
+      />
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Cart Header (consistent with empty state) */}
 
-        <h1 className="flex justify-center text-2xl font-bold mb-8 mt-4 items-center">Giỏ hàng</h1>
-        <div className="lg:col-span-2">
-          <div className="rounded-lg shadow-sm overflow-hidden border border-gray-500 bg-white">
-            <div className="hidden md:grid grid-cols-12 gap-4 p-4 border-b text-base font-medium text-gray-500">
-              <div className="col-span-6">Sản phẩm</div>
-              <div className="col-span-2 text-center">Giá</div>
-              <div className="col-span-2 text-center">Số lượng</div>
-              <div className="col-span-2 text-center">Tổng</div>
-            </div>
-
-            {cart.map((item) => (
-              <div
-                key={item.id}
-                className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border-b items-center"
-              >
-                <div className="col-span-6 flex items-center space-x-4">
-                  <div className="relative w-20 h-20 rounded-md overflow-hidden bg-white">
-                    {item.image ? (
-                      <Image
-                        src={item.image || "/placeholder.svg"}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                        <ShoppingBag className="w-8 h-8 text-gray-400" />
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-medium">{item.name}</h3>
-                    {item.size && (
-                      <p className="text-sm text-gray-500">Size: {item.size}</p>
-                    )}
-                    {item.color && (
-                      <p className="text-sm text-gray-500">Màu: {item.color}</p>
-                    )}
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="text-red-500 text-sm flex items-center mt-2 md:hidden"
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Xóa
-                    </button>
-                  </div>
-                </div>
-
-                <div className="col-span-2 text-center">
-                  <p className="md:hidden text-sm text-gray-500 mb-1">Giá:</p>
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(item.price)}
-                </div>
-
-                <div className="col-span-2 flex justify-center">
-                  <p className="md:hidden text-sm text-gray-500 mb-1">
-                    Số lượng:
-                  </p>
-                  <div className="flex items-center border rounded-md">
-                    <button
-                      onClick={() =>
-                        updateQuantity(item.id, Math.max(1, item.quantity - 1))
-                      }
-                      className="px-2 py-1 text-gray-600 hover:bg-gray-100"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="px-3 py-1">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="px-2 py-1 text-gray-600 hover:bg-gray-100"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="col-span-2 text-center flex justify-between md:justify-center items-center">
-                  <p className="md:hidden text-sm text-gray-500">Tổng:</p>
-                  <div className="flex items-center">
-                    <span className="font-medium">
-                      {new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(item.price * item.quantity)}
-                    </span>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="ml-4 text-gray-400 hover:text-red-500 hidden md:block"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Product List Section */}
+          <div className="lg:w-2/3 bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center">
+                <h1 className="text-xl font-bold mb-1">Giỏ hàng</h1>
               </div>
-            ))}
-
+            </div>
+            <div className="space-y-4">
+              {cart.map((item) => (
+                <div key={item.id}>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                    <div className="w-24 h-16 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                      {item.image ? (
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={96} // Equivalent to w-24 (96px)
+                          height={64} // Equivalent to h-24 (96px)
+                          className="object-cover object-top"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                          {/* Fallback icon if no image */}
+                          <ShoppingCartOutlined className="w-8 h-8 text-gray-400 text-base" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-grow sm:ml-6 mt-4 sm:mt-0">
+                      <h3 className="text-sm font-medium text-gray-900">
+                        <Link href={`/products/${item.slug}`} passHref>
+                          <span className="text-sm font-medium hover:underline cursor-pointer">
+                            {item.name}
+                          </span>
+                        </Link>
+                      </h3>
+                      {/* Display size/color if they exist */}
+                      {item.size && (
+                        <p className="text-sm text-gray-500">
+                          Size: {item.size}
+                        </p>
+                      )}
+                      {item.color && (
+                        <p className="text-sm text-gray-500">
+                          Màu: {item.color}
+                        </p>
+                      )}
+                      <p className="mt-1 text-sm font-semibold text-gray-900">
+                        {formatPrice(item.price)}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end mt-4 sm:mt-0">
+                      <Button
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined/>}
+                        onClick={() => removeFromCart(item.id)}
+                        className="text-red-500 !rounded-button whitespace-nowrap cursor-pointer"
+                      ></Button>
+                      <div className="flex items-center mb-1">
+                        <Button
+                          icon={<MinusOutlined />}
+                          type="text"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity - 1)
+                          }
+                          disabled={item.quantity <= 1}
+                          className="border border-black rounded-md text-sm text-gray-500 !rounded-button whitespace-nowrap cursor-pointer"
+                        />
+                        <span className="px-4 py-1 text-center text-sm w-12">
+                          {item.quantity}
+                        </span>
+                        <Button
+                          icon={<PlusOutlined />}
+                          type="text"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                          className="border border-gray-300 rounded-md text-smtext-gray-500 !rounded-button whitespace-nowrap cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <Divider className="my-0" />
+                </div>
+              ))}
+            </div>
+            {/* Action buttons at the bottom of the product list */}
             <div className="p-4 flex justify-between">
-              <Link
-                href="/"
-                className="flex items-center text-gray-600 hover:text-black"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Tiếp tục mua sắm
+              <Link href="/" passHref>
+                <Button
+                  type="link"
+                  className="flex items-center text-gray-600 hover:text-black"
+                  icon={<ShoppingOutlined/>} // Changed from ArrowLeft for Ant Design consistency
+                >
+                  <div className="text-base ">Tiếp tục mua sắm</div>
+                </Button>
               </Link>
 
-              <button
+              <Button
+                type="link"
+                danger
                 onClick={clearCart}
                 className="text-red-500 hover:text-red-600 flex items-center"
+                icon={<DeleteOutlined />} // Changed from Trash2
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Xóa giỏ hàng
-              </button>
+                <div className="text-base ">Xóa giỏ hàng</div>
+              </Button>
             </div>
           </div>
-        </div>
 
-        <div className=" lg:col-span-1 my-4 rounded border border-gray-500 bg-white">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-bold mb-4">Tổng giỏ hàng</h2>
-
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between pb-3 border-b">
-                <span className="text-gray-600">Tạm tính</span>
-                <span className="font-medium">
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(totalPrice)}
-                </span>
+          {/* Order Summary Section */}
+          <div className="lg:w-1/3">
+            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center">
+                  <h1 className="text-xl font-bold mb-1">Thông tin đơn hàng</h1>
+                </div>
+              </div>
+              <div className="mb-4">
+                <div className="flex justify-between py-2">
+                  <span className="text-sm text-gray-600">Tạm tính:</span>
+                  <span className="text-sm font-medium">{formatPrice(subtotal)}</span>
+                </div>
+                <div className="flex justify-between py-2">
+                  <span className="text-sm text-gray-600">Phí vận chuyển:</span>
+                  <span className="text-sm font-medium">
+                    {formatPrice(shippingFee)}
+                  </span>
+                </div>
+                {discountPercentage > 0 && (
+                  <div className="flex justify-between py-2 text-green-600">
+                    <span>Giảm giá ({discountPercentage}%):</span>
+                    <span className="font-medium">
+                      -{formatPrice(discountAmount)}
+                    </span>
+                  </div>
+                )}
+                <div className="my-3">
+                <p className="text-sm text-gray-600 mb-3">
+                  Mã giảm giá:
+                </p>
+                <div className="flex">
+                  <Input
+                    placeholder="Nhập mã giảm giá"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    className="rounded-l-md text-sm"
+                  />
+                  <Button
+                    type="primary"
+                    onClick={handleApplyCoupon}
+                    className="rounded-r-md !rounded-button whitespace-nowrap cursor-pointer"
+                  >
+                    Áp dụng
+                  </Button>
+                </div>
+              </div>
+                <Divider className="my-3 border-1 border-black" />
+                <div className="flex justify-between py-2">
+                  <span className="font-bold text-lg">
+                    Tổng thanh toán:
+                  </span>
+                  <span className="font-bold text-lg text-red-600">
+                    {formatPrice(total)}
+                  </span>
+                </div>
+                <p className="text-gray-500 text-sm text-right">(Đã bao gồm VAT)</p>
               </div>
 
-              <div className="flex justify-between pb-3 border-b">
-                <span className="text-gray-600">Phí vận chuyển</span>
-                <span className="font-medium">Miễn phí</span>
-              </div>
+              
 
-              <div className="flex justify-between text-lg font-bold">
-                <span>Tổng cộng</span>
-                <span>
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(totalPrice)}
-                </span>
-              </div>
+              <Link href="/cart/checkout" passHref>
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  className="h-14 text-lg font-medium !rounded-button whitespace-nowrap cursor-pointer"
+                >
+                  Thanh toán ngay
+                </Button>
+              </Link>
+
+              <p className="text-xs text-center text-gray-500 mt-4">
+                Bằng cách nhấn "Thanh toán ngay", bạn đồng ý với các điều khoản
+                và điều kiện của chúng tôi
+              </p>
             </div>
-
-            <Link href="/cart/checkout">
-              <Button
-                type="primary"
-                block
-                className="bg-blue-600 hover:bg-blue-700 !rounded-button whitespace-nowrap"
-
-              >
-                Tiến Hành Thanh Toán
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

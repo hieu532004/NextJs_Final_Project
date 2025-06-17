@@ -18,6 +18,7 @@ export interface CartItem {
   image?: string;
   size?: string;
   color?: string;
+  slug?: string; // Thêm slug nếu cần thiết
 }
 
 // Kiểu dữ liệu cho context
