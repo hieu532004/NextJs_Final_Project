@@ -1,3 +1,4 @@
+// src/app/Products.tsx
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -282,7 +283,7 @@ export default function ProductList() {
           <Skeleton active paragraph={{ rows: 2 }} className="mb-4" />
           <Row gutter={[16, 16]}>
             <Col xs={24} md={6}>
-              <Card className="shadow-sm">
+              <Card className="shadow-sm" style={{ minHeight: "600px" }}>
                 <Skeleton active paragraph={{ rows: 10 }} />
               </Card>
             </Col>
@@ -366,9 +367,13 @@ export default function ProductList() {
           </p>
         </div>
 
-        <Row gutter={[16, 16]}>
+        <Row gutter={[16, 16]} style={{ minHeight: "600px" }}>
           <Col xs={24} md={6}>
-            <Card title="Bộ lọc sản phẩm" className="shadow-sm">
+            <Card
+              title="Bộ lọc sản phẩm"
+              className="shadow-sm"
+              style={{ minHeight: "100%", paddingBottom: "16px" }}
+            >
               <h3 className="text-lg font-semibold mb-2">Danh mục</h3>
               <Menu
                 mode="vertical"
@@ -430,144 +435,151 @@ export default function ProductList() {
           </Col>
 
           <Col xs={24} md={18}>
-            <div className="mb-4 flex justify-between items-center">
-              <span className="text-sm text-gray-600">
-                Hiển thị {paginatedProducts.length} trong số{" "}
-                {filteredProducts.length} sản phẩm
-              </span>
-              <div>
-                <label className="mr-2 font-semibold">Sắp xếp:</label>
-                <Select
-                  value={sortOrder}
-                  onChange={handleSortChange}
-                  style={{ width: 200 }}
-                  placeholder="Sắp xếp"
-                >
-                  <Option value="default">Mặc định</Option>
-                  <Option value="priceAsc">Giá: Thấp đến cao</Option>
-                  <Option value="priceDesc">Giá: Cao đến thấp</Option>
-                  <Option value="ratingDesc">Đánh giá: Cao đến thấp</Option>
-                </Select>
-              </div>
-            </div>
-
-            <Row gutter={[16, 16]}>
-              {paginatedProducts.map((product) => (
-                <Col xs={24} sm={12} md={8} key={product._id}>
-                  <Card
-                    cover={
-                      <Link
-                        href={`/products/${product.slug}`}
-                        aria-label={`Xem chi tiết ${product.name}`}
-                      >
-                        <div className="relative h-48">
-                          <Image
-                            src={product.image || "/placeholder.svg"}
-                            alt={product.name}
-                            fill
-                            style={{ objectFit: "contain" }}
-                            className="p-2 transition-transform duration-300 hover:scale-105"
-                          />
-                          {product.isNew && (
-                            <Tag
-                              color="green"
-                              className="absolute top-2 left-2"
-                            >
-                              Mới
-                            </Tag>
-                          )}
-                          {product.discount > 0 && (
-                            <Tag color="red" className="absolute top-2 right-2">
-                              -{product.discount}%
-                            </Tag>
-                          )}
-                        </div>
-                      </Link>
-                    }
-                    actions={[
-                      <Button
-                        key="add-to-cart"
-                        type="primary"
-                        icon={<ShoppingCartOutlined />}
-                        onClick={() => handleAddToCart(product)}
-                        disabled={product.stock === 0}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        Thêm vào giỏ
-                      </Button>,
-                      <Button
-                        key="quick-view"
-                        icon={<EyeOutlined />}
-                        onClick={() => setQuickViewProduct(product)}
-                      >
-                        Xem nhanh
-                      </Button>,
-                    ]}
-                    className="shadow-md hover:shadow-lg transition-shadow duration-300 h-full flex flex-col"
-                    styles={{
-                      body: {
-                        flex: "1",
-                        display: "flex",
-                        flexDirection: "column",
-                      },
-                    }}
+            <Card
+              className="shadow-sm"
+              style={{ minHeight: "100%", paddingBottom: "16px" }}
+            >
+              <div className="mb-4 flex justify-between items-center">
+                <span className="text-sm text-gray-600">
+                  Hiển thị {paginatedProducts.length} trong số{" "}
+                  {filteredProducts.length} sản phẩm
+                </span>
+                <div>
+                  <label className="mr-2 font-semibold">Sắp xếp:</label>
+                  <Select
+                    value={sortOrder}
+                    onChange={handleSortChange}
+                    style={{ width: 200 }}
+                    placeholder="Sắp xếp"
                   >
-                    <Card.Meta
-                      title={
+                    <Option value="default">Mặc định</Option>
+                    <Option value="priceAsc">Giá: Thấp đến cao</Option>
+                    <Option value="priceDesc">Giá: Cao đến thấp</Option>
+                    <Option value="ratingDesc">Đánh giá: Cao đến thấp</Option>
+                  </Select>
+                </div>
+              </div>
+
+              <Row gutter={[16, 16]}>
+                {paginatedProducts.map((product) => (
+                  <Col xs={24} sm={12} md={8} key={product._id}>
+                    <Card
+                      cover={
                         <Link
                           href={`/products/${product.slug}`}
                           aria-label={`Xem chi tiết ${product.name}`}
                         >
-                          <div className="text-lg font-semibold line-clamp-2 h-12">
-                            {product.name}
+                          <div className="relative h-48">
+                            <Image
+                              src={product.image || "/placeholder.svg"}
+                              alt={product.name}
+                              fill
+                              style={{ objectFit: "contain" }}
+                              className="p-2 transition-transform duration-300 hover:scale-105"
+                            />
+                            {product.isNew && (
+                              <Tag
+                                color="green"
+                                className="absolute top-2 left-2"
+                              >
+                                Mới
+                              </Tag>
+                            )}
+                            {product.discount > 0 && (
+                              <Tag color="red" className="absolute top-2 right-2">
+                                -{product.discount}%
+                              </Tag>
+                            )}
                           </div>
                         </Link>
                       }
-                      description={
-                        <div className="flex flex-col flex-grow">
-                          <div className="flex items-center mb-1">
-                            <span className="text-red-500 font-bold mr-2">
-                              {product.salePrice.toLocaleString("vi-VN")}đ
-                            </span>
-                            {product.discount > 0 && (
-                              <span className="text-gray-500 line-through text-sm">
-                                {product.price.toLocaleString("vi-VN")}đ
+                      actions={[
+                        <Button
+                          key="add-to-cart"
+                          type="primary"
+                          icon={<ShoppingCartOutlined />}
+                          onClick={() => handleAddToCart(product)}
+                          disabled={product.stock === 0}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          Thêm vào giỏ
+                        </Button>,
+                        <Button
+                          key="quick-view"
+                          icon={<EyeOutlined />}
+                          onClick={() => setQuickViewProduct(product)}
+                        >
+                          Xem nhanh
+                        </Button>,
+                      ]}
+                      className="shadow-md hover:shadow-lg transition-shadow duration-300 h-full flex flex-col"
+                      styles={{
+                        body: {
+                          flex: "1",
+                          display: "flex",
+                          flexDirection: "column",
+                        },
+                      }}
+                    >
+                      <Card.Meta
+                        title={
+                          <Link
+                            href={`/products/${product.slug}`}
+                            aria-label={`Xem chi tiết ${product.name}`}
+                          >
+                            <div className="text-lg font-semibold line-clamp-2 h-12">
+                              {product.name}
+                            </div>
+                          </Link>
+                        }
+                        description={
+                          <div className="flex flex-col flex-grow">
+                            <div className="flex items-center mb-1">
+                              <span className="text-red-500 font-bold mr-2">
+                                {product.salePrice.toLocaleString("vi-VN")}đ
                               </span>
-                            )}
-                          </div>
-                          <Rate
-                            disabled
-                            value={product.rating}
-                            allowHalf
-                            className="text-sm mb-1"
-                          />
-                          <p className="text-gray-600 text-sm">
-                            Thương hiệu: {product.brand}
-                          </p>
-                          {product.installment_available && (
-                            <p className="text-green-600 text-sm">
-                              Hỗ trợ trả góp
+                              {product.discount > 0 && (
+                                <span className="text-gray-500 line-through text-sm">
+                                  {product.price.toLocaleString("vi-VN")}đ
+                                </span>
+                              )}
+                            </div>
+                            <Rate
+                              disabled
+                              value={product.rating}
+                              allowHalf
+                              className="text-sm mb-1"
+                            />
+                            <p className="text-gray-600 text-sm">
+                              Thương hiệu: {product.brand}
                             </p>
-                          )}
-                          <p className="text-gray-500 text-sm mt-auto">
-                            Còn {product.stock} sản phẩm
-                          </p>
-                        </div>
-                      }
-                    />
-                  </Card>
-                </Col>
-              ))}
-            </Row>
+                            {product.installment_available && (
+                              <p className="text-green-600 text-sm">
+                                Hỗ trợ trả góp
+                              </p>
+                            )}
+                            <p className="text-gray-500 text-sm mt-auto">
+                              Còn {product.stock} sản phẩm
+                            </p>
+                          </div>
+                        }
+                      />
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
 
-            <Pagination
-              current={currentPage}
-              pageSize={pageSize}
-              total={filteredProducts.length}
-              onChange={handlePageChange}
-              className="mt-6 text-center"
-              showSizeChanger={false}
-            />
+              <div className="mt-12 text-center">
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={filteredProducts.length}
+                  onChange={handlePageChange}
+                  className="text-center"
+                  showSizeChanger={false}
+                />
+              </div>
+            </Card>
           </Col>
         </Row>
 

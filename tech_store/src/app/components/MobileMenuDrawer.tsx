@@ -24,19 +24,16 @@ interface BrandWithProducts {
 const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, categories }) => {
   const { cartCount } = useCart();
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
-  const [hoveredBrand, setHoveredBrand] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [categoryProducts, setCategoryProducts] = useState<Product[]>([]);
-  const [brandProducts, setBrandProducts] = useState<Product[]>([]);
   const [brandsByCategory, setBrandsByCategory] = useState<BrandWithProducts[]>([]);
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [submenuPosition, setSubmenuPosition] = useState({ top: 0 });
   const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const submenuRef = useRef<HTMLDivElement | null>(null);
-  const brandSubmenuRef = useRef<HTMLDivElement | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const brandHoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const brandRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Kiểm tra nếu là thiết bị di động
   useEffect(() => {
@@ -93,7 +90,6 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
       }
     };
 
-    // Nếu đang ở mobile thì chỉ fetch khi expand, còn desktop thì fetch khi hover
     if ((isMobile && expandedCategory) || (!isMobile && hoveredCategory)) {
       const categoryId = isMobile ? expandedCategory : hoveredCategory;
       if (categoryId) {
@@ -102,37 +98,23 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
     }
   }, [hoveredCategory, expandedCategory, isMobile]);
 
-  // Lọc sản phẩm theo thương hiệu khi hover vào thương hiệu
-  useEffect(() => {
-    if (hoveredBrand && categoryProducts.length > 0) {
-      const filtered = categoryProducts.filter(product => product.brand === hoveredBrand);
-      setBrandProducts(filtered);
-    }
-  }, [hoveredBrand, categoryProducts]);
-
   // Xử lý hover vào danh mục
   const handleCategoryMouseEnter = (categoryId: string) => {
     if (!isMobile) {
-      // Xóa timeout trước đó nếu có
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
         hoverTimeoutRef.current = null;
       }
       setHoveredCategory(categoryId);
-      setHoveredBrand(null); // Reset hovered brand
     }
   };
 
   // Xử lý rời khỏi danh mục
   const handleCategoryMouseLeave = () => {
     if (!isMobile) {
-      // Đặt timeout để tránh menu biến mất ngay lập tức
       hoverTimeoutRef.current = setTimeout(() => {
-        // Chỉ đóng menu nếu chuột không nằm trên submenu
-        if (submenuRef.current && !isMouseOverElement(submenuRef.current) && 
-            brandSubmenuRef.current && !isMouseOverElement(brandSubmenuRef.current)) {
+        if (submenuRef.current && !isMouseOverElement(submenuRef.current)) {
           setHoveredCategory(null);
-          setHoveredBrand(null);
         }
       }, 100);
     }
@@ -150,49 +132,7 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
   const handleSubmenuMouseLeave = () => {
     if (!isMobile) {
       hoverTimeoutRef.current = setTimeout(() => {
-        if (brandSubmenuRef.current && !isMouseOverElement(brandSubmenuRef.current)) {
-          setHoveredCategory(null);
-          setHoveredBrand(null);
-        }
-      }, 100);
-    }
-  };
-
-  // Xử lý hover vào thương hiệu
-  const handleBrandMouseEnter = (brand: string) => {
-    if (!isMobile) {
-      if (brandHoverTimeoutRef.current) {
-        clearTimeout(brandHoverTimeoutRef.current);
-        brandHoverTimeoutRef.current = null;
-      }
-      setHoveredBrand(brand);
-    }
-  };
-
-  // Xử lý rời khỏi thương hiệu
-  const handleBrandMouseLeave = () => {
-    if (!isMobile) {
-      brandHoverTimeoutRef.current = setTimeout(() => {
-        if (brandSubmenuRef.current && !isMouseOverElement(brandSubmenuRef.current)) {
-          setHoveredBrand(null);
-        }
-      }, 100);
-    }
-  };
-
-  // Xử lý hover vào submenu thương hiệu
-  const handleBrandSubmenuMouseEnter = () => {
-    if (!isMobile && brandHoverTimeoutRef.current) {
-      clearTimeout(brandHoverTimeoutRef.current);
-      brandHoverTimeoutRef.current = null;
-    }
-  };
-
-  // Xử lý rời khỏi submenu thương hiệu
-  const handleBrandSubmenuMouseLeave = () => {
-    if (!isMobile) {
-      brandHoverTimeoutRef.current = setTimeout(() => {
-        setHoveredBrand(null);
+        setHoveredCategory(null);
       }, 100);
     }
   };
@@ -220,6 +160,13 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
         setExpandedCategory(categoryId);
       }
     }
+  };
+
+  // Xử lý click vào thương hiệu để chuyển hướng
+  const handleBrandClick = (brand: string, categoryId: string) => {
+    const categoryName = categories.find(cat => cat._id === categoryId)?.name || '';
+    window.location.href = `/products?brand=${encodeURIComponent(brand)}&category=${encodeURIComponent(categoryName)}`;
+    onClose(); // Đóng drawer sau khi chuyển hướng
   };
 
   // Lấy tên danh mục từ ID
@@ -266,12 +213,9 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                   className="category-item relative"
                   ref={el => { categoryRefs.current[category._id] = el; }}
                 >
-                  {/* Desktop: Chỉ hover, không click */}
                   {!isMobile ? (
                     <div 
-                      className={`flex items-center justify-between py-2 cursor-pointer text-gray-800 hover:text-blue-600 ${
-                        hoveredCategory === category._id ? 'text-blue-600' : ''
-                      }`}
+                      className={`flex items-center justify-between py-2 cursor-pointer text-gray-800 hover:text-blue-600 ${hoveredCategory === category._id ? 'text-blue-600' : ''}`}
                       onMouseEnter={() => handleCategoryMouseEnter(category._id)}
                       onMouseLeave={handleCategoryMouseLeave}
                     >
@@ -281,11 +225,8 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                       <RightOutlined className="text-xs" />
                     </div>
                   ) : (
-                    /* Mobile: Click để mở rộng */
                     <div 
-                      className={`flex items-center justify-between py-2 cursor-pointer text-gray-800 hover:text-blue-600 ${
-                        expandedCategory === category._id ? 'text-blue-600' : ''
-                      }`}
+                      className={`flex items-center justify-between py-2 cursor-pointer text-gray-800 hover:text-blue-600 ${expandedCategory === category._id ? 'text-blue-600' : ''}`}
                       onClick={() => handleCategoryClick(category._id)}
                     >
                       <div className="flex items-center space-x-2">
@@ -295,7 +236,6 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                     </div>
                   )}
                   
-                  {/* Hiển thị menu phụ khi hover hoặc click */}
                   {((isMobile && expandedCategory === category._id) || 
                     (!isMobile && hoveredCategory === category._id)) && (
                     <div 
@@ -324,7 +264,6 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                           </div>
                         ) : brandsByCategory.length > 0 ? (
                           <div className="space-y-1">
-                            {/* Sản phẩm nổi bật */}
                             <div className="featured-section mb-3">
                               <div className="flex items-center text-xs font-medium text-gray-500 mb-2">
                                 <FireOutlined className="mr-1 text-orange-500" />
@@ -367,10 +306,7 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                                   ))}
                               </div>
                             </div>
-                            
                             <Divider className="my-2" />
-                            
-                            {/* Danh sách thương hiệu */}
                             <div className="brands-section">
                               <div className="flex items-center text-xs font-medium text-gray-500 mb-2">
                                 <TagOutlined className="mr-1 text-blue-500" />
@@ -380,11 +316,9 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                                 {brandsByCategory.map(({ brand, products }) => (
                                   <div 
                                     key={brand}
-                                    className={`brand-item p-2 rounded-md cursor-pointer ${
-                                      hoveredBrand === brand ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
-                                    }`}
-                                    onMouseEnter={() => handleBrandMouseEnter(brand)}
-                                    onMouseLeave={handleBrandMouseLeave}
+                                    ref={el => { brandRefs.current[brand] = el; }}
+                                    className="brand-item p-2 rounded-md cursor-pointer hover:bg-gray-50"
+                                    onClick={() => handleBrandClick(brand, category._id)}
                                   >
                                     <div className="flex items-center justify-between">
                                       <span className="text-xs font-medium">{brand}</span>
@@ -394,80 +328,6 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
                                 ))}
                               </div>
                             </div>
-                          </div>
-                        ) : (
-                          <p className="text-xs text-gray-500 py-2">Không có sản phẩm</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Submenu thương hiệu */}
-                  {!isMobile && hoveredBrand && hoveredCategory && (
-                    <div 
-                      ref={brandSubmenuRef}
-                      className="brand-submenu"
-                      onMouseEnter={handleBrandSubmenuMouseEnter}
-                      onMouseLeave={handleBrandSubmenuMouseLeave}
-                    >
-                      <div className="submenu-header">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-semibold">{hoveredBrand}</h4>
-                          <Link 
-                            href={`/products?brand=${hoveredBrand}&category=${getCategoryName(hoveredCategory)}`}
-                            onClick={onClose}
-                            className="text-xs text-blue-600 hover:underline"
-                          >
-                            Xem tất cả
-                          </Link>
-                        </div>
-                      </div>
-                      <div className="submenu-content">
-                        {brandProducts.length > 0 ? (
-                          <div className="space-y-3">
-                            {brandProducts.slice(0, 5).map((product) => (
-                              <Link 
-                                href={`/products/${product.slug}`} 
-                                key={product._id}
-                                onClick={onClose}
-                                className="product-item block"
-                              >
-                                <div className="flex items-start space-x-2 hover:bg-gray-50 p-2 rounded-md transition-colors">
-                                  <div className="relative w-12 h-12 flex-shrink-0">
-                                    <Image
-                                      src={product.image || "/placeholder.svg"}
-                                      alt={product.name}
-                                      fill
-                                      style={{ objectFit: 'contain' }}
-                                      className="rounded-md"
-                                    />
-                                    {product.discount > 0 && (
-                                      <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] px-1 rounded">
-                                        -{product.discount}%
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-medium text-gray-900 truncate">
-                                      {product.name}
-                                    </p>
-                                    <div className="flex items-center">
-                                      <p className="text-xs text-red-600 font-semibold">
-                                        {product.salePrice.toLocaleString('vi-VN')}đ
-                                      </p>
-                                      {product.discount > 0 && (
-                                        <p className="text-[10px] text-gray-500 line-through ml-1">
-                                          {product.price.toLocaleString('vi-VN')}đ
-                                        </p>
-                                      )}
-                                    </div>
-                                    {product.isNew && (
-                                      <span className="text-[10px] text-green-600">Mới</span>
-                                    )}
-                                  </div>
-                                </div>
-                              </Link>
-                            ))}
                           </div>
                         ) : (
                           <p className="text-xs text-gray-500 py-2">Không có sản phẩm</p>
@@ -485,7 +345,7 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
       {/* CSS cho menu phụ */}
       <style jsx global>{`
         /* Thiết lập chung cho menu phụ */
-        .category-submenu, .brand-submenu {
+        .category-submenu {
           background-color: white;
           border-radius: 8px;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -518,12 +378,7 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
             animation: fadeIn 0.2s ease-in-out;
           }
           
-          .brand-submenu {
-            position: fixed;
-            left: calc(100% - 300px - 290px - 290px);
-            top: var(--submenu-top, 0);
-            animation: fadeIn 0.2s ease-in-out;
-          }
+          /* Loại bỏ brand-submenu CSS vì không còn dùng */
           
           /* Thêm vùng kết nối giữa danh mục và submenu */
           .category-item {
@@ -531,21 +386,6 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ visible, onClose, c
           }
           
           .category-item::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: -20px;
-            width: 20px;
-            height: 100%;
-            background: transparent;
-          }
-          
-          /* Thêm vùng kết nối giữa brand và submenu */
-          .brand-item {
-            position: relative;
-          }
-          
-          .brand-item::after {
             content: '';
             position: absolute;
             top: 0;

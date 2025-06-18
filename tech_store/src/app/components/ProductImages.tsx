@@ -10,9 +10,10 @@ interface ProductImagesProps {
   productName: string
   discount: number
   isNew: boolean
+  selectedColor?: string
 }
 
-export default function ProductImages({ images, productName, discount, isNew }: ProductImagesProps) {
+export default function ProductImages({ images, productName, discount, isNew, selectedColor }: ProductImagesProps) {
   const carouselRef = useRef<CarouselRef>(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [loadedImages, setLoadedImages] = useState<string[]>([])
@@ -28,11 +29,16 @@ export default function ProductImages({ images, productName, discount, isNew }: 
     }
 
     console.log("Images received in ProductImages:", ensuredImages)
+    console.log("Selected color:", selectedColor)
 
     // Đặt ảnh ngay lập tức để tránh màn hình trống
     setLoadedImages(ensuredImages)
     setImagesLoaded(true)
-  }, [images])
+
+    // Reset về ảnh đầu tiên khi thay đổi màu
+    setActiveIndex(0)
+    carouselRef.current?.goTo(0)
+  }, [images, selectedColor])
 
   const handleThumbnailClick = (index: number) => {
     carouselRef.current?.goTo(index)
@@ -65,14 +71,15 @@ export default function ProductImages({ images, productName, discount, isNew }: 
             <Image
               src={
                 img ||
-                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
+                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3" ||
+                "/placeholder.svg"
               }
-              alt={`${productName} - Image ${index + 1}`}
+              alt={`${productName} - ${selectedColor || "Default"} - Image ${index + 1}`}
               fill
               style={{ objectFit: "contain" }}
               className="p-4"
               onError={() => handleImageError(index)}
-              unoptimized={true} // Tắt tối ưu hóa cho tất cả ảnh để tránh lỗi
+              unoptimized={true}
             />
           </div>
         ))}
@@ -91,13 +98,14 @@ export default function ProductImages({ images, productName, discount, isNew }: 
             <Image
               src={
                 img ||
-                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
+                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3" ||
+                "/placeholder.svg"
               }
-              alt={`Thumbnail ${index + 1}`}
+              alt={`${selectedColor || "Default"} Thumbnail ${index + 1}`}
               fill
               style={{ objectFit: "cover" }}
               onError={() => handleImageError(index)}
-              unoptimized={true} // Tắt tối ưu hóa cho tất cả ảnh để tránh lỗi
+              unoptimized={true}
             />
           </div>
         ))}
