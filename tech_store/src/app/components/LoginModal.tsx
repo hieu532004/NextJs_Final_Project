@@ -104,7 +104,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isVisible, onCancel, onShowRegi
         >
             <Form
                 form={form}
-                name="login_form"
+                name="login_form_modal"
                 layout="vertical"
                 onFinish={handleFinish}
                 autoComplete="off"
