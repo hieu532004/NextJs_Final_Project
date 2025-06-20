@@ -20,22 +20,15 @@ export default function ProductImages({ images, productName, discount, isNew, se
   const [imagesLoaded, setImagesLoaded] = useState(false)
 
   useEffect(() => {
-    // Đảm bảo luôn có 3 ảnh, nếu không đủ thì dùng ảnh dự phòng
     const ensuredImages = [...images]
     while (ensuredImages.length < 3) {
       ensuredImages.push(
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
+        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
       )
     }
 
-    console.log("Images received in ProductImages:", ensuredImages)
-    console.log("Selected color:", selectedColor)
-
-    // Đặt ảnh ngay lập tức để tránh màn hình trống
     setLoadedImages(ensuredImages)
     setImagesLoaded(true)
-
-    // Reset về ảnh đầu tiên khi thay đổi màu
     setActiveIndex(0)
     carouselRef.current?.goTo(0)
   }, [images, selectedColor])
@@ -46,7 +39,6 @@ export default function ProductImages({ images, productName, discount, isNew, se
   }
 
   const handleImageError = (index: number) => {
-    console.log(`Error loading image at index ${index}`)
     const newImages = [...loadedImages]
     newImages[index] =
       "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
@@ -68,11 +60,26 @@ export default function ProductImages({ images, productName, discount, isNew, se
       <Carousel ref={carouselRef} autoplay={false} beforeChange={(_, next) => setActiveIndex(next)}>
         {loadedImages.map((img, index) => (
           <div key={index} className="relative h-96">
+            {/* Tag nằm trong ảnh hiện tại */}
+            {index === activeIndex && (
+              <div className="absolute top-2 left-2 z-10 flex gap-2">
+                {discount > 0 && (
+                  <Tag color="red" className="rounded px-2 py-1 text-xs shadow-sm">
+                    -{discount}%
+                  </Tag>
+                )}
+                {isNew && (
+                  <Tag color="green" className="rounded px-2 py-1 text-xs shadow-sm">
+                    Mới
+                  </Tag>
+                )}
+              </div>
+            )}
+
             <Image
               src={
                 img ||
-                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3" ||
-                "/placeholder.svg"
+                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
               }
               alt={`${productName} - ${selectedColor || "Default"} - Image ${index + 1}`}
               fill
@@ -85,7 +92,7 @@ export default function ProductImages({ images, productName, discount, isNew, se
         ))}
       </Carousel>
 
-      {/* Hiển thị thumbnail */}
+      {/* Thumbnail images */}
       <div className="flex justify-center mt-4 space-x-4">
         {loadedImages.map((img, index) => (
           <div
@@ -98,8 +105,7 @@ export default function ProductImages({ images, productName, discount, isNew, se
             <Image
               src={
                 img ||
-                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3" ||
-                "/placeholder.svg"
+                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
               }
               alt={`${selectedColor || "Default"} Thumbnail ${index + 1}`}
               fill
@@ -110,17 +116,6 @@ export default function ProductImages({ images, productName, discount, isNew, se
           </div>
         ))}
       </div>
-
-      {discount > 0 && (
-        <Tag color="red" className="absolute top-2 left-2">
-          -{discount}%
-        </Tag>
-      )}
-      {isNew && (
-        <Tag color="green" className="absolute top-2 right-2">
-          Mới
-        </Tag>
-      )}
     </Card>
   )
 }
