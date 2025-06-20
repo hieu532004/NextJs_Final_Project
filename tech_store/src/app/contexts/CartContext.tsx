@@ -90,6 +90,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [cart]);
 
+  useEffect(() => {
+    const syncCart = () => {
+      loadCartFromLocalStorage();
+    };
+    window.addEventListener('storage', syncCart);
+    return () => window.removeEventListener('storage', syncCart);
+  }, [loadCartFromLocalStorage]);
+
   const addToCart = (item: CartItem) => {
     const quantityToAdd = item.quantity > 0 ? item.quantity : 1;
 

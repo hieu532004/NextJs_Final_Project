@@ -13,6 +13,7 @@ import {
   PlusOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 
 // The CartItem interface should come from your CartContext definitions
 // but defined here for clarity if it's not globally accessible
@@ -37,6 +38,7 @@ const formatPrice = (price: number): string => {
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, loadCartFromLocalStorage, clearCart } =
     useCart();
+  const router = useRouter();
 
   // State for coupon code and discount percentage, as in the target layout
   const [couponCode, setCouponCode] = useState<string>("");
@@ -252,15 +254,16 @@ export default function CartPage() {
             </div>
             {/* Action buttons at the bottom of the product list */}
             <div className="p-4 flex justify-between">
-              <Link href="/" passHref>
+              {/* <Link href="/" passHref> */}
                 <Button
                   type="link"
                   className="flex items-center text-gray-600 hover:text-black"
-                  icon={<ShoppingOutlined/>} // Changed from ArrowLeft for Ant Design consistency
+                  icon={<ShoppingOutlined />}
+                  onClick={() => router.push("/")}
                 >
-                  <div className="text-base ">Tiếp tục mua sắm</div>
+                  <div className="text-base">Tiếp tục mua sắm</div>
                 </Button>
-              </Link>
+              {/* </Link> */}
 
               <Button
                 type="link"

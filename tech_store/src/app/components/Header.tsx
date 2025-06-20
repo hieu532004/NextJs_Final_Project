@@ -294,8 +294,7 @@ const Header: React.FC<HeaderProps> = ({
                           key: "0",
                           label: (
                             <Link href="/account">
-                              <UserOutlined className="mr-2" /> Tài khoản của
-                              tôi
+                              <UserOutlined className="mr-2" /> Tài khoản của tôi
                             </Link>
                           ),
                         },
