@@ -10,6 +10,7 @@ import {
 } from "@ant-design/icons";
 import { Product, Category } from "@/app/types";
 import AddToCart from './AddToCart';
+import "@ant-design/v5-patch-for-react-19";
 
 const { Option } = Select;
 
