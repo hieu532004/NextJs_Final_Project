@@ -26,7 +26,7 @@ export default async function Home() {
   const reviewsData = await fetchData<{ reviews: Review[] }>('/reviews');
 
   return (
-    <CartProvider>
+    
       <HomeClient
         categories={categoriesData.categories || []}
         featuredProducts={productsData.products || []}
@@ -35,6 +35,6 @@ export default async function Home() {
         reviews={reviewsData.reviews || []}
         initialCartCount={0} // Bỏ cartCount từ API, để HomeClient xử lý
       />
-    </CartProvider>
+    
   );
 }

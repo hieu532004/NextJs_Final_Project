@@ -18,6 +18,7 @@ export interface CartItem {
   image?: string;
   size?: string;
   color?: string;
+  slug?: string; // Thêm slug nếu cần thiết
 }
 
 // Kiểu dữ liệu cho context
@@ -88,6 +89,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       console.error('Lỗi khi lưu giỏ hàng:', error);
     }
   }, [cart]);
+
+  useEffect(() => {
+    const syncCart = () => {
+      loadCartFromLocalStorage();
+    };
+    window.addEventListener('storage', syncCart);
+    return () => window.removeEventListener('storage', syncCart);
+  }, [loadCartFromLocalStorage]);
 
   const addToCart = (item: CartItem) => {
     const quantityToAdd = item.quantity > 0 ? item.quantity : 1;

@@ -1,4 +1,3 @@
-
 import { FC, useEffect, useState } from "react";
 import Image from "next/image";
 
@@ -21,19 +20,19 @@ const OrderItem: FC<OrderItemProps> = ({ name, quantity, price, image }) => {
   return (
     <div className="flex items-center py-4 border-b">
       <div className="w-16 h-16 flex-shrink-0 relative">
-  <Image
-    src={image || "/placeholder.svg"} // Fallback if image is undefined
-    alt={name}
-    layout="fill"
-    style={{ objectFit: 'cover', objectPosition: 'top' }} // Replace object-cover and object-top
-    className="rounded-md" // Keep rounded corners
-  />
-</div>
+        <Image
+          src={image || "/placeholder.svg"} // Fallback if image is undefined
+          alt={name}
+          layout="fill"
+          style={{ objectFit: "cover", objectPosition: "top" }} // Replace object-cover and object-top
+          className="rounded-md" // Keep rounded corners
+        />
+      </div>
       <div className="ml-4 flex-grow">
         <h3 className="font-medium">{name}</h3>
         <p className="text-gray-500">SL: {quantity}</p>
       </div>
-      <div className="text-right">a
+      <div className="text-right">
         <p className="font-medium">{formattedPrice} VND</p>
       </div>
     </div>

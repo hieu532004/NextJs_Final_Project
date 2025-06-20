@@ -1,35 +1,32 @@
 "use client";
 
 import { Button, Card, Rate, Skeleton } from "antd";
-import { ShoppingCartOutlined, RightOutlined } from "@ant-design/icons";
+import { RightOutlined } from "@ant-design/icons";
 import { Product } from "@/app/types";
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "@/app/contexts/CartContext";
 import "@ant-design/v5-patch-for-react-19";
+import { useState } from "react";
+import LoginModal from "./LoginModal";
+import AddToCart from "./AddToCart";
 interface BestSellingProductsProps {
   products: Product[];
   loading?: boolean;
 }
-
 const BestSellingProducts: React.FC<BestSellingProductsProps> = ({
   products,
   loading = false,
 }) => {
-  const { addToCart } = useCart();
-
-  const handleAddToCart = (product: Product) => {
-    addToCart({
-      id: product._id,
-      name: product.name,
-      price: product.salePrice,
-      quantity: 1,
-      image: product.image,
-    });
-  };
-
+  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   return (
     <section className="container mx-auto px-4 py-12">
+      <LoginModal
+        isVisible={isLoginModalVisible}
+        onCancel={() => setIsLoginModalVisible(false)}
+        onShowRegister={() => {
+          /* handle show register modal here if needed */
+        }}
+      />
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-800 relative">
           Sản phẩm bán chạy
@@ -45,39 +42,46 @@ const BestSellingProducts: React.FC<BestSellingProductsProps> = ({
         </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {loading || products.length === 0
-  ? Array.from({ length: 4 }).map((_, index) => (
-      <Card
-        key={index}
-        className="border-none shadow-sm rounded-xl overflow-hidden h-full flex flex-col"
-      >
-        <Skeleton.Image style={{ width: "100%", height: 240 }} active />
+        {loading || products.length === 0
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <Card
+                key={index}
+                className="border-none shadow-sm rounded-xl overflow-hidden h-full flex flex-col"
+              >
+                <Skeleton.Image style={{ width: "100%", height: 240 }} active />
 
-        <div className="p-4 flex flex-col justify-between flex-1 space-y-3">
-          {/* Tên sản phẩm */}
-          <Skeleton.Input active style={{ width: "100%", height: 20 }} />
+                <div className="p-4 flex flex-col justify-between flex-1 space-y-3">
+                  {/* Tên sản phẩm */}
+                  <Skeleton.Input
+                    active
+                    style={{ width: "100%", height: 20 }}
+                  />
 
-          {/* Rating giả */}
-          <div className="flex space-x-1">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton.Button
-                key={i}
-                active
-                shape="circle"
-                style={{ width: 16, height: 16, padding: 0 }}
-              />
-            ))}
-          </div>
+                  {/* Rating giả */}
+                  <div className="flex space-x-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Skeleton.Button
+                        key={i}
+                        active
+                        shape="circle"
+                        style={{ width: 16, height: 16, padding: 0 }}
+                      />
+                    ))}
+                  </div>
 
-          {/* Giá */}
-          <Skeleton.Input active style={{ width: 100, height: 20 }} />
+                  {/* Giá */}
+                  <Skeleton.Input active style={{ width: 100, height: 20 }} />
 
-          {/* Nút thêm vào giỏ */}
-          <Skeleton.Button active block style={{ height: 40, marginTop: "auto" }} />
-        </div>
-      </Card>
-    ))
-    : ( // Hiển thị sản phẩm
+                  {/* Nút thêm vào giỏ */}
+                  <Skeleton.Button
+                    active
+                    block
+                    style={{ height: 40, marginTop: "auto" }}
+                  />
+                </div>
+              </Card>
+            ))
+          : // Hiển thị sản phẩm
             products.map((product) => (
               <Card
                 key={product._id}
@@ -130,17 +134,12 @@ const BestSellingProducts: React.FC<BestSellingProductsProps> = ({
                     )}
                   </div>
                 </div>
-                <Button
-                  type="primary"
-                  block
-                  icon={<ShoppingCartOutlined />}
-                  onClick={() => handleAddToCart(product)}
-                  className="bg-blue-600 hover:bg-blue-700 !rounded-button whitespace-nowrap"
-                >
-                  Thêm vào giỏ
-                </Button>
+
+                <div>
+                  <AddToCart product={product} />
+                </div>
               </Card>
-            )))}
+            ))}
       </div>
     </section>
   );
